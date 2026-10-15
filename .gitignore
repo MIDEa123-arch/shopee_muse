@@ -7,6 +7,15 @@ checkpoints/
 
 # Database & environment
 data/*.db
+data/*.db-shm
+data/*.db-wal
+data/*.sqlite*
+data/backups/
+.venv/
+.test-deps/
+.pytest_cache/
+test-results/
+playwright-report/
 __pycache__/
 *.pyc
 .env

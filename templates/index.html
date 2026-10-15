@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#ee4d2d"><meta name="description" content="Khám phá, mua sắm và trải nghiệm gợi ý cá nhân hóa cùng Shopee MUSE.">
+  <title>Shopee MUSE · Mua sắm đúng gu, ưu đãi mỗi ngày</title>
+  <link rel="icon" href="/static/images/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/css/style.css"><script defer src="/static/js/app.js"></script>
+</head>
+<body>
+  <div class="demo-strip" id="demo-strip" hidden><span>BẢN DEMO NGHIÊN CỨU</span> Trải nghiệm mua sắm tích hợp Alibaba MUSE · Ví và giao nhận được mô phỏng</div>
+  <header class="site-header">
+    <div class="container top-nav"><div class="top-links"><button data-action="about">Kênh người bán</button><i></i><button data-action="about">Trở thành người bán</button><i></i><button data-action="about">Tải ứng dụng</button><i></i><span>Kết nối</span><span class="social">f</span><span class="social">◎</span></div><div class="top-links"><button data-action="notifications"><span data-icon="bell"></span>Thông báo <b id="notice-count" hidden></b></button><button data-action="help"><span data-icon="help"></span>Hỗ trợ</button><span class="language">Tiếng Việt⌄</span><button id="account-nav" data-action="account"><span data-icon="user"></span>Đăng nhập</button></div></div>
+    <div class="container main-nav"><button class="brand" data-action="home" aria-label="Shopee MUSE trang chủ"><img src="/static/images/logo.svg" alt=""><span>Shopee<small>MUSE</small></span></button><div class="search-area"><form id="search-form" class="search-box"><input id="search" type="search" placeholder="Tìm sản phẩm, thương hiệu và điều bạn yêu thích" autocomplete="off" aria-label="Tìm kiếm sản phẩm"><button type="submit" aria-label="Tìm kiếm"><span data-icon="search"></span></button></form><div class="search-suggestions"><button data-search="tai nghe">Tai nghe không dây</button><button data-search="áo thun">Áo thun nam</button><button data-search="serum">Chăm sóc da</button><button data-search="giày">Giày sneaker</button><button data-search="gia dụng">Nhà cửa & Đời sống</button></div></div><button class="cart-trigger" data-action="cart" aria-label="Mở giỏ hàng"><span data-icon="cart"></span><b id="cart-count">0</b></button></div>
+  </header>
+  <div id="demo-toolbar" class="demo-toolbar" hidden><div class="container"><span class="demo-context"><span class="status-dot"></span>Không gian trải nghiệm</span><label class="profile-switch"><span data-icon="users"></span><select id="profile-switch" aria-label="Đổi hồ sơ demo"><option value="">Chọn hồ sơ mua sắm</option></select></label><label class="debug-toggle"><input type="checkbox" id="debug-toggle"><span class="switch"></span> MUSE Lab <span class="lab-label">AI INSIGHTS</span></label></div></div>
+  <aside id="debug-panel" class="debug-panel" hidden></aside>
+  <main id="app"><div class="container loading-screen"><div class="spinner"></div><p>Đang chuẩn bị trải nghiệm mua sắm của bạn…</p></div></main>
+  <footer><div class="container"><div class="footer-brand"><strong>Shopee<span>MUSE</span></strong><p>Mua sắm đúng gu. Khám phá mỗi ngày.</p></div><div><strong>CHĂM SÓC KHÁCH HÀNG</strong><button data-action="help">Trung tâm hỗ trợ</button><button data-action="orders">Theo dõi đơn hàng</button><button data-action="addresses">Địa chỉ nhận hàng</button></div><div><strong>TRẢI NGHIỆM CỦA BẠN</strong><button data-action="vouchers">Kho voucher</button><button data-action="wishlist">Sản phẩm yêu thích</button><button data-action="account">Tài khoản của tôi</button></div><div><strong>CÔNG NGHỆ GỢI Ý</strong><p>Alibaba MUSE</p><p>Multimodal · Lifelong interest</p><a href="https://arxiv.org/abs/2512.07216" target="_blank" rel="noopener">Tìm hiểu nghiên cứu ↗</a></div></div><div class="footer-bottom container">© 2026 Shopee MUSE · Đồ án nghiên cứu độc lập, không liên kết với Shopee.<span>Hình ảnh, thông tin thương mại và ưu đãi phục vụ minh họa.</span></div></footer>
+  <nav class="mobile-nav" aria-label="Điều hướng di động"><button data-action="home"><span data-icon="home"></span>Trang chủ</button><button data-action="wishlist"><span data-icon="heart"></span>Yêu thích</button><button data-action="cart"><span data-icon="cart"></span>Giỏ hàng</button><button data-action="account"><span data-icon="user"></span>Tôi</button></nav>
+  <dialog id="modal" aria-labelledby="modal-title"><div id="modal-content"></div></dialog>
+  <div id="toasts" class="toasts" role="status" aria-live="polite"></div>
+</body></html>

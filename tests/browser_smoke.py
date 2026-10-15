@@ -1,0 +1,82 @@
+"""Run against a server using an ISOLATED demo DB: python tests/browser_smoke.py."""
+import json
+import os
+from pathlib import Path
+from playwright.sync_api import sync_playwright
+
+base=os.getenv('TEST_BASE_URL','http://127.0.0.1:8011')
+output=Path(os.getenv('TEST_SCREENSHOT_DIR','/tmp/shopee-muse-preview'))
+output.mkdir(parents=True,exist_ok=True)
+
+with sync_playwright() as p:
+    browser=p.chromium.launch(headless=True,args=['--no-sandbox'])
+    page=browser.new_page(viewport={'width':1440,'height':1050},device_scale_factor=1)
+    errors=[]
+    page.on('pageerror',lambda error:errors.append(str(error)))
+    page.goto(base,wait_until='domcontentloaded')
+    page.locator('#home-products .product-card').first.wait_for()
+    page.screenshot(path=str(output/'desktop-home.png'),full_page=True)
+    assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'),'Desktop horizontal overflow'
+    page.select_option('#profile-switch','1')
+    page.locator('#home-products .product-card').first.wait_for()
+    page.locator('.debug-toggle').click()
+    page.locator('#debug-panel').get_by_text('CHECKPOINT LOADED').wait_for()
+    page.locator('#home-products .product-score').first.wait_for()
+    page.screenshot(path=str(output/'muse-lab.png'),full_page=True)
+    page.locator('#home-products .product-card-main').first.click()
+    page.locator('#modal .detail-title').wait_for()
+    page.locator('#modal [data-action="add-product"]').click()
+    page.get_by_text('Đã thêm sản phẩm vào giỏ hàng.',exact=True).wait_for()
+    page.locator('#modal [data-action="close-modal"]').click()
+    page.locator('.cart-trigger').click()
+    page.locator('.cart-line').first.wait_for()
+    page.locator('#app [data-action="checkout"]').click()
+    page.locator('#place-order:not([disabled])').wait_for()
+    page.screenshot(path=str(output/'checkout.png'),full_page=True)
+    page.locator('#place-order').click()
+    page.get_by_text('Đặt hàng thành công!',exact=True).wait_for()
+    page.locator('#app [data-action="orders"]').click()
+    page.locator('.order-card').first.wait_for()
+    page.locator('[data-action="cancel-order"]').first.click()
+    page.locator('#modal [data-action="confirm-cancel-order"]').click()
+    page.get_by_text('Đã hủy đơn và hoàn lại quyền lợi.',exact=True).wait_for()
+    page.locator('[data-action="home"]').first.click()
+    page.locator('#home-products .product-card').first.wait_for()
+    page.fill('#search','tai nghe')
+    page.locator('#search-form button').click()
+    page.locator('#catalog-products .product-card').first.wait_for()
+    assert 'tai nghe' in page.locator('.page-title').inner_text().lower()
+    page.screenshot(path=str(output/'search.png'),full_page=True)
+    page.select_option('#price-sort','price_asc')
+    page.wait_for_url('**sort=price_asc*')
+    page.locator('#catalog-products .product-card').first.wait_for()
+    page.goto(base+'/#/account',wait_until='domcontentloaded')
+    page.locator('#profile-form').wait_for()
+    assert page.locator('#profile-avatar option').count()==9
+    page.goto(base+'/#/addresses',wait_until='domcontentloaded')
+    page.locator('#app [data-action="new-address"]').first.click()
+    page.fill('#address-name','Người nhận kiểm thử giao diện')
+    page.fill('#address-phone','0912345678')
+    page.select_option('#address-province','34')
+    page.fill('#address-detail','123 Đường kiểm thử, Phường thử nghiệm')
+    page.locator('#address-form button[type="submit"]').click()
+    page.get_by_text('Đã lưu địa chỉ nhận hàng.',exact=True).wait_for()
+    page.get_by_text('Người nhận kiểm thử giao diện',exact=False).first.wait_for()
+    page.set_viewport_size({'width':390,'height':844})
+    page.locator('[data-action="home"]').first.click()
+    page.locator('#home-products .product-card').first.wait_for()
+    if page.is_checked('#debug-toggle'):
+        page.locator('.debug-toggle').click()
+        page.locator('#debug-panel').wait_for(state='hidden')
+        page.locator('#home-products .product-score').first.wait_for(state='hidden')
+    page.locator('#toasts .toast').last.wait_for(state='hidden')
+    assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'),'Mobile horizontal overflow'
+    page.screenshot(path=str(output/'mobile-home.png'),full_page=True)
+    page.screenshot(path=str(output/'mobile-viewport.png'),full_page=False)
+    page.locator('#home-products .product-card-main').first.click()
+    page.locator('#modal .detail-title').wait_for()
+    assert page.evaluate("document.querySelector('#modal').scrollWidth<=document.querySelector('#modal').clientWidth"),'Modal horizontal overflow'
+    page.screenshot(path=str(output/'mobile-product.png'),full_page=True)
+    assert not errors,errors
+    print(json.dumps({'status':'passed','screenshots':str(output),'javascript_errors':errors,'flows':['guest home','profile switch','real MUSE Lab','product detail','add to cart','checkout','order','cancel/refund','search','price sort','account avatars','address form','mobile home','mobile product']},ensure_ascii=False))
+    browser.close()
