@@ -1,0 +1,14 @@
+# Model checkpoints (heavy files > 100MB)
+checkpoints/
+*.ckpt
+*.pt
+*.pth
+*.bin
+
+# Database & environment
+data/*.db
+__pycache__/
+*.pyc
+.env
+demo_env/
+venv/
