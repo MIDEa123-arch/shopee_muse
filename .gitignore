@@ -6,17 +6,20 @@ checkpoints/
 *.bin
 
 # Database & environment
-/data/
+/data/*
+!data/cloud_catalog.db
 *.db
+!data/cloud_catalog.db
 *.db-shm
 *.db-wal
 *.sqlite
 *.sqlite3
-data/*.db
+data/shopee_muse.db
 data/*.db-shm
 data/*.db-wal
 data/*.sqlite*
 data/backups/
+!data/cloud_catalog.db
 .venv/
 .test-deps/
 .pytest_cache/

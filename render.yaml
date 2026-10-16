@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: shopee-muse-backend
+    runtime: python
+    region: singapore
+    plan: free
+    buildCommand: "pip install --upgrade pip && pip install torch --index-url https://download.pytorch.org/whl/cpu && pip install -r requirements.txt && python scripts/init_cloud_db.py"
+    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: DEMO_MODE
+        value: "true"
+      - key: DATABASE_PATH
+        value: "data/shopee_muse.db"
+      - key: ALLOWED_ORIGINS
+        value: "*"

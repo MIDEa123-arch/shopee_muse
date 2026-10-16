@@ -46,18 +46,48 @@ async def invalid_input(request,exception):
     return JSONResponse({'detail':messages.get(field,'Thông tin chưa hợp lệ. Vui lòng kiểm tra lại các trường đã nhập.')},status_code=422)
 
 
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origin_regex=r"https://.*\.vercel\.app|https://.*\.onrender\.com|https://.*\.hf\.space|http://localhost:.*|http://127\.0\.0\.1:.*",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 @app.middleware('http')
 async def security_headers(request:Request,call_next):
     start=time.perf_counter()
     if request.method not in ('GET','HEAD','OPTIONS'):
         origin=request.headers.get('origin')
-        if request.headers.get('sec-fetch-site')=='cross-site' or (origin and urlsplit(origin).netloc!=request.headers.get('host')):
-            return JSONResponse({'detail':'Nguồn yêu cầu không hợp lệ.'},status_code=403)
+        if origin:
+            netloc = urlsplit(origin).netloc
+            host = request.headers.get('host')
+            is_allowed = (
+                netloc == host
+                or 'vercel.app' in netloc
+                or 'onrender.com' in netloc
+                or 'hf.space' in netloc
+                or 'localhost' in netloc
+                or '127.0.0.1' in netloc
+                or config.DEMO_MODE
+            )
+            if not is_allowed:
+                return JSONResponse({'detail':'Nguồn yêu cầu không hợp lệ.'},status_code=403)
     response=await call_next(request)
     response.headers['X-Content-Type-Options']='nosniff'
-    response.headers['X-Frame-Options']='DENY'
+    host = request.headers.get('host', '')
+    if 'hf.space' not in host:
+        response.headers['X-Frame-Options']='SAMEORIGIN'
     response.headers['Referrer-Policy']='strict-origin-when-cross-origin'
-    response.headers['Content-Security-Policy']="default-src 'self'; script-src 'self'; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self' https://salt.tikicdn.com https://*.tikicdn.com https://m.media-amazon.com https://images.unsplash.com data:; connect-src 'self'; font-src 'self'; frame-ancestors 'none'; form-action 'self'; base-uri 'self'"
+    response.headers['Content-Security-Policy']=(
+        "default-src 'self'; script-src 'self'; style-src 'self'; style-src-attr 'unsafe-inline'; "
+        "img-src 'self' https://salt.tikicdn.com https://*.tikicdn.com https://m.media-amazon.com https://images.unsplash.com data:; "
+        "connect-src 'self' https://*.onrender.com https://*.vercel.app https://*.hf.space; "
+        "font-src 'self'; frame-ancestors 'self' https://huggingface.co https://*.hf.space; form-action 'self'; base-uri 'self'"
+    )
     response.headers['Server-Timing']=f'app;dur={(time.perf_counter()-start)*1000:.2f}'
     if request.url.path.startswith('/api/') and not request.url.path.startswith('/api/item-art/'):
         response.headers['Cache-Control']='no-store'
