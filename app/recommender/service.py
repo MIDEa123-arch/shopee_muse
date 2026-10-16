@@ -143,17 +143,17 @@ def apply_customer_intent(ranked, signals):
 
 
 COMPLEMENTARY_MAP = {
-    1: [1, 2, 8, 9],  # Điện tử -> Phụ kiện điện tử, Âm thanh, Balo/Phụ kiện, Điện thoại
-    2: [2, 1, 9, 8],  # Âm thanh -> Điện tử, Điện thoại, Phụ kiện
-    3: [3, 5, 8],     # Thời trang nam -> Quần/Áo nam, Giày dép, Phụ kiện (đồng hồ, ví)
-    4: [4, 5, 7, 8],  # Thời trang nữ -> Đầm/Váy/Áo nữ, Giày cao gót, Mỹ phẩm, Phụ kiện
-    5: [5, 11, 3, 8], # Giày dép -> Thể thao, Giày dép, Phụ kiện
-    6: [6, 8],        # Gia dụng thông minh -> Đồ gia dụng khác, Phụ kiện nhà cửa
-    7: [7, 4, 8],     # Mỹ phẩm -> Các bước skincare khác, Thời trang nữ, Phụ kiện
-    8: [8, 3, 4, 1],  # Phụ kiện -> Thời trang, Công nghệ
-    9: [9, 2, 1, 8],  # Điện thoại & Tablet -> Âm thanh/Tai nghe, Phụ kiện điện tử
-    10: [10, 6, 11],  # Đồ chơi & Trẻ Em -> Đồ chơi, Gia dụng, Dã ngoại
-    11: [11, 5, 8],   # Thể thao & Dã ngoại -> Thể thao, Giày dép, Trang phục
+    1: [2, 9, 8, 6, 1],   # Thiết Bị Điện Tử & Công Nghệ -> Âm Thanh, Điện Thoại, Đồng Hồ, Gia Dụng
+    2: [1, 9, 8, 5, 2],   # Âm Thanh & Tai Nghe -> Điện Tử, Điện Thoại, Đồng Hồ, Sneaker
+    3: [5, 8, 11, 1, 3],  # Thời Trang Nam -> Giày Dép, Đồng Hồ, Thể Thao, Điện Tử
+    4: [7, 8, 5, 6, 4],   # Thời Trang Nữ -> Mỹ Phẩm, Đồng Hồ/Trang Sức, Giày Dép, Gia Dụng
+    5: [3, 4, 11, 8, 5],  # Giày Dép & Sneaker -> Thời Trang Nam/Nữ, Thể Thao, Đồng Hồ
+    6: [1, 10, 8, 2, 6],  # Đồ Gia Dụng Thông Minh -> Điện Tử, Đồ Chơi/Mẹ Bé, Đồng Hồ, Âm Thanh
+    7: [4, 8, 6, 2, 7],   # Mỹ Phẩm & Sắc Đẹp -> Thời Trang Nữ, Đồng Hồ/Trang Sức, Gia Dụng
+    8: [3, 4, 9, 1, 8],   # Đồng Hồ & Trang Sức -> Thời Trang Nam/Nữ, Điện Thoại, Điện Tử
+    9: [2, 1, 8, 6, 9],   # Điện Thoại & Máy Tính Bảng -> Âm Thanh, Điện Tử, Đồng Hồ, Gia Dụng
+    10: [6, 4, 11, 7, 10], # Đồ Chơi & Trẻ Em -> Gia Dụng, Thời Trang Nữ, Thể Thao, Mỹ Phẩm
+    11: [5, 2, 3, 8, 11], # Thể Thao & Dã Ngoại -> Giày Dép, Âm Thanh/Tai Nghe, Thời Trang, Đồng Hồ
 }
 
 CATEGORY_COMPLEMENTS = {
@@ -434,338 +434,406 @@ class RecommendationService:
                     candidate.pop(key,None)
         return candidates
 
-    def recommend(self,user_id=None,touchpoint='home',product_id=None,limit=24,category_id=None,display_category='',presentation_policy='original',focus_product_id=None,*,write_logs=True,order_id=None):
+    def multicriteria_rank(self, products, user=None, target=None, touchpoint='home', cart=None,
+                           signals=None, ai_scores=None, user_price=None, limit=24):
+        scored = []
+        u_gender = user.get('gender') if user else None
+        u_prov = user.get('province_id') if user else None
+        u_tier = user.get('member_tier') if user else None
+
+        target_price = target['price'] if target else 500000
+        target_cid = target['category_id'] if target else None
+        target_kind = product_kind(target['name']) if target else None
+        target_tokens = set(re.findall(r'\w+', target['name'].lower())) if target else set()
+
+        comp_cats = set(COMPLEMENTARY_MAP.get(target_cid, [target_cid])) if target_cid else set()
+        cart_cids = {i['category_id'] for i in (cart or []) if i.get('category_id')}
+        cart_shops = {i['shop_name'] for i in (cart or []) if i.get('shop_name')}
+        for cc in list(cart_cids):
+            comp_cats.update(COMPLEMENTARY_MAP.get(cc, []))
+
+        intent_cats = Counter()
+        intent_kinds = Counter()
+        for idx, s in enumerate(signals or []):
+            w = {'purchase': 5.0, 'add_to_cart': 4.0, 'favorite': 3.0, 'click': 1.5, 'demo_interest': 3.5}.get(s.get('action_type'), 1.0) * (0.86**idx)
+            if s.get('category_id'): intent_cats[s['category_id']] += w
+            k = product_kind(s.get('product_name') or '')
+            if k: intent_kinds[k] += w
+
+        max_intent_cat = max(intent_cats.values(), default=1.0)
+        max_intent_kind = max(intent_kinds.values(), default=1.0)
+
+        for p in products:
+            raw_id = p.get('raw_item_id')
+            price = max(1, p.get('price', 0))
+            cid = p.get('category_id')
+            p_kind = product_kind(p.get('name', ''))
+
+            # 1. AI Model Score (0.28)
+            s_ai = 0.50
+            if ai_scores and raw_id in ai_scores:
+                val = ai_scores[raw_id]
+                if touchpoint in ('similar', 'complementary'):
+                    s_ai = max(0.0, min(1.0, (val + 0.3) / 1.3))
+                else:
+                    s_ai = max(0.0, min(1.0, val / 0.30))
+            else:
+                s_ai = min(1.0, math.log(1 + p.get('sold_count', 0)) / 10.0) * 0.50
+
+            # 2. Context & Intent Relevance (0.28)
+            s_ctx = 0.30
+            reason = 'Gợi ý phù hợp dành cho bạn'
+
+            if touchpoint == 'similar' and target:
+                if cid == target_cid: s_ctx += 0.25
+                if target_kind and p_kind == target_kind:
+                    s_ctx += 0.35
+                    reason = f'Cùng dòng {target_kind.title()} · Giá tương đương'
+                else:
+                    reason = 'Cùng danh mục · Mẫu bán chạy'
+                price_ratio = abs(math.log(price / target_price))
+                s_ctx += max(0.0, 0.20 * math.exp(-0.5 * (price_ratio / 0.69)**2))
+                p_tokens = set(re.findall(r'\w+', p['name'].lower()))
+                overlap = len(target_tokens & p_tokens) / max(1, len(target_tokens))
+                s_ctx += min(0.20, overlap * 0.40)
+
+            elif touchpoint == 'complementary' and target:
+                if cid in comp_cats and cid != target_cid:
+                    s_ctx += 0.35
+                    reason = f'Phụ kiện hoàn hảo cho {target["name"][:25]}…'
+                elif cid in comp_cats:
+                    s_ctx += 0.15
+                    reason = f'Mua kèm tiện lợi cùng {target["name"][:25]}…'
+                if 0.05 * target_price <= price <= 1.2 * target_price:
+                    s_ctx += 0.25
+                p_lower = p['name'].lower()
+                if any(k in p_lower for k in ('sạc', 'cáp', 'ốp', 'bao', 'túi', 'pin', 'tai nghe', 'kính', 'dây', 'lót', 'vớ', 'thảm', 'bình', 'chảo', 'dao', 'hộp')):
+                    s_ctx += 0.15
+                if target_kind and p_kind == target_kind:
+                    s_ctx -= 0.25
+
+            elif touchpoint == 'cart':
+                if cart and p.get('shop_name') in cart_shops:
+                    s_ctx += 0.30
+                    reason = f'Cùng shop {p.get("shop_name", "")} · Gom đơn Freeship'
+                elif cart and cid in comp_cats:
+                    s_ctx += 0.25
+                    reason = 'Phụ kiện bổ trợ cho sản phẩm trong giỏ'
+                elif intent_cats and cid in intent_cats:
+                    s_ctx += 0.25 * (intent_cats[cid] / max_intent_cat)
+                    reason = 'Sản phẩm theo sở thích quan tâm gần đây'
+                else:
+                    s_ctx += 0.15
+                    reason = 'Sản phẩm giá tốt mua kèm giỏ hàng'
+                if price <= 350000: s_ctx += 0.15
+
+            elif touchpoint == 'home':
+                if intent_kinds and p_kind in intent_kinds:
+                    s_ctx += 0.35 * (intent_kinds[p_kind] / max_intent_kind)
+                    reason = f'Gợi ý theo sở thích {p_kind.title()}'
+                elif intent_cats and cid in intent_cats:
+                    s_ctx += 0.25 * (intent_cats[cid] / max_intent_cat)
+                    reason = 'Hợp với hoạt động quan tâm gần đây'
+                else:
+                    s_ctx += 0.15
+                    reason = 'Gợi ý thịnh hành hôm nay'
+
+            # 3. User Demographics & Spending Tier (0.16)
+            s_user = 0.50
+            if u_gender == 'Nam':
+                if cid == 3: s_user += 0.20
+                elif cid in (1, 2, 11): s_user += 0.10
+                elif cid in (4, 7): s_user -= 0.20
+            elif u_gender == 'Nữ':
+                if cid in (4, 7): s_user += 0.20
+                elif cid in (8, 10): s_user += 0.10
+                elif cid == 3: s_user -= 0.20
+
+            if user_price and user_price.get('tier') != 'all':
+                if user_price['min_price'] <= price <= user_price['max_price']:
+                    s_user += 0.18
+
+            if u_prov and p.get('province_id') == u_prov:
+                s_user += 0.15
+
+            if u_tier in ('Kim Cương', 'Vàng') and p.get('is_mall'):
+                s_user += 0.10
+
+            # 4. Product Quality & Proof (0.16)
+            star = max(0.0, (p.get('rating_star', 4.5) - 3.0) / 2.0)
+            sold = min(1.0, math.log(1 + p.get('sold_count', 0)) / 10.0)
+            disc = min(1.0, p.get('discount_percent', 0) / 50.0)
+            s_qual = 0.40 * star + 0.35 * sold + 0.25 * disc
+
+            # 5. Merchant & Logistics (0.12)
+            s_merch = (0.14 if p.get('is_mall') else 0.0) + (0.08 if p.get('is_freeship') else 0.0)
+
+            jitter = random.uniform(-0.03, 0.03)
+
+            final_score = 0.28 * s_ai + 0.28 * s_ctx + 0.16 * s_user + 0.16 * s_qual + 0.12 * s_merch + jitter
+            p['recommendation_reason'] = reason
+            p['ranking_score'] = round(final_score, 5)
+            scored.append((p, final_score))
+
+        scored.sort(key=lambda x: x[1], reverse=True)
+        return [p for p, _ in scored]
+
+    def recommend(self, user_id=None, touchpoint='home', product_id=None, limit=24, category_id=None,
+                  display_category='', presentation_policy='original', focus_product_id=None, *,
+                  write_logs=True, order_id=None):
+        from app.recommender.commerce import user_price_affinity
+        start = time.perf_counter()
         with connection() as db:
-            cinfo=catalog_info(db)
-            native=cinfo['mode']==MODE
-            retail=cinfo['mode'] in ('vietnam_tiki_v1','amazon_reviews_2023_v1')
-        if retail:
-            from .retail import recommend as retail_recommend
-            return retail_recommend(self,user_id,touchpoint,product_id,limit,category_id,order_id=order_id,write_logs=write_logs)
-        if native:
-            return native_ranking.recommend(self,user_id,touchpoint,product_id,limit,category_id,display_category=display_category,presentation_policy=presentation_policy,focus_product_id=focus_product_id,write_logs=write_logs)
-        start=time.perf_counter()
-        with connection() as db:
-            target=db.execute('SELECT * FROM products WHERE id=?',(product_id,)).fetchone() if touchpoint in ('similar','complementary') else None
-            cart=cart_rows(db,user_id) if user_id else []
-            purchases=purchase_context(db,user_id) if retail else {'keys':set(),'recent_kinds':set(),'items':[]}
-            purchased_ids={p['id'] for p in purchases['items']}
-            signals=[dict(r) for r in db.execute('''SELECT h.action_type,p.category_id,c.name category_name,p.id product_id,p.name product_name,p.price product_price
+            user = dict(db.execute('SELECT * FROM users WHERE id=?', (user_id,)).fetchone()) if user_id else {}
+            u_price = user_price_affinity(db, user_id) if user_id else None
+            effective_product_id = product_id or focus_product_id
+            target = dict(db.execute('''SELECT p.*, pr.name province_name FROM products p
+                LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.id=?''', (effective_product_id,)).fetchone()) if effective_product_id else None
+            cart = cart_rows(db, user_id) if user_id else []
+            signals = [dict(r) for r in db.execute('''SELECT h.action_type, p.category_id, c.name category_name, p.id product_id, p.name product_name, p.price product_price
                 FROM user_behavior_history h JOIN products p ON p.id=h.product_id
                 JOIN categories c ON c.id=p.category_id
                 WHERE h.user_id=? AND h.action_type IN ('demo_interest','click','add_to_cart','purchase','favorite')
-                ORDER BY h.id DESC LIMIT 16''',(user_id,))] if user_id else []
-            if retail:
-                signals=[s for s in signals if s['action_type']!='purchase' or s['product_id'] in purchased_ids]
-            is_million = cinfo.get('mode') in ('amazon_reviews_2023_v1', 'vietnam_tiki_v1') or bool(db.execute("SELECT 1 FROM products WHERE id > 1000 LIMIT 1").fetchone())
-            if is_million:
+                ORDER BY h.id DESC LIMIT 24''', (user_id,))] if user_id else []
+
+            # 1. Broad Multi-Channel Candidate Retrieval
+            products = []
+            seen_p = {target['id']} if target else set()
+
+            if touchpoint == 'similar':
+                if not target:
+                    raise HTTPException(404, 'Sản phẩm không tồn tại.')
+                cid = target['category_id']
+                # Same category candidates (up to 120)
+                for r in db.execute('''SELECT p.*, pr.name province_name FROM products p
+                    LEFT JOIN provinces pr ON pr.id=p.province_id
+                    WHERE p.category_id=? AND p.stock>0 AND p.id!=?
+                    ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 120''', (cid, target['id'])):
+                    d = dict(r)
+                    if d['id'] not in seen_p:
+                        seen_p.add(d['id'])
+                        products.append(d)
+                # Complementary categories for diversity (up to 60)
+                for cc in COMPLEMENTARY_MAP.get(cid, [cid])[:3]:
+                    if cc == cid: continue
+                    for r in db.execute('''SELECT p.*, pr.name province_name FROM products p
+                        LEFT JOIN provinces pr ON pr.id=p.province_id
+                        WHERE p.category_id=? AND p.stock>0 AND p.id!=?
+                        ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 25''', (cc, target['id'])):
+                        d = dict(r)
+                        if d['id'] not in seen_p:
+                            seen_p.add(d['id'])
+                            products.append(d)
+
+            elif touchpoint == 'complementary':
+                if not target:
+                    raise HTTPException(404, 'Sản phẩm không tồn tại.')
+                cid = target['category_id']
+                ordered_cids = [c for c in COMPLEMENTARY_MAP.get(cid, [cid]) if c != cid] + [cid]
+                for cc in ordered_cids[:5]:
+                    for r in db.execute('''SELECT p.*, pr.name province_name FROM products p
+                        LEFT JOIN provinces pr ON pr.id=p.province_id
+                        WHERE p.category_id=? AND p.stock>0 AND p.id!=?
+                        ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 45''', (cc, target['id'])):
+                        d = dict(r)
+                        if d['id'] not in seen_p:
+                            seen_p.add(d['id'])
+                            products.append(d)
+
+            elif touchpoint == 'cart':
+                cart_cids = list(dict.fromkeys(i['category_id'] for i in cart if i.get('category_id')))
+                cart_shops = list({i['shop_name'] for i in cart if i.get('shop_name')})
+                comp_cids = []
+                for cc in cart_cids:
+                    for c in COMPLEMENTARY_MAP.get(cc, [cc]):
+                        if c not in comp_cids: comp_cids.append(c)
+                if not comp_cids:
+                    comp_cids = list(range(1, 12))
+                for cc in comp_cids[:6]:
+                    for r in db.execute('''SELECT p.*, pr.name province_name FROM products p
+                        LEFT JOIN provinces pr ON pr.id=p.province_id
+                        WHERE p.category_id=? AND p.stock>0
+                        ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 35''', (cc,)):
+                        d = dict(r)
+                        if d['id'] not in seen_p:
+                            seen_p.add(d['id'])
+                            products.append(d)
+                if cart_shops:
+                    placeholders = ','.join('?' for _ in cart_shops[:4])
+                    for r in db.execute(f'''SELECT p.*, pr.name province_name FROM products p
+                        LEFT JOIN provinces pr ON pr.id=p.province_id
+                        WHERE p.shop_name IN ({placeholders}) AND p.stock>0
+                        ORDER BY p.rating_star DESC, p.sold_count DESC LIMIT 30''', cart_shops[:4]):
+                        d = dict(r)
+                        if d['id'] not in seen_p:
+                            seen_p.add(d['id'])
+                            products.append(d)
+
+            elif touchpoint in ('orders', 'post_purchase'):
+                order_cids = []
+                if order_id:
+                    order_items = db.execute('SELECT product_id FROM order_items WHERE order_id=?', (order_id,)).fetchall()
+                    for oi in order_items:
+                        op = db.execute('SELECT category_id FROM products WHERE id=?', (oi[0],)).fetchone()
+                        if op and op[0]: order_cids.append(op[0])
+                if not order_cids and target:
+                    order_cids = [target['category_id']]
+                if not order_cids:
+                    order_cids = [1, 2, 3, 4, 6]
+                for cc in order_cids[:4]:
+                    for comp_c in COMPLEMENTARY_MAP.get(cc, [cc])[:3]:
+                        for r in db.execute('''SELECT p.*, pr.name province_name FROM products p
+                            LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.category_id=? AND p.stock>0
+                            ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 40''', (comp_c,)):
+                            d = dict(r)
+                            if d['id'] not in seen_p:
+                                seen_p.add(d['id'])
+                                products.append(d)
+
+            else:  # 'home', 'deals', or category browsing
                 if category_id is not None:
-                    products=[dict(r) for r in db.execute('''SELECT p.*,pr.name province_name FROM products p
+                    products = [dict(r) for r in db.execute('''SELECT p.*, pr.name province_name FROM products p
                         LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.category_id=? AND p.stock>0
                         ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 240''', (category_id,))]
-                elif target and touchpoint == 'similar':
-                    products=[dict(r) for r in db.execute('''SELECT p.*,pr.name province_name FROM products p
-                        LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.category_id=? AND p.stock>0
-                        ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 240''', (target['category_id'],))]
-                elif target and touchpoint == 'complementary':
-                    # Product-detail add-ons come only from the target's curated
-                    # merchandise neighbourhood. Unrelated recent activity must
-                    # never leak into this placement.
-                    pool_cats = list(dict.fromkeys(
-                        COMPLEMENTARY_MAP.get(target['category_id'], [target['category_id']])
-                    ))
-                    products = []
-                    seen_p = set()
-                    for cid in pool_cats[:4]:
-                        for r in db.execute('''SELECT p.*,pr.name province_name FROM products p
-                            LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.category_id=? AND p.id <= 50000 AND p.stock>0
-                            ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 60''', (cid,)):
-                            if r['id'] not in seen_p:
-                                seen_p.add(r['id'])
-                                products.append(dict(r))
-                elif touchpoint == 'cart' and cart:
-                    products = []
-                    seen_p = set()
-                    cart_cats = list(dict.fromkeys(i['category_id'] for i in cart if i.get('category_id')))
-                    comp_cats = []
-                    for cart_cat in cart_cats:
-                        for cid in COMPLEMENTARY_MAP.get(cart_cat, [cart_cat]):
-                            if cid not in comp_cats:
-                                comp_cats.append(cid)
-                    for cid in comp_cats[:8]:
-                        for r in db.execute('''SELECT p.*,pr.name province_name FROM products p
-                            LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.category_id=? AND p.id <= 50000 AND p.stock>0
-                            ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 50''', (cid,)):
-                            if r['id'] not in seen_p:
-                                seen_p.add(r['id'])
-                                products.append(dict(r))
                 else:
-                    # Multi-Channel Recall: Top Global Popular + Top User Intent Categories & Kinds
-                    products=[dict(r) for r in db.execute('''SELECT p.*,pr.name province_name FROM products p
+                    # Multi-channel recall
+                    products = [dict(r) for r in db.execute('''SELECT p.*, pr.name province_name FROM products p
                         LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.stock>0
-                        ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 160''')]
+                        ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 120''')]
                     seen_p = {p['id'] for p in products}
                     intent_cats = list(dict.fromkeys(s['category_id'] for s in signals[:6]))
-                    for owned in purchases['items'][:4]:
-                        if owned.get('recent_purchase'):
-                            for cid in COMPLEMENTARY_MAP.get(owned['category_id'],[]):
-                                if cid not in intent_cats:intent_cats.append(cid)
-                    for cid in intent_cats[:6]:
-                        for r in db.execute('''SELECT p.*,pr.name province_name FROM products p
+                    for cid in intent_cats[:4]:
+                        for r in db.execute('''SELECT p.*, pr.name province_name FROM products p
                             LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.category_id=? AND p.stock>0
-                            ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 140''', (cid,)):
-                            if r['id'] not in seen_p:
-                                seen_p.add(r['id'])
-                                products.append(dict(r))
+                            ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 50''', (cid,)):
+                            d = dict(r)
+                            if d['id'] not in seen_p:
+                                seen_p.add(d['id'])
+                                products.append(d)
                     intent_kinds = [product_kind(s.get('product_name') or '') for s in signals[:4] if product_kind(s.get('product_name') or '')]
                     for kind in list(dict.fromkeys(intent_kinds))[:2]:
-                        for r in db.execute('''SELECT p.*,pr.name province_name FROM products p
-                            LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.id<=50000 AND p.name LIKE ? AND p.stock>0
-                            ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 80''', (f'%{kind}%',)):
-                            if r['id'] not in seen_p:
-                                seen_p.add(r['id'])
-                                products.append(dict(r))
-            else:
-                if category_id is not None:
-                    products=[dict(r) for r in db.execute('''SELECT p.*,pr.name province_name FROM products p
-                        LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.stock>0 AND p.category_id=? ORDER BY p.id''', (category_id,))]
-                elif target and touchpoint in ('similar','complementary'):
-                    products=[dict(r) for r in db.execute('''SELECT p.*,pr.name province_name FROM products p
-                        LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.stock>0 AND p.category_id=? ORDER BY p.id''', (target['category_id'],))]
-                elif touchpoint == 'cart' and cart:
-                    shop_names = list({i['shop_name'] for i in cart if i.get('shop_name')})
-                    if shop_names:
-                        placeholders = ','.join('?' for _ in shop_names)
-                        products=[dict(r) for r in db.execute(f'''SELECT p.*,pr.name province_name FROM products p
-                            LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.stock>0 AND p.shop_name IN ({placeholders}) ORDER BY p.id''', shop_names)]
-                    else:
-                        products=[]
-                else:
-                    products=[dict(r) for r in db.execute('''SELECT p.*,pr.name province_name FROM products p
-                        LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.stock>0 ORDER BY p.id''')]
-        if touchpoint in ('similar','complementary') and not target:
-            raise HTTPException(404,'Sản phẩm không tồn tại.')
-        if touchpoint=='cart' and not cart:
-            products=[]
-        model=self.model;metadata={};strategy='popular';engine='Catalog fallback';metric='popularity'
-        if model:
-            model.items.register_products(products)
-            if target:
-                model.items.register_products([dict(target)])
-        # Expanded imported histories contain automatically assembled demo names
-        # with incompatible specs. Recommend from the original coherent title set;
-        # retain all products, raw IDs and histories in the database.
-        if config.DEMO_MODE:
-            curated=[p for p in products if p.get('catalog_source') in ('amazon-2023', 'tiki-vn') or (p['name'] in curated_demo_titles() and has_matching_demo_photo(p))]
-            if curated:
-                products=curated
-                metadata['catalog_policy']='curated_demo_metadata'
-        products=[p for p in products if p['id']!=product_id]
-        if retail:
-            products=exclude_owned(products,purchases,cart if touchpoint in ('home','cart') else (),
-                                   home=touchpoint=='home',manual_category=category_id is not None)
-            metadata['purchase_policy']={'excluded_models':len(purchases['keys']),
-                'recent_durable_types':sorted(purchases['recent_kinds']),
-                'durable_cooldown_days':30,'cancelled_orders_excluded':True}
-            if target:
-                products=[p for p in products if identity(p)!=identity(dict(target))]
-        if touchpoint=='home':
-            recent_ids={row['product_id'] for row in signals if row['action_type'] in ('click','add_to_cart','purchase')}
-            products=[p for p in products if p['id'] not in recent_ids]
-        if touchpoint=='similar':
-            products=[p for p in products if p['category_id']==target['category_id']]
-            band=[p for p in products if target['price']*.5<=p['price']<=target['price']*2]
-            if band or retail:
-                products=band
-            metadata['context_policy']='same_category_price_band' if band else 'same_category'
-            same_kind=[p for p in products if (merchandise_kind(p)==merchandise_kind(dict(target)) if retail
-                      else product_kind(p['name'])==product_kind(target['name']))]
-            if same_kind or retail:
-                products=same_kind
-                metadata['context_policy']='same_kind_price_band' if band else 'same_kind'
-            alternatives=[p for p in products if p['image_url']!=target['image_url']]
-            if alternatives:
-                products=alternatives
-            for p in products:
-                p['recommendation_reason']=('Cùng loại sản phẩm' if same_kind else 'Cùng danh mục')+(' · Giá tương đương' if band else '')
-        elif touchpoint=='complementary':
-            if retail:
-                products=[p for p in products if is_complement(p,dict(target))]
-            # Items of the same kind already appear in "Sản phẩm tương tự".
-            target_kind=product_kind(target['name'])
-            others=[p for p in products if product_kind(p['name'])!=target_kind]
-            if others:
-                products=others
-            prefixes=CATEGORY_COMPLEMENTS.get(target['category_id'])
-            if prefixes:
-                safe=[p for p in products if any(p['name'].casefold().startswith(prefix) for prefix in prefixes)]
-                if safe:
-                    products=safe
-            for p in products:
-                p['recommendation_reason']=f"Phụ kiện & đồ bổ trợ cho {target['name'][:30]}…"
-            metadata['context_policy']='curated_complementary_categories'
-        elif touchpoint=='cart':
-            cart_ids={i['id'] for i in cart}
-            cart_photos={i['image_url'] for i in cart if i['image_url']}
-            cart_cats=list(dict.fromkeys(i['category_id'] for i in cart if i.get('category_id')))
-            allowed_cats=set()
-            for category in cart_cats:
-                allowed_cats.update(COMPLEMENTARY_MAP.get(category,[category]))
-            max_cart_price=max((i['price'] for i in cart),default=500000)
-            price_cap=max(1200000,int(max_cart_price*1.5))
-            products=[p for p in products if p['id'] not in cart_ids
-                      and p['image_url'] not in cart_photos
-                      and (not allowed_cats or p['category_id'] in allowed_cats)
-                      and p['price']<=price_cap]
-            if retail:
-                products=[p for p in products if any(is_complement(p,item) for item in cart)]
-            for p in products:
-                p['recommendation_reason']='Phù hợp với sản phẩm trong giỏ'
-            metadata.update({'context_policy':'curated_cart_categories',
-                             'cart_categories':cart_cats,
-                             'allowed_categories':sorted(allowed_cats),
-                             'price_cap':price_cap})
-        else:
-            metadata['context_policy']='in_stock_catalog'
-        mapped=[p for p in products if p['raw_item_id'] in model.items] if model else []
-        if mapped:
-            products=mapped
-        scores=[p['sold_count'] for p in products]
-        inference_start=time.perf_counter();model_used=False
-        try:
-            if model and mapped:
-                ids=[p['raw_item_id'] for p in products]
-                if touchpoint=='similar' and target['raw_item_id'] in model.items:
-                    scores=model.similarities(target['raw_item_id'],ids)
-                    metric='cosine_similarity';strategy='SCL cosine / GSU';engine='MUSE SCL 128D';model_used=True
-                    for p,s in zip(products,scores):
-                        p['similarity']=round(s,6)
-                elif touchpoint=='complementary':
-                    if user_id:
-                        if len(products)>128:
-                            raw_ids=[p['raw_item_id'] for p in products]
-                            selected_ids=set(model.retrieve_gsu(user_id,raw_ids,top_k=128))
-                            products=[p for p in products if p['raw_item_id'] in selected_ids]
-                        ids=[p['raw_item_id'] for p in products]
-                        scores,extra=model.predict(user_id,ids)
-                        metadata.update(extra);metric='p_click';strategy='MUSE P(click) theo lịch sử hành vi';engine='Alibaba MUSE';model_used=True
-                        for p,s in zip(products,scores):
-                            p['p_click']=round(s,7)
-                    elif target and target['raw_item_id'] in model.items:
-                        scores=model.similarities(target['raw_item_id'],ids)
-                        metric='cosine_similarity';strategy='MUSE SCL cosine';engine='MUSE SCL 128D';model_used=True
-                        for p,s in zip(products,scores):
-                            p['similarity']=round(s,6)
-                elif user_id and touchpoint not in ('similar','complementary'):
-                    if len(products)>128:
-                        raw_ids=[p['raw_item_id'] for p in products]
-                        selected_ids=set(model.retrieve_gsu(user_id,raw_ids,top_k=128))
-                        # Retain alternatives for each available photo so the
-                        # final feed can stay diverse without repeating cards.
-                        representatives={}
-                        for p in sorted(products,key=lambda p:(p['rating_star'],p['sold_count']),reverse=True):
-                            representatives.setdefault(p['image_url'] or p['id'],p['raw_item_id'])
-                        selected_ids.update(list(representatives.values())[:64])
-                        for category in list(dict.fromkeys(row['category_id'] for row in signals[:6]))[:3]:
-                            selected_ids=include_category_candidates(products,selected_ids,category)
-                        products=[p for p in products if p['raw_item_id'] in selected_ids]
-                    ids=[p['raw_item_id'] for p in products]
-                    scores,extra=model.predict(user_id,ids)
-                    metadata.update(extra);metric='p_click';strategy='GSU (SCL Top-128) → SimTier + SA-TA → ESU';engine='Alibaba MUSE';model_used=True
-                    for p,s in zip(products,scores):
-                        p['p_click']=round(s,7)
-                elif not user_id:
-                    engine='Popular / guest'
-                    for p in products:
-                        p['recommendation_reason']='Sản phẩm bán chạy nổi bật'
-            if len(scores)!=len(products) or not all(math.isfinite(s) for s in scores):
-                raise RuntimeError('Invalid recommendation scores')
-        except Exception:
-            logging.exception('Recommendation inference failed; serving explicit popularity fallback')
-            scores=[p['sold_count'] for p in products]
-            for p in products:
-                p.pop('p_click',None);p.pop('similarity',None)
-            metric='popularity';strategy='popular';engine='Catalog fallback';model_used=False
-            metadata['fallback_reason']='inference_failed'
-        if not model_used:
-            metadata.setdefault('fallback_reason','guest' if not user_id else 'model_unavailable' if not model else 'no_model_candidates')
-            for p in products:
-                p.setdefault('recommendation_reason','Sản phẩm bán chạy trong danh mục')
-        for p in products:
-            p['recommendation_source']='ai' if model_used else 'catalog'
-        inference_ms=(time.perf_counter()-inference_start)*1000
-        ranked=sorted(zip(products,scores),key=lambda x:(x[1],x[0]['sold_count'],-x[0]['id']),reverse=True)
-        if retail:
-            score_by_id={p['id']:score for p,score in ranked}
-            visible=[public_product(p) for p,_ in ranked]
-            visible=[p for p in visible if p.get('image_url')!='/static/images/placeholder.svg']
-            visible=unique_models(visible,exclude=[public_product(target)] if target else [])
-            ranked=[(p,score_by_id[p['id']]) for p in visible]
+                        for r in db.execute('''SELECT p.*, pr.name province_name FROM products p
+                            LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.name LIKE ? AND p.stock>0
+                            ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 40''', (f'%{kind}%',)):
+                            d = dict(r)
+                            if d['id'] not in seen_p:
+                                seen_p.add(d['id'])
+                                products.append(d)
+                    if intent_cats:
+                        for cid in COMPLEMENTARY_MAP.get(intent_cats[0], [])[:3]:
+                            for r in db.execute('''SELECT p.*, pr.name province_name FROM products p
+                                LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.category_id=? AND p.stock>0
+                                ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 30''', (cid,)):
+                                d = dict(r)
+                                if d['id'] not in seen_p:
+                                    seen_p.add(d['id'])
+                                    products.append(d)
+
+        metadata = {}
+        model = self.model
+        ai_scores = {}
+        model_used = False
+        strategy = 'MUSE Multi-Criteria (AI + Context + Demographics + Quality + Merchant)'
+        engine = 'Catalog Multi-Criteria Ranking'
+        metric = 'ranking_score'
+        inference_start = time.perf_counter()
+
+        if model and products:
+            try:
+                model.items.register_products(products + ([target] if target else []))
+                mapped = [p for p in products if p['raw_item_id'] in model.items]
+                valid_raw = [p['raw_item_id'] for p in mapped]
+                if touchpoint in ('similar', 'complementary') and target and target.get('raw_item_id') in model.items:
+                    if valid_raw:
+                        sims = model.similarities(target['raw_item_id'], valid_raw)
+                        ai_scores = dict(zip(valid_raw, sims))
+                        model_used = True
+                        engine = 'MUSE SCL 128D Embedding'
+                        metric = 'cosine_similarity'
+                        for p in mapped:
+                            if p['raw_item_id'] in ai_scores:
+                                p['similarity'] = round(ai_scores[p['raw_item_id']], 6)
+                elif user_id and valid_raw:
+                    preds, extra = model.predict(user_id, valid_raw[:128])
+                    ai_scores = dict(zip(valid_raw[:128], preds))
+                    metadata.update(extra)
+                    model_used = True
+                    engine = 'Alibaba MUSE DIN + GSU'
+                    metric = 'p_click'
+                    for p in mapped:
+                        if p['raw_item_id'] in ai_scores:
+                            p['p_click'] = round(ai_scores[p['raw_item_id']], 7)
+            except Exception as exc:
+                logging.exception('AI scoring failed; continuing with full multi-criteria ranking: %s', exc)
+
+        inference_ms = (time.perf_counter() - inference_start) * 1000
+
+        # Multi-Criteria Scoring & Ranking
+        scored_products = self.multicriteria_rank(
+            products,
+            user=user,
+            target=target,
+            touchpoint=touchpoint,
+            cart=cart,
+            signals=signals,
+            ai_scores=ai_scores,
+            user_price=u_price
+        )
+
+        for p in scored_products:
+            p['recommendation_source'] = 'ai' if model_used else 'catalog'
+
         intent_summary = []
         if touchpoint == 'home':
-            feed_signals=list(signals)
-            if retail:
-                recent_signal_ids={s['product_id'] for s in signals}
-                for owned in purchases['items'][:4]:
-                    if owned.get('recent_purchase') and owned['id'] not in recent_signal_ids:
-                        feed_signals.append({'action_type':'purchase','category_id':owned['category_id'],
-                            'product_id':owned['id'],'product_name':owned['name'],'product_price':owned['price'],
-                            'category_name':f"Danh mục {owned['category_id']}"})
-            if retail:
-                top, intent_summary = build_shopee_feed(ranked, feed_signals, limit=limit, retail=True)
-            else:
-                # Legacy demo contracts: stable prefixes and original photo
-                # identities. Retail uses the separate model-identity pipeline.
-                legacy_ranked,intent_summary,_=apply_customer_intent(ranked,feed_signals)
-                selected=next((s for s in feed_signals if s['action_type']=='demo_interest'),None)
-                if selected:
-                    legacy_ranked.sort(key=lambda pair:pair[0]['category_id']==selected['category_id'],reverse=True)
-                    for p,_ in legacy_ranked:
-                        if p['category_id']==selected['category_id']:
-                            p['recommendation_reason']='Ưu tiên '+selected['category_name']
-                top=unique_models([public_product(p) for p,_ in legacy_ranked])[:limit]
-            if retail:
-                just_bought=[p for p in purchases['items'][:4] if p.get('hot_purchase')]
-                accessories=[p for p,_ in ranked if any(is_complement(p,owned) for owned in just_bought)][:3]
-                top=unique_models(accessories+top)[:limit]
-                metadata['post_purchase_accessories']=len(accessories)
+            ranked_tuples = [(p, p.get('ranking_score', 0.5)) for p in scored_products]
+            top, intent_summary = build_shopee_feed(ranked_tuples, signals, limit=limit)
         else:
             top = []
-            visible_names = set()
-            for product, _ in ranked:
-                item = public_product(product)
-                name = item['name'].strip().casefold()
-                if name in visible_names:
+            seen_names = set()
+            seen_cores = set()
+            for p in scored_products:
+                name = p['name'].strip().casefold()
+                core = core_product_title(p['name'])
+                if name in seen_names or (core and core in seen_cores):
                     continue
-                visible_names.add(name)
+                seen_names.add(name)
+                if core: seen_cores.add(core)
+                item = public_product(p)
+                item['recommendation_reason'] = p.get('recommendation_reason', 'Gợi ý phù hợp dành cho bạn')
+                item['recommendation_source'] = p.get('recommendation_source', 'catalog')
+                if 'ranking_score' in p: item['ranking_score'] = p['ranking_score']
+                if 'p_click' in p: item['p_click'] = p['p_click']
+                if 'similarity' in p: item['similarity'] = p['similarity']
                 top.append(item)
                 if len(top) >= limit:
                     break
-        if retail:
-            top=unique_models(top,exclude=[dict(target)] if target else [])
-            top=[p for p in top if p.get('image_url')!='/static/images/placeholder.svg']
-        else:
-            top=unique_models(top)
-        active_interest=next(({'category_id':row['category_id'],'category_name':row['category_name'],
-                               'product_id':row['product_id']} for row in signals
-                              if row['action_type']=='demo_interest'),None)
-        metadata.update({'engine':engine,'strategy':strategy,'score_type':metric,'candidate_count':len(products),
-                         'inference_ms':round(inference_ms,2),'latency_ms':round((time.perf_counter()-start)*1000,2),
-                         'checkpoint_loaded':model is not None,'model_used':model_used,'touchpoint':touchpoint,
-                         'ranking_policy':'model_rank_with_recent_intent_and_diversity' if touchpoint=='home' and user_id else 'score_order_with_photo_and_category_diversity',
-                         'has_more':len(ranked)>limit,'active_interest':active_interest,
-                         'intent_summary':intent_summary})
+
+        active_interest = next(({'category_id': row['category_id'], 'category_name': row['category_name'],
+                                 'product_id': row['product_id']} for row in signals
+                                if row['action_type'] == 'demo_interest'), None)
+
+        metadata.update({
+            'engine': engine, 'strategy': strategy, 'score_type': metric,
+            'candidate_count': len(products), 'result_count': len(top),
+            'inference_ms': round(inference_ms, 2), 'latency_ms': round((time.perf_counter() - start) * 1000, 2),
+            'checkpoint_loaded': model is not None, 'model_used': model_used, 'touchpoint': touchpoint,
+            'ranking_policy': 'multi_criteria_ranking_with_diversity',
+            'has_more': len(products) > limit, 'active_interest': active_interest,
+            'intent_summary': intent_summary
+        })
+
         if user_id and write_logs:
             with self.metrics_lock:
-                self.last_metrics[user_id]=metadata
+                self.last_metrics[user_id] = metadata
                 self.last_metrics.move_to_end(user_id)
-                while len(self.last_metrics)>128:
+                while len(self.last_metrics) > 128:
                     self.last_metrics.popitem(last=False)
             with connection(write=True) as db:
                 db.execute('''INSERT INTO recommendation_logs(user_id,touchpoint,candidate_count,top_recommended_ids,model_name,latency_ms)
-                    VALUES (?,?,?,?,?,?)''',(user_id,touchpoint,len(products),','.join(str(x['id']) for x in top),engine,metadata['latency_ms']))
-        quality=evaluation_summary() if model_used and metric=='p_click' else {'available':False,'reason':'not_click_ranking'}
-        return {'items':top,'meta':metadata,'quality':quality}
+                    VALUES (?,?,?,?,?,?)''', (user_id, touchpoint, len(products), ','.join(str(x['id']) for x in top), engine, metadata['latency_ms']))
+
+        quality = evaluation_summary() if model_used and metric == 'p_click' else {'available': False, 'reason': 'not_click_ranking'}
+        return {'items': top, 'meta': metadata, 'quality': quality}
 
 
 service=RecommendationService()

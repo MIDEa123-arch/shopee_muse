@@ -205,19 +205,42 @@ def complementary_bundle(db, user_id=None, focus_product_id=None):
     from app.database import public_product
     from app.recommender.service import service, COMPLEMENTARY_MAP
     displays = presentation_map(str(config.DB_PATH))
-    from app.native_catalog import catalog_info
-    if catalog_info(db)['mode'] in ('vietnam_tiki_v1','amazon_reviews_2023_v1'):
-        from .retail import recommend as retail_recommend
-        if not focus_product_id:
-            row=db.execute('SELECT product_id FROM cart_items WHERE user_id=? AND is_selected=1 ORDER BY id DESC LIMIT 1',(user_id,)).fetchone()
-            if not row:
-                row=db.execute("SELECT i.product_id FROM orders o JOIN order_items i ON i.order_id=o.id WHERE o.user_id=? AND o.order_status!='Đã hủy' ORDER BY o.id DESC,i.id LIMIT 1",(user_id,)).fetchone()
-            focus_product_id=row[0] if row else None
-        if not focus_product_id:return {'focus':None,'items':[],'bundle_label':'Mua kèm tiện hơn'}
-        result=retail_recommend(service,user_id,'complementary',focus_product_id,3,write_logs=False)
-        row=db.execute('SELECT * FROM products WHERE id=?',(focus_product_id,)).fetchone()
-        return {'focus':public_product(row),'items':result['items'],'bundle_label':'Mua kèm tiện hơn',
-                'meta':result['meta'],'total_price':sum(p['price'] for p in result['items'])+(row['price'] if row else 0)}
+    if not focus_product_id and user_id:
+        row=db.execute('SELECT product_id FROM cart_items WHERE user_id=? AND is_selected=1 ORDER BY id DESC LIMIT 1',(user_id,)).fetchone()
+        if not row:
+            row=db.execute("SELECT i.product_id FROM orders o JOIN order_items i ON i.order_id=o.id WHERE o.user_id=? AND o.order_status!='Đã hủy' ORDER BY o.id DESC,i.id LIMIT 1",(user_id,)).fetchone()
+        if not row:
+            row=db.execute('SELECT product_id FROM user_behavior_history WHERE user_id=? AND action_type IN ("click","favorite","add_to_cart","purchase") ORDER BY id DESC LIMIT 1',(user_id,)).fetchone()
+        focus_product_id=row[0] if row else None
+    if not focus_product_id:
+        pop_row=db.execute('SELECT id FROM products WHERE stock>0 ORDER BY rating_star DESC, sold_count DESC LIMIT 1').fetchone()
+        focus_product_id=pop_row[0] if pop_row else 1
+
+    result=service.recommend(user_id=user_id,touchpoint='complementary',product_id=focus_product_id,limit=4,write_logs=False)
+    items=result['items'][:4]
+    row=db.execute('SELECT p.*, pr.name province_name FROM products p LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.id=?',(focus_product_id,)).fetchone()
+    focus_pub=public_product(dict(row)) if row else None
+    focus_name=focus_pub['name'] if focus_pub else ''
+    total_original=(focus_pub['original_price'] if focus_pub else 0)+sum(p.get('original_price', p['price']) for p in items)
+    raw_sum=(focus_pub['price'] if focus_pub else 0)+sum(p['price'] for p in items)
+    combo_price=int(raw_sum*0.95)
+    savings=max(total_original-combo_price, raw_sum-combo_price)
+    discount_pct=round((savings/max(total_original,1))*100) if total_original>0 else 5
+
+    return {
+        'focus': focus_pub,
+        'items': items,
+        'bundle_label': f"Mua kèm tiết kiệm cùng {focus_name[:35]}…" if focus_name else 'Combo mua kèm hấp dẫn',
+        'meta': result['meta'],
+        'total_price': combo_price,
+        'pricing': {
+            'original_total': total_original,
+            'regular_total': raw_sum,
+            'bundle_total': combo_price,
+            'savings': savings,
+            'discount_percent': discount_pct
+        }
+    }
 
     focus = None
     focus_source = 'direct' if focus_product_id else 'popular'

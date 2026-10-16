@@ -198,8 +198,8 @@ async function openProduct(id){
   const detailHeadings=document.querySelectorAll('#modal .detail-rec-header h3');if(detailHeadings[1])detailHeadings[1].textContent='Mua kèm tiện hơn';
   if(state.user){await post('/recommendations/behavior/'+id);if(version!==state.modalVersion)return;state.lastInteraction={category_name:p.category_name,product_name:nameOf(p.name)};}
   const [relatedResult,compResult]=await Promise.allSettled([
-    api('/recommendations?touchpoint=similar&product_id='+id+'&limit=6'),
-    api('/recommendations?touchpoint=complementary&product_id='+id+'&limit=6')
+    api('/recommendations?touchpoint=similar&product_id='+id+'&limit=12'),
+    api('/recommendations?touchpoint=complementary&product_id='+id+'&limit=12')
   ]);
   if(version!==state.modalVersion)return;
   const related=relatedResult.status==='fulfilled'?relatedResult.value:null;
