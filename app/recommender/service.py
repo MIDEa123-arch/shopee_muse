@@ -16,7 +16,7 @@ from app.native_catalog import catalog_info,MODE
 from .native import native_ranking
 from .merchandise import (kind as merchandise_kind, identity, COMPLEMENTS, DURABLE_KINDS,
                           is_complement, purchase_context, exclude_owned, unique_models,
-                          is_gender_incompatible)
+                          product_gender_affinity, product_life_stage_affinity)
 
 
 def diversify(ranked, intent_caps=None):
@@ -177,22 +177,35 @@ def core_product_title(name: str) -> str:
 
 
 def build_shopee_feed(ranked, signals, limit=24, retail=False, user=None):
-    """Build a balanced, harmonious Shopee/Taobao style feed:
-    - High-intent items (sub-kind or category matching active user signals): ~60% of feed for active users
-    - Complementary cross-category items: ~20% of feed
-    - Diverse lifestyle & popular discovery: ~20% of feed across relevant demographic categories
-    - Strict gender integrity: never leak women's dresses/makeup/heels to men or vice versa
-    - Deduplication strictly by core product name (no photo filtering restriction)
+    """Build a natural, harmonious Shopee/Taobao style feed:
+    - Pure score-driven prioritization: items with highest multi-criteria scores are prioritized!
+    - Soft diversity: prevent category or kind monotony (no more than 2 consecutive items of identical kind/category)
+    - Fatigue suppression: hide recently purchased durable goods and pivot to complements
+    - Zero hard blocking: all catalog products are fairly evaluated and ranked on known criteria
     """
     if not ranked:
         return [], []
 
-    # 1. Deduplicate candidates by product name & core title, filter out gender-incompatible items
+    # 1. Purchase fatigue suppression
+    purchased_ids = set()
+    purchased_kinds = set()
+    for row in signals or []:
+        if row.get('action_type') == 'purchase':
+            if row.get('product_id'):
+                purchased_ids.add(row['product_id'])
+            k = merchandise_kind({'name': row.get('product_name', '')})
+            if k in DURABLE_KINDS:
+                purchased_kinds.add(k)
+
+    # 2. Deduplicate candidates and sort strictly by multi-criteria score
     unique_candidates = []
     seen_names = set()
     seen_cores = set()
     for product, score in ranked:
-        if is_gender_incompatible(product, user, signals):
+        if product.get('id') in purchased_ids:
+            continue
+        p_kind = merchandise_kind(product)
+        if p_kind in purchased_kinds:
             continue
         name = product['name'].strip().casefold()
         core = core_product_title(product['name'])
@@ -201,210 +214,65 @@ def build_shopee_feed(ranked, signals, limit=24, retail=False, user=None):
         seen_names.add(name)
         if core:
             seen_cores.add(core)
-        jitter = 0 if retail else random.uniform(-0.04, 0.04)
+        jitter = 0 if retail else random.uniform(-0.02, 0.02)
         unique_candidates.append((product, score + jitter))
 
-    # 2. Extract recent customer intent across all active categories and handle durable purchase fatigue
-    strengths = {}
-    names = {}
-    kind_strengths = {}
-    purchased_kinds = set()
-    purchased_ids = set()
+    unique_candidates.sort(key=lambda x: x[1], reverse=True)
 
-    for index, row in enumerate(signals or []):
-        cat = row['category_id']
-        weight = ACTION_WEIGHTS.get(row['action_type'], 1.0) * (0.86**index)
-        names[cat] = row.get('category_name') or f"Danh mục {cat}"
-        p_name = row.get('product_name') or ''
-        k = merchandise_kind({'name': p_name})
-        if row.get('action_type') == 'purchase':
-            if row.get('product_id'):
-                purchased_ids.add(row['product_id'])
-            if k in DURABLE_KINDS:
-                purchased_kinds.add(k)
-                # Transfer purchase weight to its complementary accessories
-                for comp_k in COMPLEMENTS.get(k, set()):
-                    kind_strengths[comp_k] = kind_strengths.get(comp_k, 0) + weight
-                continue
-        strengths[cat] = strengths.get(cat, 0) + weight
-        if k:
-            kind_strengths[k] = kind_strengths.get(k, 0) + weight
-
-    # Multi-category intent recognition (all categories with meaningful interaction weight)
-    intent_cats = {c for c, w in strengths.items() if w >= 0.7}
-    intent_kinds = {k for k, w in kind_strengths.items() if w >= 0.7}
-    comp_cats = set()
-    for ic in intent_cats:
-        comp_cats.update(COMPLEMENTARY_MAP.get(ic, []))
-    comp_cats -= intent_cats
-
-    # 3. Partition candidates into 3 distinct pools
-    intent_pool = []
-    comp_pool = []
-    explore_pool = []
+    # 3. Score-driven greedy selection with soft diversity (max 2 consecutive of same category or same kind)
+    feed = []
+    deferred = []
+    feed_names = set()
+    feed_cores = set()
+    recent_cats = []
+    recent_kinds = []
 
     for product, score in unique_candidates:
-        if product.get('id') in purchased_ids:
+        c_name = product['name'].strip().casefold()
+        c_core = core_product_title(product['name'])
+        if c_name in feed_names or (c_core and c_core in feed_cores):
             continue
-        if is_gender_incompatible(product, user, signals):
-            continue
+
         cid = product['category_id']
         p_kind = merchandise_kind(product)
 
-        # Fatigue suppression: if user bought this durable kind, avoid flooding feed with more
-        if p_kind in purchased_kinds:
+        # Soft diversity check: avoid monotony of more than 2 consecutive items of identical kind/category
+        if (len(recent_cats) >= 2 and recent_cats[-1] == cid and recent_cats[-2] == cid) or \
+           (len(recent_kinds) >= 2 and recent_kinds[-1] == p_kind and recent_kinds[-2] == p_kind):
+            deferred.append((product, score))
             continue
 
-        if intent_kinds and p_kind in intent_kinds:
-            product['recommendation_reason'] = f"Gợi ý theo sở thích về {p_kind.title()}"
-            intent_pool.append((product, score))
-        elif intent_cats and cid in intent_cats:
-            product['recommendation_reason'] = f"Hợp với hoạt động gần đây về {names.get(cid, '')}"
-            intent_pool.append((product, score))
-        elif (any(is_complement(product, {'name': s['product_name'], 'price': s.get('product_price', 10000000)})
-                  for s in signals[:8] if s.get('product_name')) or cid in comp_cats or p_kind in kind_strengths):
-            product['recommendation_reason'] = "Phụ kiện & gợi ý phối hợp phù hợp"
-            comp_pool.append((product, score))
-        else:
-            product['recommendation_reason'] = "Gợi ý thịnh hành hôm nay"
-            explore_pool.append((product, score))
+        feed_names.add(c_name)
+        if c_core:
+            feed_cores.add(c_core)
+        recent_cats.append(cid)
+        recent_kinds.append(p_kind)
+        feed.append(public_product(product))
+        if len(feed) >= limit:
+            break
 
-    intent_pool.sort(key=lambda x: x[1], reverse=True)
-    comp_pool.sort(key=lambda x: x[1], reverse=True)
-    explore_pool.sort(key=lambda x: x[1], reverse=True)
-
-    # Interleave explore_pool across categories to guarantee varied, non-monolithic shelves
-    explore_by_cat = defaultdict(list)
-    for it in explore_pool:
-        explore_by_cat[it[0]['category_id']].append(it)
-    rotated_explore = []
-    cat_keys = list(explore_by_cat.keys())
-    random.shuffle(cat_keys)
-    max_len = max((len(v) for v in explore_by_cat.values()), default=0)
-    for round_i in range(max_len):
-        for ck in cat_keys:
-            if round_i < len(explore_by_cat[ck]):
-                rotated_explore.append(explore_by_cat[ck][round_i])
-    explore_pool = rotated_explore
-
-    # 4. Adaptive Quotas: High-intent gets priority when user has strong engagement history
-    has_strong_signals = len(signals or []) >= 4 and bool(intent_cats or intent_kinds)
-    if has_strong_signals:
-        intent_target = min(15, len(intent_pool))
-        comp_target = min(5, len(comp_pool))
-        schedule = [
-            'I', 'I', 'C', 'I', 'E',
-            'I', 'I', 'C', 'I', 'E',
-            'I', 'I', 'C', 'I', 'E',
-            'I', 'I', 'C', 'I', 'E',
-            'I', 'I', 'C', 'I', 'E'
-        ]
-    else:
-        intent_target = min(5, len(intent_pool)) if intent_cats else 0
-        comp_target = min(3, len(comp_pool)) if comp_cats else 0
-        schedule = [
-            'I', 'E', 'C', 'E',
-            'I', 'E', 'E', 'C',
-            'I', 'E', 'E', 'E',
-            'I', 'E', 'C', 'E',
-            'I', 'E', 'E', 'E',
-            'E', 'E', 'E', 'E',
-            'E', 'E', 'E', 'E',
-            'E', 'E', 'E', 'E'
-        ]
-
-    feed = []
-    feed_names = set()
-    feed_cores = set()
-    explore_cat_count = Counter()
-    intent_idx = 0
-    comp_idx = 0
-    explore_idx = 0
-
-    for slot in schedule:
-        chosen = None
-        if slot == 'I' and intent_idx < intent_target:
-            while intent_idx < len(intent_pool):
-                cand = intent_pool[intent_idx][0]
-                intent_idx += 1
-                c_name = cand['name'].strip().casefold()
-                c_core = core_product_title(cand['name'])
-                if c_name not in feed_names and (not c_core or c_core not in feed_cores):
-                    chosen = cand
-                    break
-        elif slot == 'C' and comp_idx < comp_target:
-            while comp_idx < len(comp_pool):
-                cand = comp_pool[comp_idx][0]
-                comp_idx += 1
-                c_name = cand['name'].strip().casefold()
-                c_core = core_product_title(cand['name'])
-                if c_name not in feed_names and (not c_core or c_core not in feed_cores):
-                    chosen = cand
-                    break
-        else:
-            cur_idx = explore_idx
-            found = False
-            while cur_idx < len(explore_pool):
-                cand = explore_pool[cur_idx][0]
-                if is_gender_incompatible(cand, user, signals):
-                    cur_idx += 1
-                    continue
-                c_name = cand['name'].strip().casefold()
-                c_core = core_product_title(cand['name'])
-                if c_name not in feed_names and (not c_core or c_core not in feed_cores):
-                    if explore_cat_count[cand['category_id']] < 2:
-                        chosen = cand
-                        explore_cat_count[cand['category_id']] += 1
-                        explore_pool.pop(cur_idx)
-                        found = True
-                        break
-                cur_idx += 1
-            if not found and explore_idx < len(explore_pool):
-                while explore_idx < len(explore_pool):
-                    cand = explore_pool[explore_idx][0]
-                    explore_idx += 1
-                    if is_gender_incompatible(cand, user, signals):
-                        continue
-                    c_name = cand['name'].strip().casefold()
-                    c_core = core_product_title(cand['name'])
-                    if c_name not in feed_names and (not c_core or c_core not in feed_cores):
-                        chosen = cand
-                        explore_cat_count[cand['category_id']] += 1
-                        break
-
-        if not chosen:
-            for p, _ in unique_candidates:
-                if is_gender_incompatible(p, user, signals):
-                    continue
-                c_name = p['name'].strip().casefold()
-                c_core = core_product_title(p['name'])
-                if c_name not in feed_names and (not c_core or c_core not in feed_cores):
-                    chosen = p
-                    break
-
-        if chosen:
-            c_name = chosen['name'].strip().casefold()
-            c_core = core_product_title(chosen['name'])
+    # 4. Fill remaining slots from deferred if needed
+    if len(feed) < limit:
+        for product, score in deferred:
+            c_name = product['name'].strip().casefold()
+            c_core = core_product_title(product['name'])
+            if c_name in feed_names or (c_core and c_core in feed_cores):
+                continue
             feed_names.add(c_name)
             if c_core:
                 feed_cores.add(c_core)
-            feed.append(public_product(chosen))
+            feed.append(public_product(product))
             if len(feed) >= limit:
                 break
 
-    if len(feed) < limit:
-        for p, _ in unique_candidates:
-            if is_gender_incompatible(p, user, signals):
-                continue
-            c_name = p['name'].strip().casefold()
-            c_core = core_product_title(p['name'])
-            if c_name not in feed_names and (not c_core or c_core not in feed_cores):
-                feed_names.add(c_name)
-                if c_core:
-                    feed_cores.add(c_core)
-                feed.append(public_product(p))
-                if len(feed) >= limit:
-                    break
+    # Also calculate summary of intent strengths for UI metadata
+    strengths = {}
+    names = {}
+    for idx, row in enumerate(signals or []):
+        cat = row['category_id']
+        w = ACTION_WEIGHTS.get(row['action_type'], 1.0) * (0.86**idx)
+        strengths[cat] = strengths.get(cat, 0) + w
+        names[cat] = row.get('category_name') or f"Danh mục {cat}"
 
     summary = []
     if strengths:
@@ -511,7 +379,7 @@ class RecommendationService:
         for idx, s in enumerate(signals or []):
             w = {'purchase': 5.0, 'add_to_cart': 4.0, 'favorite': 3.0, 'click': 1.5, 'demo_interest': 3.5}.get(s.get('action_type'), 1.0) * (0.86**idx)
             if s.get('category_id'): intent_cats[s['category_id']] += w
-            k = product_kind(s.get('product_name') or '')
+            k = merchandise_kind({'name': s.get('product_name') or ''})
             if k: intent_kinds[k] += w
 
         max_intent_cat = max(intent_cats.values(), default=1.0)
@@ -526,7 +394,7 @@ class RecommendationService:
             raw_id = p.get('raw_item_id')
             price = max(1, p.get('price', 0))
             cid = p.get('category_id')
-            p_kind = product_kind(p.get('name', ''))
+            p_kind = merchandise_kind(p)
 
             # 1. AI Model Score (0.35)
             s_ai = 0.40
@@ -649,37 +517,32 @@ class RecommendationService:
                 if price <= 350000: s_ctx += 0.15
 
             elif touchpoint == 'home':
+                s_ctx = 0.15
+                reason = 'Gợi ý thịnh hành hôm nay'
                 if intent_kinds and p_kind in intent_kinds:
-                    s_ctx += 0.35 * (intent_kinds[p_kind] / max_intent_kind)
+                    s_ctx = 0.50 + 0.45 * (intent_kinds[p_kind] / max_intent_kind)
                     reason = f'Gợi ý theo sở thích {p_kind.title()}'
                 elif intent_cats and cid in intent_cats:
-                    s_ctx += 0.25 * (intent_cats[cid] / max_intent_cat)
+                    s_ctx = 0.40 + 0.35 * (intent_cats[cid] / max_intent_cat)
                     reason = 'Hợp với hoạt động quan tâm gần đây'
-                else:
-                    s_ctx += 0.15
-                    reason = 'Gợi ý thịnh hành hôm nay'
+                for s in signals[:6]:
+                    if is_complement(p, {'name': s.get('product_name', ''), 'price': s.get('product_price', 10000000)}):
+                        if s_ctx < 0.60:
+                            s_ctx = 0.60
+                            reason = 'Phụ kiện bổ trợ phù hợp'
+                        break
 
-            # 3. User Demographics & Spending Tier (0.20)
-            s_user = 0.50
-            if u_gender == 'Nam':
-                if cid == 3: s_user += 0.30  # Men fashion
-                elif cid in (1, 2, 5, 8, 11): s_user += 0.15
-                elif cid == 4: s_user -= 0.60  # Avoid dresses/skirts for men
-                elif cid == 7 and p_kind in ('lipstick', 'skirt', 'dress'): s_user -= 0.60
-            elif u_gender == 'Nữ':
-                if cid in (4, 7): s_user += 0.30  # Women fashion & beauty
-                elif cid in (5, 8, 10, 6): s_user += 0.15
-                elif cid == 3: s_user -= 0.60  # Avoid men clothing for women
-            if user and 'Gia Đình' in user.get('full_name', ''):
-                if cid in (10, 6): s_user += 0.35  # Family baby & home goods
-                elif cid == 11: s_user += 0.15
-
-            if user_price and user_price.get('tier') != 'all':
-                if user_price['min_price'] <= price <= user_price['max_price']:
-                    s_user += 0.18
+            # 3. User Demographics, Location & Spending Tier (0.25)
+            gen_aff = product_gender_affinity(p, user, signals)
+            life_aff = product_life_stage_affinity(p, user, signals)
+            s_user = 0.60 * gen_aff + 0.40 * life_aff
 
             if u_prov and p.get('province_id') == u_prov:
                 s_user += 0.15
+
+            if user_price and user_price.get('tier') != 'all':
+                if user_price['min_price'] <= price <= user_price['max_price']:
+                    s_user += 0.15
 
             if u_tier in ('Kim Cương', 'Vàng') and p.get('is_mall'):
                 s_user += 0.10
@@ -695,7 +558,7 @@ class RecommendationService:
 
             jitter = random.uniform(-0.02, 0.02)
 
-            final_score = 0.35 * s_ai + 0.25 * s_ctx + 0.20 * s_user + 0.10 * s_qual + 0.10 * s_merch + jitter
+            final_score = 0.30 * s_ai + 0.35 * s_ctx + 0.20 * s_user + 0.08 * s_qual + 0.07 * s_merch + jitter
             p['recommendation_reason'] = reason
             p['ranking_score'] = round(final_score, 5)
             scored.append((p, final_score))
@@ -933,7 +796,6 @@ class RecommendationService:
 
                     # Channel 2: Demographic & Preference Alignment
                     u_gender = user.get('gender')
-                    user_signal_cids = {s.get('category_id') for s in signals}
                     demo_cids = []
                     if u_gender == 'Nam':
                         demo_cids = [3, 5, 1, 9, 11, 8]
@@ -947,30 +809,18 @@ class RecommendationService:
                             LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.category_id=? AND p.stock>0
                             ORDER BY p.sold_count DESC LIMIT 20 OFFSET ?''', (dc, offset)):
                             d = dict(r)
-                            if d['id'] not in seen_p and not is_gender_incompatible(d, user, signals):
+                            if d['id'] not in seen_p:
                                 seen_p.add(d['id'])
                                 products.append(d)
 
-                    # Channel 3: Broad diverse lifestyle discovery across relevant demographic categories
+                    # Channel 3: Broad diverse lifestyle discovery across all 11 categories
                     cat_offset = ((user_id or 1) * 17 + random.randint(0, 20)) % 50
-                    explore_cids = list(range(1, 12))
-                    if u_gender == 'Nam':
-                        if 4 not in user_signal_cids and 4 in explore_cids:
-                            explore_cids.remove(4)
-                        if 'Gia Đình' not in user.get('full_name', '') and 10 not in user_signal_cids and 10 in explore_cids:
-                            explore_cids.remove(10)
-                        if 7 not in user_signal_cids and 7 in explore_cids:
-                            explore_cids.remove(7)
-                    elif u_gender == 'Nữ':
-                        if 3 not in user_signal_cids and 3 in explore_cids:
-                            explore_cids.remove(3)
-
-                    for cid in explore_cids:
+                    for cid in range(1, 12):
                         for r in db.execute('''SELECT p.*, pr.name province_name FROM products p
                             LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.category_id=? AND p.stock>0
                             ORDER BY p.sold_count DESC LIMIT 15 OFFSET ?''', (cid, cat_offset)):
                             d = dict(r)
-                            if d['id'] not in seen_p and not is_gender_incompatible(d, user, signals):
+                            if d['id'] not in seen_p:
                                 seen_p.add(d['id'])
                                 products.append(d)
 
@@ -1037,8 +887,6 @@ class RecommendationService:
             seen_names = set()
             seen_cores = set()
             for p in scored_products:
-                if is_gender_incompatible(p, user, signals):
-                    continue
                 name = p['name'].strip().casefold()
                 core = core_product_title(p['name'])
                 if name in seen_names or (core and core in seen_cores):

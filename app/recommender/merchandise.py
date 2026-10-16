@@ -310,39 +310,67 @@ def merchandise_image(product):
     return pool[index]
 
 
-def is_gender_incompatible(product, user, signals=None):
-    """Enforce strict gender integrity: prevent women's clothing/makeup from appearing to men,
-    and men's apparel from appearing to women, unless explicitly browsed."""
+def product_gender_affinity(product, user, signals=None):
+    """Compute continuous demographic gender alignment (0.0 to 1.0) instead of crude hard-blocking.
+    Allows gentle cross-gender gift shopping if user interacted with items, while heavily prioritizing
+    natural demographic matches."""
     if not user:
-        return False
+        return 0.75  # Neutral default for guest
     gender = user.get('gender')
     if not gender:
-        return False
+        return 0.75
     name = (product.get('name') or '').lower()
     if 'nam nữ' in name or 'unisex' in name:
-        return False
+        return 0.80  # Unisex items fit everyone naturally
+
     cid = product.get('category_id')
     p_kind = kind(product)
     signals = signals or []
     user_cids = {s.get('category_id') for s in signals}
 
+    is_female = (cid == 4 or p_kind in ('dress', 'skirt', 'heels', 'flats', 'lipstick') or
+                 any(t in name for t in ['đầm ', 'váy ', 'chân váy', 'cao gót', 'búp bê', 'croptop', 'son tint', 'son kem', 'nước tẩy trang', 'nữ ']))
+    is_male = (cid == 3 or any(t in name for t in ['áo sơ mi nam', 'áo thun nam', 'áo polo nam', 'quần tây nam', 'quần jean nam', 'áo khoác bomber nam', 'quần short nam', 'quần lót nam', 'boxer', 'giày tây nam', 'đồng hồ nam']))
+
     if gender == 'Nam':
-        if cid == 4 and 4 not in user_cids:
-            return True
-        if p_kind in ('dress', 'skirt', 'heels', 'flats'):
-            return True
-        if any(term in name for term in ['đầm ', 'váy ', 'chân váy', 'cao gót', 'búp bê', 'croptop', 'son tint', 'son kem', 'nước tẩy trang', 'nữ ']):
-            if cid in (4, 5, 7, 8):
-                return True
-        if cid == 10 and 'Gia Đình' not in user.get('full_name', '') and 10 not in user_cids:
-            if p_kind in ('diapers', 'milk') or any(term in name for term in ['tã ', 'bỉm ', 'sữa bột', 'bình sữa']):
-                return True
+        if is_male:
+            return 1.0   # Highest priority: product designed for men
+        if is_female:
+            # If user has explicit past interest in female items (e.g. buying gift for girlfriend/wife/mother)
+            if cid in user_cids or 4 in user_cids or 7 in user_cids:
+                return 0.65
+            return 0.05  # Low demographic score when user shows zero interest in female items
+        return 0.75      # Tech, audio, laptops, phones, camping, cookware are neutral/unisex
 
     elif gender == 'Nữ':
-        if cid == 3 and 3 not in user_cids:
-            return True
-        if any(term in name for term in ['nam ', 'boxer', 'quần tây nam', 'áo sơ mi nam', 'áo polo nam', 'giày tây nam', 'quần short nam']):
-            if cid in (3, 5, 8):
-                return True
-    return False
+        if is_female:
+            return 1.0   # Highest priority: product designed for women
+        if is_male:
+            if cid in user_cids or 3 in user_cids:
+                return 0.65
+            return 0.05
+        return 0.75
+
+    return 0.75
+
+
+def product_life_stage_affinity(product, user, signals=None):
+    """Compute continuous life-stage affinity (0.0 to 1.0) based on age, family profile, and product category."""
+    if not user:
+        return 0.75
+    cid = product.get('category_id')
+    p_kind = kind(product)
+    name = (product.get('name') or '').lower()
+    signals = signals or []
+    user_cids = {s.get('category_id') for s in signals}
+    is_baby = cid == 10 and (p_kind in ('diapers', 'milk') or any(t in name for t in ['tã ', 'bỉm ', 'sữa bột', 'bình sữa']))
+
+    if is_baby:
+        if 'Gia Đình' in user.get('full_name', '') or 10 in user_cids:
+            return 1.0
+        birth_year = user.get('birth_year')
+        if birth_year and birth_year >= 2000:  # Young single customer (born 2000-2005)
+            return 0.08  # Natural low priority for baby diapers
+        return 0.40
+    return 0.75
 
