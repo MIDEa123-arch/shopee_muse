@@ -108,30 +108,51 @@ def initialize():
                        (json.dumps({'version':1,'after_behavior_id':boundary}),))
 
 
+HEADPHONE_IMAGES = [
+    '/static/images/storefront/100.webp',
+    '/static/images/storefront/101.webp',
+    '/static/images/storefront/107.webp',
+    'https://salt.tikicdn.com/cache/280x280/ts/product/04/1e/99/b9c26723ba7decb415260d0a29738747.jpg',
+    'https://salt.tikicdn.com/cache/280x280/ts/product/a8/b4/d2/44b79741ec6b69a10b00782a9b750955.jpg',
+    'https://salt.tikicdn.com/cache/280x280/ts/product/37/cd/19/02c6d6c12555558121bd0b62369bfdd2.jpg',
+    'https://salt.tikicdn.com/cache/280x280/ts/product/68/a4/28/c0d46b9578a8bcb9f92a0247fe271298.jpg',
+    'https://salt.tikicdn.com/cache/280x280/ts/product/91/f6/0a/c51f6d8957113a1d8a2f0c7ad588beb0.jpg',
+    'https://salt.tikicdn.com/cache/280x280/ts/product/28/77/34/2bc30a08e9ce7537b92bb717805178f5.jpg',
+    'https://salt.tikicdn.com/cache/280x280/ts/product/f4/04/89/66a6a0928929944a61be68bdf3b9df7d.jpg',
+    'https://salt.tikicdn.com/cache/280x280/ts/product/c3/02/75/a69766bb70f5e718b52a78ec4ce4812a.jpg'
+]
+
+SPEAKER_IMAGES = [
+    '/static/images/storefront/99.webp',
+    'https://salt.tikicdn.com/cache/280x280/ts/product/bf/0e/a9/62280749cd095d6dd351c8e01d2b7365.jpg'
+]
+
+KEYBOARD_IMAGES = [
+    '/static/images/catalog/0ff14790a138c6fd.jpg',
+    '/static/images/catalog/50867512f65f1c41.jpg',
+    '/static/images/catalog/c366d5473a83e25f.jpg',
+    '/static/images/storefront/81.webp',
+    '/static/images/storefront/82.webp',
+    'https://salt.tikicdn.com/cache/280x280/ts/product/6d/fc/25/42afb0c0cf52cf8f83a0f98d5e550ff7.jpg'
+]
+
+LAPTOP_IMAGES = [
+    '/static/images/storefront/78.webp',
+    '/static/images/storefront/79.webp',
+    '/static/images/storefront/80.webp',
+    '/static/images/catalog/deb5000b89dc7274.jpg',
+    'https://salt.tikicdn.com/cache/280x280/ts/product/e3/a7/5a/bc0d48d4659e0d2bb24b9920e737a018.jpg',
+    'https://salt.tikicdn.com/cache/280x280/ts/product/29/d3/ff/c375a5143579ff61d25375e3e55f5a2a.jpg'
+]
+
+MOUSE_IMAGES = [
+    '/static/images/catalog/7caad0a5922c8026.jpg',
+    'https://salt.tikicdn.com/cache/280x280/ts/product/3c/e0/00/bccd602b77761cbfabe803ff1ee94ebc.png'
+]
+
 VERIFIED_CATEGORY_IMAGES = {
-    1: [
-        '/static/images/storefront/78.webp', '/static/images/storefront/79.webp', '/static/images/storefront/80.webp',
-        '/static/images/storefront/81.webp', '/static/images/storefront/82.webp', '/static/images/catalog/deb5000b89dc7274.jpg',
-        'https://salt.tikicdn.com/cache/280x280/ts/product/e3/a7/5a/bc0d48d4659e0d2bb24b9920e737a018.jpg',
-        'https://salt.tikicdn.com/cache/280x280/ts/product/29/d3/ff/c375a5143579ff61d25375e3e55f5a2a.jpg',
-        'https://salt.tikicdn.com/cache/280x280/ts/product/bf/0e/a9/62280749cd095d6dd351c8e01d2b7365.jpg',
-        'https://salt.tikicdn.com/cache/280x280/ts/product/6d/fc/25/42afb0c0cf52cf8f83a0f98d5e550ff7.jpg',
-        'https://salt.tikicdn.com/cache/280x280/ts/product/3c/e0/00/bccd602b77761cbfabe803ff1ee94ebc.png'
-    ],
-    2: [
-        '/static/images/storefront/99.webp', '/static/images/storefront/100.webp', '/static/images/storefront/101.webp',
-        '/static/images/storefront/102.webp', '/static/images/storefront/103.webp', '/static/images/storefront/104.webp',
-        '/static/images/storefront/105.webp', '/static/images/storefront/106.webp', '/static/images/storefront/107.webp',
-        '/static/images/storefront/108.webp', '/static/images/storefront/109.webp', '/static/images/storefront/110.webp',
-        '/static/images/storefront/111.webp', '/static/images/storefront/112.webp',
-        '/static/images/catalog/0ff14790a138c6fd.jpg', '/static/images/catalog/50867512f65f1c41.jpg',
-        '/static/images/catalog/c366d5473a83e25f.jpg',
-        'https://salt.tikicdn.com/cache/280x280/ts/product/04/1e/99/b9c26723ba7decb415260d0a29738747.jpg',
-        'https://salt.tikicdn.com/cache/280x280/ts/product/a8/b4/d2/44b79741ec6b69a10b00782a9b750955.jpg',
-        'https://salt.tikicdn.com/cache/280x280/ts/product/37/cd/19/02c6d6c12555558121bd0b62369bfdd2.jpg',
-        'https://salt.tikicdn.com/cache/280x280/ts/product/68/a4/28/c0d46b9578a8bcb9f92a0247fe271298.jpg',
-        'https://salt.tikicdn.com/cache/280x280/ts/product/91/f6/0a/c51f6d8957113a1d8a2f0c7ad588beb0.jpg'
-    ],
+    1: LAPTOP_IMAGES + KEYBOARD_IMAGES + MOUSE_IMAGES,
+    2: HEADPHONE_IMAGES + SPEAKER_IMAGES,
     3: [
         '/static/images/storefront/83.webp', '/static/images/storefront/84.webp', '/static/images/storefront/85.webp',
         '/static/images/storefront/86.webp', '/static/images/storefront/87.webp', '/static/images/storefront/162.webp',
@@ -221,7 +242,25 @@ def public_product(row):
 
         cat_id = result.get('category_id') or 1
         prod_id = result.get('id') or 1
-        pool = VERIFIED_CATEGORY_IMAGES.get(cat_id) or VERIFIED_CATEGORY_IMAGES[1]
+        nl = (result.get('name') or '').lower()
+
+        # Context-aware precise image selection by product name keyword
+        if cat_id == 2:
+            if any(k in nl for k in ('tai nghe', 'headphone', 'earphone', 'airpods', 'tws', 'chup tai', 'nhet tai', 'in-ear', 'wf-', 'wh-')):
+                pool = HEADPHONE_IMAGES
+            elif any(k in nl for k in ('loa', 'soundbar', 'bluetooth speaker')):
+                pool = SPEAKER_IMAGES
+            else:
+                pool = HEADPHONE_IMAGES
+        elif cat_id == 1:
+            if any(k in nl for k in ('ban phim', 'bàn phím', 'keyboard', 'keychron')):
+                pool = KEYBOARD_IMAGES
+            elif any(k in nl for k in ('chuot', 'chuột', 'mouse', 'logitech')):
+                pool = MOUSE_IMAGES
+            else:
+                pool = LAPTOP_IMAGES
+        else:
+            pool = VERIFIED_CATEGORY_IMAGES.get(cat_id) or VERIFIED_CATEGORY_IMAGES[1]
 
         curr_img = result.get('image_url') or ''
         if not curr_img or curr_img not in pool:

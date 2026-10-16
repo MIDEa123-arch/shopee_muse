@@ -12,11 +12,10 @@ def curated_demo_titles():
 
 def product_kind(name):
     name=name.casefold()
-    # Prefixes prevent accessory names such as "Balo Laptop" being called laptops.
     kinds=('kem chống nắng','bàn phím','màn hình','củ sạc','cáp sạc','pin dự phòng',
            'tai nghe','máy hút bụi','robot hút bụi','máy pha cà phê','nồi chiên',
            'nồi cơm','đồng hồ','kính mát','kính râm','laptop','chuột','serum','son','loa')
-    return next((kind for kind in kinds if name.startswith(kind)),' '.join(name.split()[:3]))
+    return next((kind for kind in kinds if kind in name),' '.join(name.split()[:3]))
 
 
 @lru_cache(maxsize=1)

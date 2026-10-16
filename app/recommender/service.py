@@ -14,76 +14,128 @@ from app.native_catalog import catalog_info,MODE
 from .native import native_ranking
 
 
-def diversify(ranked):
-    """Keep a stable, varied list without repeating a product name or photo."""
-    result=[];images=set();names=set()
+def diversify(ranked, intent_caps=None):
+    """Keep a stable, varied list without repeating a product name or duplicating photos adjacent to each other,
+    while allowing high-intent categories to occupy a larger share of the feed."""
+    result = []
+    photo_counts = {}
+    names = set()
+    intent_caps = intent_caps or {}
+    last_photo = None
     while ranked:
-        categories={};deferred=[]
-        for product,score in ranked:
-            category=product['category_id'];photo=product['image_url'] or product['id']
-            name=product['name'].casefold()
+        categories = {}
+        deferred = []
+        for product, score in ranked:
+            category = product['category_id']
+            photo = product.get('image_url') or product['id']
+            name = product['name'].casefold().strip()
             if name in names:
                 continue
-            if photo in images:
+            # Allow at most 2 items with the same photo across the feed, avoiding identical consecutive photos
+            if photo_counts.get(photo, 0) >= 2 or (photo == last_photo and len(result) > 0):
+                deferred.append((product, score))
                 continue
-            if categories.get(category,0)>=3:
-                deferred.append((product,score));continue
-            images.add(photo);names.add(name);categories[category]=categories.get(category,0)+1
-            result.append((product,score))
-        ranked=deferred
+            max_cat = intent_caps.get(category, 3)
+            if categories.get(category, 0) >= max_cat:
+                deferred.append((product, score))
+                continue
+            photo_counts[photo] = photo_counts.get(photo, 0) + 1
+            last_photo = photo
+            names.add(name)
+            categories[category] = categories.get(category, 0) + 1
+            result.append((product, score))
+        if not deferred or len(deferred) == len(ranked):
+            # If no items could be added without violation, add remaining unique names
+            for product, score in deferred:
+                name = product['name'].casefold().strip()
+                if name not in names:
+                    names.add(name)
+                    result.append((product, score))
+            break
+        ranked = deferred
     return result
 
 
-ACTION_WEIGHTS={'demo_interest':8.0,'purchase':5.0,'add_to_cart':4.0,'favorite':3.0,'click':2.0}
+ACTION_WEIGHTS = {'demo_interest': 8.0, 'purchase': 5.0, 'add_to_cart': 4.0, 'favorite': 3.0, 'click': 2.0}
 
 
-def include_category_candidates(products,selected_ids,category_id,limit=8):
+def include_category_candidates(products, selected_ids, category_id, limit=24):
     """Include top rated candidates from a category of interest."""
     if not category_id:
         return selected_ids
-    images=set();added=0
-    candidates=sorted((p for p in products if p['category_id']==category_id),
-                      key=lambda p:(p['rating_star'],p['sold_count']),reverse=True)
+    photo_counts = {}
+    added = 0
+    candidates = sorted((p for p in products if p['category_id'] == category_id),
+                        key=lambda p: (p['rating_star'], p['sold_count']), reverse=True)
     for product in candidates:
-        image=product['image_url'] or product['id']
-        if image in images:
+        image = product.get('image_url') or product['id']
+        if photo_counts.get(image, 0) >= 2:
             continue
-        images.add(image);selected_ids.add(product['raw_item_id']);added+=1
-        if added>=limit:
+        photo_counts[image] = photo_counts.get(image, 0) + 1
+        selected_ids.add(product['raw_item_id'])
+        added += 1
+        if added >= limit:
             break
     return selected_ids
 
 
-def apply_customer_intent(ranked,signals):
-    """Combine base model rank with real recent session actions."""
+def apply_customer_intent(ranked, signals):
+    """Combine base model rank with real recent session actions and allocate feed share."""
     if not ranked:
-        return ranked,[]
-    strengths={};names={}
-    for index,row in enumerate(signals):
-        category=row['category_id']
-        strengths[category]=strengths.get(category,0)+ACTION_WEIGHTS.get(row['action_type'],1.0)*(0.86**index)
-        names[category]=row['category_name']
+        return ranked, [], {}
+    strengths = {}
+    names = {}
+    kind_strengths = {}
+    for index, row in enumerate(signals):
+        category = row['category_id']
+        weight = ACTION_WEIGHTS.get(row['action_type'], 1.0) * (0.86**index)
+        strengths[category] = strengths.get(category, 0) + weight
+        names[category] = row.get('category_name') or f"Danh mục {category}"
+        prod_name = row.get('product_name') or ''
+        kind = product_kind(prod_name)
+        if kind:
+            kind_strengths[kind] = kind_strengths.get(kind, 0) + weight
     if not strengths:
-        for product,_ in ranked:
-            product.setdefault('recommendation_reason','Gợi ý dành cho bạn')
-        return ranked,[]
-    peak=max(strengths.values())
-    count=max(1,len(ranked)-1)
-    rescored=[]
-    for base_index,(product,model_score) in enumerate(ranked):
-        category=product['category_id']
-        base_rank=1-(base_index/count)
-        intent=strengths.get(category,0)/peak
-        display_rank=base_rank+1.2*intent
-        if intent:
-            product['recommendation_reason']=f"Hợp với hoạt động gần đây về {names[category]}"
+        for product, _ in ranked:
+            product.setdefault('recommendation_reason', 'Gợi ý dành cho bạn')
+        return ranked, [], {}
+    peak = max(strengths.values())
+    peak_kind = max(kind_strengths.values()) if kind_strengths else 0
+    count = max(1, len(ranked) - 1)
+    rescored = []
+    for base_index, (product, model_score) in enumerate(ranked):
+        category = product['category_id']
+        p_kind = product_kind(product['name'])
+        base_rank = 1 - (base_index / count)
+        cat_intent = strengths.get(category, 0) / peak
+        kind_intent = (kind_strengths.get(p_kind, 0) / peak_kind) if peak_kind and p_kind else 0
+        display_rank = base_rank + 1.5 * cat_intent + 1.2 * kind_intent
+        if kind_intent > 0.25:
+            product['recommendation_reason'] = f"Gợi ý theo sự quan tâm về {p_kind.title()}"
+        elif cat_intent > 0.15:
+            product['recommendation_reason'] = f"Hợp với hoạt động gần đây về {names[category]}"
         else:
-            product['recommendation_reason']='Gợi ý dành cho bạn'
-        rescored.append((product,model_score,display_rank))
-    rescored.sort(key=lambda row:(row[2],row[1],row[0]['sold_count']),reverse=True)
-    summary=[{'category_id':category,'category_name':names[category],'strength':round(value/peak,3)}
-             for category,value in sorted(strengths.items(),key=lambda pair:pair[1],reverse=True)]
-    return [(product,score) for product,score,_ in rescored],summary
+            product['recommendation_reason'] = 'Gợi ý dành cho bạn'
+        rescored.append((product, model_score, display_rank))
+    rescored.sort(key=lambda row: (row[2], row[1], row[0]['sold_count']), reverse=True)
+    summary = [{'category_id': category, 'category_name': names[category], 'strength': round(value / peak, 3)}
+               for category, value in sorted(strengths.items(), key=lambda pair: pair[1], reverse=True)]
+
+    # Dynamic feed quota: high-intent categories receive up to 14 items out of 24
+    intent_caps = {}
+    for s in summary:
+        cid = s['category_id']
+        st = s['strength']
+        if st >= 0.65:
+            intent_caps[cid] = 14
+        elif st >= 0.4:
+            intent_caps[cid] = 8
+        elif st >= 0.2:
+            intent_caps[cid] = 5
+        else:
+            intent_caps[cid] = 3
+
+    return [(product, score) for product, score, _ in rescored], summary, intent_caps
 
 
 COMPLEMENTARY_MAP = {
@@ -198,7 +250,7 @@ class RecommendationService:
         with connection() as db:
             target=db.execute('SELECT * FROM products WHERE id=?',(product_id,)).fetchone() if touchpoint in ('similar','complementary') else None
             cart=cart_rows(db,user_id) if user_id else []
-            signals=[dict(r) for r in db.execute('''SELECT h.action_type,p.category_id,c.name category_name,p.id product_id
+            signals=[dict(r) for r in db.execute('''SELECT h.action_type,p.category_id,c.name category_name,p.id product_id,p.name product_name
                 FROM user_behavior_history h JOIN products p ON p.id=h.product_id
                 JOIN categories c ON c.id=p.category_id
                 WHERE h.user_id=? AND h.action_type IN ('demo_interest','click','add_to_cart','purchase','favorite')
@@ -246,7 +298,7 @@ class RecommendationService:
                                 seen_p.add(r['id'])
                                 products.append(dict(r))
                 else:
-                    # Multi-Channel Recall: Top Global Popular + Top User Intent Categories
+                    # Multi-Channel Recall: Top Global Popular + Top User Intent Categories & Kinds
                     products=[dict(r) for r in db.execute('''SELECT p.*,pr.name province_name FROM products p
                         LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.stock>0
                         ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 160''')]
@@ -255,7 +307,15 @@ class RecommendationService:
                     for cid in intent_cats[:3]:
                         for r in db.execute('''SELECT p.*,pr.name province_name FROM products p
                             LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.category_id=? AND p.stock>0
-                            ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 60''', (cid,)):
+                            ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 140''', (cid,)):
+                            if r['id'] not in seen_p:
+                                seen_p.add(r['id'])
+                                products.append(dict(r))
+                    intent_kinds = [product_kind(s.get('product_name') or '') for s in signals[:4] if product_kind(s.get('product_name') or '')]
+                    for kind in list(dict.fromkeys(intent_kinds))[:2]:
+                        for r in db.execute('''SELECT p.*,pr.name province_name FROM products p
+                            LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.name LIKE ? AND p.stock>0
+                            ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 80''', (f'%{kind}%',)):
                             if r['id'] not in seen_p:
                                 seen_p.add(r['id'])
                                 products.append(dict(r))
@@ -417,8 +477,9 @@ class RecommendationService:
         inference_ms=(time.perf_counter()-inference_start)*1000
         ranked=sorted(zip(products,scores),key=lambda x:(x[1],x[0]['sold_count'],-x[0]['id']),reverse=True)
         intent_summary=[]
+        intent_caps={}
         if touchpoint=='home' and user_id:
-            ranked,intent_summary=apply_customer_intent(ranked,signals)
+            ranked,intent_summary,intent_caps=apply_customer_intent(ranked,signals)
         if touchpoint in ('similar','cart','complementary'):
             photos=set();unique=[]
             for product,score in ranked:
@@ -426,17 +487,34 @@ class RecommendationService:
                 if photo not in photos:
                     photos.add(photo);unique.append((product,score))
             ranked=unique
-        ranked=diversify(ranked)
-        top=[];visible_photos=set();visible_names=set()
-        for product,_ in ranked:
-            item=public_product(product)
-            photo=item.get('image_url') or item['id']
-            name=item['name'].strip().casefold()
-            if photo in visible_photos or name in visible_names:
+        ranked=diversify(ranked,intent_caps=intent_caps)
+        top = []
+        visible_photo_counts = {}
+        visible_names = set()
+        last_photo = None
+        for product, _ in ranked:
+            item = public_product(product)
+            photo = item.get('image_url') or item['id']
+            name = item['name'].strip().casefold()
+            if name in visible_names:
                 continue
-            visible_photos.add(photo);visible_names.add(name);top.append(item)
-            if len(top)>=limit:
+            if visible_photo_counts.get(photo, 0) >= 2 or (photo == last_photo and len(top) > 0):
+                continue
+            visible_photo_counts[photo] = visible_photo_counts.get(photo, 0) + 1
+            last_photo = photo
+            visible_names.add(name)
+            top.append(item)
+            if len(top) >= limit:
                 break
+        if len(top) < limit:
+            for product, _ in ranked:
+                item = public_product(product)
+                name = item['name'].strip().casefold()
+                if name not in visible_names:
+                    visible_names.add(name)
+                    top.append(item)
+                    if len(top) >= limit:
+                        break
         active_interest=next(({'category_id':row['category_id'],'category_name':row['category_name'],
                                'product_id':row['product_id']} for row in signals
                               if row['action_type']=='demo_interest'),None)
