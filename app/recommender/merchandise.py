@@ -308,3 +308,41 @@ def merchandise_image(product):
         return '/static/images/placeholder.svg'
     index = int.from_bytes(hashlib.sha256(identity(product).encode()).digest()[:4], 'big') % len(pool)
     return pool[index]
+
+
+def is_gender_incompatible(product, user, signals=None):
+    """Enforce strict gender integrity: prevent women's clothing/makeup from appearing to men,
+    and men's apparel from appearing to women, unless explicitly browsed."""
+    if not user:
+        return False
+    gender = user.get('gender')
+    if not gender:
+        return False
+    name = (product.get('name') or '').lower()
+    if 'nam nữ' in name or 'unisex' in name:
+        return False
+    cid = product.get('category_id')
+    p_kind = kind(product)
+    signals = signals or []
+    user_cids = {s.get('category_id') for s in signals}
+
+    if gender == 'Nam':
+        if cid == 4 and 4 not in user_cids:
+            return True
+        if p_kind in ('dress', 'skirt', 'heels', 'flats'):
+            return True
+        if any(term in name for term in ['đầm ', 'váy ', 'chân váy', 'cao gót', 'búp bê', 'croptop', 'son tint', 'son kem', 'nước tẩy trang', 'nữ ']):
+            if cid in (4, 5, 7, 8):
+                return True
+        if cid == 10 and 'Gia Đình' not in user.get('full_name', '') and 10 not in user_cids:
+            if p_kind in ('diapers', 'milk') or any(term in name for term in ['tã ', 'bỉm ', 'sữa bột', 'bình sữa']):
+                return True
+
+    elif gender == 'Nữ':
+        if cid == 3 and 3 not in user_cids:
+            return True
+        if any(term in name for term in ['nam ', 'boxer', 'quần tây nam', 'áo sơ mi nam', 'áo polo nam', 'giày tây nam', 'quần short nam']):
+            if cid in (3, 5, 8):
+                return True
+    return False
+
