@@ -88,22 +88,30 @@ def apply_customer_intent(ranked,signals):
 
 COMPLEMENTARY_MAP = {
     1: [1, 2, 8, 9],  # Điện tử -> Phụ kiện điện tử, Âm thanh, Balo/Phụ kiện, Điện thoại
-    2: [1, 2, 9, 8],  # Âm thanh -> Điện tử, Điện thoại, Phụ kiện
+    2: [2, 1, 9, 8],  # Âm thanh -> Điện tử, Điện thoại, Phụ kiện
     3: [3, 5, 8],     # Thời trang nam -> Quần/Áo nam, Giày dép, Phụ kiện (đồng hồ, ví)
     4: [4, 5, 7, 8],  # Thời trang nữ -> Đầm/Váy/Áo nữ, Giày cao gót, Mỹ phẩm, Phụ kiện
-    5: [3, 4, 8, 11], # Giày dép -> Trang phục thể thao, Phụ kiện
-    6: [6, 1],        # Gia dụng thông minh -> Đồ gia dụng khác, Thiết bị điện
-    7: [7, 4],        # Mỹ phẩm -> Các bước skincare khác, Thời trang nữ
-    8: [3, 4, 1, 8],  # Phụ kiện -> Thời trang, Công nghệ
-    9: [2, 1, 9, 8],  # Điện thoại & Tablet -> Âm thanh/Tai nghe, Phụ kiện điện tử
+    5: [5, 11, 3, 8], # Giày dép -> Thể thao, Giày dép, Phụ kiện
+    6: [6, 8],        # Gia dụng thông minh -> Đồ gia dụng khác, Phụ kiện nhà cửa
+    7: [7, 4, 8],     # Mỹ phẩm -> Các bước skincare khác, Thời trang nữ, Phụ kiện
+    8: [8, 3, 4, 1],  # Phụ kiện -> Thời trang, Công nghệ
+    9: [9, 2, 1, 8],  # Điện thoại & Tablet -> Âm thanh/Tai nghe, Phụ kiện điện tử
     10: [10, 6, 11],  # Đồ chơi & Trẻ Em -> Đồ chơi, Gia dụng, Dã ngoại
-    11: [11, 5, 3, 8],# Thể thao & Dã ngoại -> Thể thao, Giày dép, Trang phục
+    11: [11, 5, 8],   # Thể thao & Dã ngoại -> Thể thao, Giày dép, Trang phục
 }
 
-ELECTRONICS_COMPLEMENTS = {
-    9: ('tai nghe','củ sạc','cáp sạc','pin dự phòng','sạc','ốp','bao da'),
-    1: ('tai nghe','bàn phím','chuột','màn hình','củ sạc','cáp sạc','pin dự phòng','balo laptop'),
-    2: ('củ sạc','cáp sạc','pin dự phòng','sạc','túi đựng','đệm tai','giá đỡ'),
+CATEGORY_COMPLEMENTS = {
+    1: ('tai nghe', 'bàn phím', 'chuột', 'màn hình', 'củ sạc', 'cáp sạc', 'pin dự phòng', 'balo', 'lót chuột'),
+    2: ('củ sạc', 'cáp sạc', 'pin dự phòng', 'sạc', 'túi đựng', 'đệm tai', 'giá đỡ'),
+    3: ('đồng hồ', 'ví da', 'thắt lưng', 'kính', 'giày', 'tất'),
+    4: ('túi xách', 'son', 'serum', 'kem', 'kính', 'giày'),
+    5: ('vớ', 'tất', 'bình nước', 'thảm tập', 'thể thao', 'kháng lực', 'dây giày', 'lót'),
+    6: ('chảo', 'hộp cơm', 'máy xay', 'bình giữ nhiệt', 'bàn ủi', 'khăn lau', 'giấy nến', 'kẹp', 'dao'),
+    7: ('kem chống nắng', 'serum', 'son', 'nước tẩy trang', 'sữa rửa mặt', 'mặt nạ', 'bông'),
+    8: ('hộp đựng', 'khăn lau', 'dây da', 'ví da'),
+    9: ('tai nghe', 'củ sạc', 'cáp sạc', 'pin dự phòng', 'sạc', 'ốp', 'bao da'),
+    10: ('khăn ướt', 'bình sữa', 'sữa', 'đồ chơi'),
+    11: ('thảm tập', 'con lăn', 'dây kháng lực', 'bình nước', 'túi thể thao'),
 }
 
 
@@ -311,9 +319,9 @@ class RecommendationService:
             others=[p for p in products if product_kind(p['name'])!=target_kind]
             if others:
                 products=others
-            prefixes=ELECTRONICS_COMPLEMENTS.get(target['category_id'])
+            prefixes=CATEGORY_COMPLEMENTS.get(target['category_id'])
             if prefixes:
-                safe=[p for p in products if p['name'].casefold().startswith(prefixes)]
+                safe=[p for p in products if any(p['name'].casefold().startswith(prefix) for prefix in prefixes)]
                 if safe:
                     products=safe
             for p in products:
