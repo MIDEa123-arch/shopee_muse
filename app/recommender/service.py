@@ -3,7 +3,7 @@ import math
 import random
 import re
 import time
-from collections import Counter, OrderedDict
+from collections import Counter, OrderedDict, defaultdict
 from threading import Lock
 from fastapi import HTTPException
 from app.database import connection,public_product
@@ -14,7 +14,7 @@ from .evaluation import evaluation_summary
 from .catalog import curated_demo_titles,product_kind,has_matching_demo_photo
 from app.native_catalog import catalog_info,MODE
 from .native import native_ranking
-from .merchandise import (kind as merchandise_kind, identity, COMPLEMENTS,
+from .merchandise import (kind as merchandise_kind, identity, COMPLEMENTS, DURABLE_KINDS,
                           is_complement, purchase_context, exclude_owned, unique_models)
 
 
@@ -143,31 +143,31 @@ def apply_customer_intent(ranked, signals):
 
 
 COMPLEMENTARY_MAP = {
-    1: [2, 9, 8, 6, 1],   # Thiết Bị Điện Tử & Công Nghệ -> Âm Thanh, Điện Thoại, Đồng Hồ, Gia Dụng
-    2: [1, 9, 8, 5, 2],   # Âm Thanh & Tai Nghe -> Điện Tử, Điện Thoại, Đồng Hồ, Sneaker
-    3: [5, 8, 11, 1, 3],  # Thời Trang Nam -> Giày Dép, Đồng Hồ, Thể Thao, Điện Tử
-    4: [7, 8, 5, 6, 4],   # Thời Trang Nữ -> Mỹ Phẩm, Đồng Hồ/Trang Sức, Giày Dép, Gia Dụng
-    5: [3, 4, 11, 8, 5],  # Giày Dép & Sneaker -> Thời Trang Nam/Nữ, Thể Thao, Đồng Hồ
-    6: [1, 10, 8, 2, 6],  # Đồ Gia Dụng Thông Minh -> Điện Tử, Đồ Chơi/Mẹ Bé, Đồng Hồ, Âm Thanh
-    7: [4, 8, 6, 2, 7],   # Mỹ Phẩm & Sắc Đẹp -> Thời Trang Nữ, Đồng Hồ/Trang Sức, Gia Dụng
-    8: [3, 4, 9, 1, 8],   # Đồng Hồ & Trang Sức -> Thời Trang Nam/Nữ, Điện Thoại, Điện Tử
-    9: [2, 1, 8, 6, 9],   # Điện Thoại & Máy Tính Bảng -> Âm Thanh, Điện Tử, Đồng Hồ, Gia Dụng
-    10: [6, 4, 11, 7, 10], # Đồ Chơi & Trẻ Em -> Gia Dụng, Thời Trang Nữ, Thể Thao, Mỹ Phẩm
-    11: [5, 2, 3, 8, 11], # Thể Thao & Dã Ngoại -> Giày Dép, Âm Thanh/Tai Nghe, Thời Trang, Đồng Hồ
+    1: [2, 9, 8, 1],       # Thiết Bị Điện Tử & Công Nghệ -> Âm Thanh, Điện Thoại, Đồng Hồ
+    2: [1, 9, 8, 2],       # Âm Thanh & Phụ Kiện Máy Tính -> Điện Tử, Điện Thoại, Đồng Hồ
+    3: [5, 8, 11, 3],      # Thời Trang Nam -> Giày Dép, Đồng Hồ, Thể Thao
+    4: [7, 5, 8, 4],       # Thời Trang Nữ -> Mỹ Phẩm, Giày Dép Nữ, Đồng Hồ/Trang Sức
+    5: [5, 3, 4, 11, 8],   # Giày Dép & Sneaker -> Phụ kiện giày (vớ/lót/vệ sinh), Thời Trang, Thể Thao
+    6: [6, 10],            # Đồ Gia Dụng Thông Minh -> Đồ Bếp/Gia Dụng, Mẹ & Bé (KHÔNG CÓ CÔNG NGHỆ/ĐỒNG HỒ)
+    7: [7, 4],             # Mỹ Phẩm & Sắc Đẹp -> Skincare cùng bộ (Tẩy trang -> Sữa rửa mặt, Serum, Kem dưỡng, Chống nắng), Thời Trang Nữ (TUYỆT ĐỐI KHÔNG CÔNG NGHỆ/ĐỒNG HỒ)
+    8: [3, 4, 8],          # Đồng Hồ & Trang Sức -> Thời Trang Nam/Nữ
+    9: [2, 8, 1, 9],       # Điện Thoại & Máy Tính Bảng -> Âm Thanh/Tai Nghe, Đồng Hồ, Điện Tử
+    10: [10, 6, 7],        # Đồ Chơi & Mẹ Bé -> Sữa/Bình sữa/Tã bỉm, Gia Dụng, Chăm sóc em bé
+    11: [11, 5, 3, 4],     # Thể Thao & Dã Ngoại -> Phụ kiện thể thao (túi vợt, cầu lông, bình nước, thảm yoga), Giày Thể Thao, Quần Áo Thể Thao (TUYỆT ĐỐI KHÔNG CÔNG NGHỆ/CHUỘT/ĐỒNG HỒ)
 }
 
 CATEGORY_COMPLEMENTS = {
     1: ('tai nghe', 'bàn phím', 'chuột', 'màn hình', 'củ sạc', 'cáp sạc', 'pin dự phòng', 'balo', 'lót chuột'),
-    2: ('củ sạc', 'cáp sạc', 'pin dự phòng', 'sạc', 'túi đựng', 'đệm tai', 'giá đỡ'),
-    3: ('đồng hồ', 'ví da', 'thắt lưng', 'kính', 'giày', 'tất'),
-    4: ('túi xách', 'son', 'serum', 'kem', 'kính', 'giày'),
-    5: ('vớ', 'tất', 'bình nước', 'thảm tập', 'thể thao', 'kháng lực', 'dây giày', 'lót'),
-    6: ('chảo', 'hộp cơm', 'máy xay', 'bình giữ nhiệt', 'bàn ủi', 'khăn lau', 'giấy nến', 'kẹp', 'dao'),
-    7: ('kem chống nắng', 'serum', 'son', 'nước tẩy trang', 'sữa rửa mặt', 'mặt nạ', 'bông'),
-    8: ('hộp đựng', 'khăn lau', 'dây da', 'ví da'),
-    9: ('tai nghe', 'củ sạc', 'cáp sạc', 'pin dự phòng', 'sạc', 'ốp', 'bao da'),
-    10: ('khăn ướt', 'bình sữa', 'sữa', 'đồ chơi'),
-    11: ('thảm tập', 'con lăn', 'dây kháng lực', 'bình nước', 'túi thể thao'),
+    2: ('củ sạc', 'cáp sạc', 'pin dự phòng', 'giá đỡ', 'laptop', 'điện thoại'),
+    3: ('đồng hồ', 'ví da', 'thắt lưng', 'kính', 'giày', 'tất', 'vớ', 'sneaker'),
+    4: ('túi xách', 'son', 'serum', 'kem', 'kính', 'giày cao gót', 'sandal'),
+    5: ('vớ', 'tất', 'lót giày', 'dây giày', 'vệ sinh giày', 'khử mùi', 'bình nước', 'thể thao'),
+    6: ('chảo', 'hộp cơm', 'máy xay', 'bình giữ nhiệt', 'bàn ủi', 'khăn lau', 'giấy nến', 'dao'),
+    7: ('sữa rửa mặt', 'nước tẩy trang', 'kem chống nắng', 'serum', 'kem dưỡng', 'son', 'bông tẩy trang', 'mặt nạ'),
+    8: ('hộp đựng', 'khăn lau', 'dây da', 'ví da', 'vòng tay', 'dây chuyền'),
+    9: ('tai nghe', 'củ sạc', 'cáp sạc', 'pin dự phòng', 'sạc', 'ốp', 'bao da', 'kính cường lực'),
+    10: ('khăn ướt', 'bình sữa', 'sữa bột', 'tã', 'đồ chơi', 'ăn dặm'),
+    11: ('bao vợt', 'vợt', 'cầu lông', 'thảm tập', 'con lăn', 'dây kháng lực', 'bình nước', 'túi thể thao', 'giày thể thao'),
 }
 
 
@@ -202,21 +202,32 @@ def build_shopee_feed(ranked, signals, limit=24, retail=False):
         jitter = 0 if retail else random.uniform(-0.04, 0.04)
         unique_candidates.append((product, score + jitter))
 
-    # 2. Extract recent customer intent
+    # 2. Extract recent customer intent and handle durable purchase fatigue
     strengths = {}
     names = {}
     kind_strengths = {}
+    purchased_kinds = set()
+    purchased_ids = set()
+
     for index, row in enumerate(signals or []):
         cat = row['category_id']
         weight = ACTION_WEIGHTS.get(row['action_type'], 1.0) * (0.86**index)
-        strengths[cat] = strengths.get(cat, 0) + weight
         names[cat] = row.get('category_name') or f"Danh mục {cat}"
         p_name = row.get('product_name') or ''
-        k = merchandise_kind({'name':p_name}) if retail else product_kind(p_name)
-        target_types=COMPLEMENTS.get(k,set()) if retail and row['action_type']=='purchase' else {k}
-        for target_type in sorted(target_types):
-            if target_type:
-                kind_strengths[target_type] = kind_strengths.get(target_type, 0) + weight
+        k = merchandise_kind({'name': p_name})
+        if row.get('action_type') == 'purchase':
+            if row.get('product_id'):
+                purchased_ids.add(row['product_id'])
+            if k in DURABLE_KINDS:
+                purchased_kinds.add(k)
+                # DO NOT boost the durable kind itself (user already owns it)!
+                # Transfer purchase weight to its complementary accessories!
+                for comp_k in COMPLEMENTS.get(k, set()):
+                    kind_strengths[comp_k] = kind_strengths.get(comp_k, 0) + weight
+                continue
+        strengths[cat] = strengths.get(cat, 0) + weight
+        if k:
+            kind_strengths[k] = kind_strengths.get(k, 0) + weight
 
     intent_cat = max(strengths, key=strengths.get) if strengths else None
     intent_kind = max(kind_strengths, key=kind_strengths.get) if kind_strengths else None
@@ -228,18 +239,23 @@ def build_shopee_feed(ranked, signals, limit=24, retail=False):
     explore_pool = []
 
     for product, score in unique_candidates:
+        if product.get('id') in purchased_ids:
+            continue
         cid = product['category_id']
-        p_kind = merchandise_kind(product) if retail else product_kind(product['name'])
+        p_kind = merchandise_kind(product)
 
-        if intent_cat and ((not retail and cid == intent_cat) or (intent_kind and p_kind == intent_kind)):
-            if intent_kind and p_kind == intent_kind:
-                product['recommendation_reason'] = f"Gợi ý theo sở thích về {intent_kind.title()}"
-                intent_pool.append((product, score))
-            else:
-                product['recommendation_reason'] = f"Hợp với hoạt động gần đây về {names.get(cid, '')}"
-                intent_pool.append((product, score))
-        elif (any(is_complement(product,{'name':s['product_name'],'price':s.get('product_price',10000000)})
-                  for s in signals[:8] if s.get('product_name')) if retail else cid in comp_cats):
+        # Fatigue suppression: if user bought this durable kind, avoid flooding feed with more
+        if p_kind in purchased_kinds:
+            continue
+
+        if intent_kind and p_kind == intent_kind:
+            product['recommendation_reason'] = f"Gợi ý theo sở thích về {intent_kind.title()}"
+            intent_pool.append((product, score))
+        elif intent_cat and cid == intent_cat:
+            product['recommendation_reason'] = f"Hợp với hoạt động gần đây về {names.get(cid, '')}"
+            intent_pool.append((product, score))
+        elif (any(is_complement(product, {'name': s['product_name'], 'price': s.get('product_price', 10000000)})
+                  for s in signals[:8] if s.get('product_name')) or cid in comp_cats or p_kind in kind_strengths):
             product['recommendation_reason'] = "Phụ kiện & gợi ý phối hợp phù hợp"
             comp_pool.append((product, score))
         else:
@@ -249,6 +265,20 @@ def build_shopee_feed(ranked, signals, limit=24, retail=False):
     intent_pool.sort(key=lambda x: x[1], reverse=True)
     comp_pool.sort(key=lambda x: x[1], reverse=True)
     explore_pool.sort(key=lambda x: x[1], reverse=True)
+
+    # Interleave explore_pool across categories to guarantee varied, non-monolithic shelves
+    explore_by_cat = defaultdict(list)
+    for it in explore_pool:
+        explore_by_cat[it[0]['category_id']].append(it)
+    rotated_explore = []
+    cat_keys = list(explore_by_cat.keys())
+    random.shuffle(cat_keys)
+    max_len = max((len(v) for v in explore_by_cat.values()), default=0)
+    for round_i in range(max_len):
+        for ck in cat_keys:
+            if round_i < len(explore_by_cat[ck]):
+                rotated_explore.append(explore_by_cat[ck][round_i])
+    explore_pool = rotated_explore
 
     # 4. Balanced Quotas: ~4-5 intent items (20%), ~3 complementary, remainder explore
     intent_target = min(5, len(intent_pool)) if intent_cat else 0
@@ -463,24 +493,25 @@ class RecommendationService:
         max_intent_cat = max(intent_cats.values(), default=1.0)
         max_intent_kind = max(intent_kinds.values(), default=1.0)
 
+        # Dynamic range normalization for authentic MUSE model predictions
+        min_ai = min(ai_scores.values()) if ai_scores else 0.0
+        max_ai = max(ai_scores.values()) if ai_scores else 1.0
+        ai_span = max(1e-6, max_ai - min_ai)
+
         for p in products:
             raw_id = p.get('raw_item_id')
             price = max(1, p.get('price', 0))
             cid = p.get('category_id')
             p_kind = product_kind(p.get('name', ''))
 
-            # 1. AI Model Score (0.28)
-            s_ai = 0.50
+            # 1. AI Model Score (0.35)
+            s_ai = 0.40
             if ai_scores and raw_id in ai_scores:
-                val = ai_scores[raw_id]
-                if touchpoint in ('similar', 'complementary'):
-                    s_ai = max(0.0, min(1.0, (val + 0.3) / 1.3))
-                else:
-                    s_ai = max(0.0, min(1.0, val / 0.30))
+                s_ai = (ai_scores[raw_id] - min_ai) / ai_span
             else:
-                s_ai = min(1.0, math.log(1 + p.get('sold_count', 0)) / 10.0) * 0.50
+                s_ai = min(1.0, math.log(1 + p.get('sold_count', 0)) / 10.0) * 0.40
 
-            # 2. Context & Intent Relevance (0.28)
+            # 2. Context & Intent Relevance (0.25)
             s_ctx = 0.30
             reason = 'Gợi ý phù hợp dành cho bạn'
 
@@ -498,19 +529,85 @@ class RecommendationService:
                 s_ctx += min(0.20, overlap * 0.40)
 
             elif touchpoint == 'complementary' and target:
-                if cid in comp_cats and cid != target_cid:
-                    s_ctx += 0.35
-                    reason = f'Phụ kiện hoàn hảo cho {target["name"][:25]}…'
-                elif cid in comp_cats:
-                    s_ctx += 0.15
-                    reason = f'Mua kèm tiện lợi cùng {target["name"][:25]}…'
+                if target_cid == 7:  # Mỹ Phẩm & Sắc Đẹp
+                    if cid == 7:
+                        if p_kind in ('cleanser', 'serum', 'moisturizer', 'sunscreen', 'lipstick', 'makeup-remover'):
+                            s_ctx += 0.55
+                            reason = 'Bước dưỡng tiếp theo cho chu trình làm đẹp'
+                        else:
+                            s_ctx += 0.35
+                            reason = f'Sản phẩm làm đẹp mua kèm cùng {target["name"][:20]}…'
+                    elif cid == 4:
+                        s_ctx += 0.25
+                        reason = 'Thời trang & phụ kiện làm đẹp phù hợp'
+                    else:
+                        s_ctx -= 0.70  # Strictly reject tech/cookware/watches when viewing cosmetics
+                elif target_cid == 11:  # Thể Thao & Dã Ngoại
+                    if cid == 11:
+                        s_ctx += 0.55
+                        reason = 'Phụ kiện thể thao bổ trợ hoàn hảo'
+                    elif cid in (5, 3, 4):
+                        s_ctx += 0.35
+                        reason = 'Trang bị thể thao & dã ngoại phù hợp'
+                    else:
+                        s_ctx -= 0.70  # Strictly reject tech/mice when viewing sports
+                elif target_cid == 5:  # Giày dép
+                    if cid == 5 and p_kind in ('socks', 'shoe-insole', 'shoe-cleaner', 'shoelaces', 'shoe-deodorizer'):
+                        s_ctx += 0.55
+                        reason = 'Phụ kiện chăm sóc & vớ mua kèm'
+                    elif cid in (3, 4, 11):
+                        s_ctx += 0.35
+                        reason = 'Trang phục & thể thao phối cùng giày'
+                    elif p_kind == 'shoes':
+                        s_ctx -= 0.35  # Fatigue
+                else:
+                    if cid in comp_cats and cid != target_cid:
+                        s_ctx += 0.35
+                        reason = f'Phụ kiện hoàn hảo cho {target["name"][:25]}…'
+                    elif cid in comp_cats:
+                        s_ctx += 0.20
+                        reason = f'Mua kèm tiện lợi cùng {target["name"][:25]}…'
                 if 0.05 * target_price <= price <= 1.2 * target_price:
-                    s_ctx += 0.25
-                p_lower = p['name'].lower()
-                if any(k in p_lower for k in ('sạc', 'cáp', 'ốp', 'bao', 'túi', 'pin', 'tai nghe', 'kính', 'dây', 'lót', 'vớ', 'thảm', 'bình', 'chảo', 'dao', 'hộp')):
                     s_ctx += 0.15
-                if target_kind and p_kind == target_kind:
-                    s_ctx -= 0.25
+
+            elif touchpoint in ('orders', 'post_purchase'):
+                if target:
+                    if target_cid == 11:
+                        if cid == 11:
+                            s_ctx += 0.55
+                            reason = 'Phụ kiện thể thao mua kèm đơn hàng'
+                        elif cid in (5, 3, 4):
+                            s_ctx += 0.35
+                            reason = 'Trang bị thể thao & dã ngoại mua kèm'
+                        else:
+                            s_ctx -= 0.70
+                    elif target_cid == 7:
+                        if cid == 7:
+                            s_ctx += 0.55
+                            reason = 'Sản phẩm chăm sóc da mua kèm đơn hàng'
+                        elif cid == 4:
+                            s_ctx += 0.30
+                            reason = 'Thời trang & làm đẹp mua kèm đơn hàng'
+                        else:
+                            s_ctx -= 0.70
+                    elif target_cid == 5:
+                        if cid == 5 and p_kind in ('socks', 'shoe-insole', 'shoe-cleaner', 'shoelaces', 'shoe-deodorizer'):
+                            s_ctx += 0.55
+                            reason = 'Phụ kiện chăm sóc & vớ mua kèm đơn hàng'
+                        elif cid in (3, 4, 11):
+                            s_ctx += 0.35
+                            reason = 'Trang phục thể thao mua kèm đơn hàng'
+                        elif p_kind == 'shoes':
+                            s_ctx -= 0.40
+                    elif cid in comp_cats:
+                        s_ctx += 0.35
+                        reason = 'Mua kèm tiện lợi cho đơn hàng'
+                    else:
+                        s_ctx += 0.15
+                        reason = 'Gợi ý thêm cho đơn hàng của bạn'
+                else:
+                    s_ctx += 0.20
+                    reason = 'Gợi ý mua kèm đơn hàng vừa đặt'
 
             elif touchpoint == 'cart':
                 if cart and p.get('shop_name') in cart_shops:
@@ -538,16 +635,20 @@ class RecommendationService:
                     s_ctx += 0.15
                     reason = 'Gợi ý thịnh hành hôm nay'
 
-            # 3. User Demographics & Spending Tier (0.16)
+            # 3. User Demographics & Spending Tier (0.20)
             s_user = 0.50
             if u_gender == 'Nam':
-                if cid == 3: s_user += 0.20
-                elif cid in (1, 2, 11): s_user += 0.10
-                elif cid in (4, 7): s_user -= 0.20
+                if cid == 3: s_user += 0.30  # Men fashion
+                elif cid in (1, 2, 5, 8, 11): s_user += 0.15
+                elif cid == 4: s_user -= 0.60  # Avoid dresses/skirts for men
+                elif cid == 7 and p_kind in ('lipstick', 'skirt', 'dress'): s_user -= 0.60
             elif u_gender == 'Nữ':
-                if cid in (4, 7): s_user += 0.20
-                elif cid in (8, 10): s_user += 0.10
-                elif cid == 3: s_user -= 0.20
+                if cid in (4, 7): s_user += 0.30  # Women fashion & beauty
+                elif cid in (5, 8, 10, 6): s_user += 0.15
+                elif cid == 3: s_user -= 0.60  # Avoid men clothing for women
+            if user and 'Gia Đình' in user.get('full_name', ''):
+                if cid in (10, 6): s_user += 0.35  # Family baby & home goods
+                elif cid == 11: s_user += 0.15
 
             if user_price and user_price.get('tier') != 'all':
                 if user_price['min_price'] <= price <= user_price['max_price']:
@@ -559,18 +660,18 @@ class RecommendationService:
             if u_tier in ('Kim Cương', 'Vàng') and p.get('is_mall'):
                 s_user += 0.10
 
-            # 4. Product Quality & Proof (0.16)
+            # 4. Product Quality & Proof (0.10)
             star = max(0.0, (p.get('rating_star', 4.5) - 3.0) / 2.0)
             sold = min(1.0, math.log(1 + p.get('sold_count', 0)) / 10.0)
             disc = min(1.0, p.get('discount_percent', 0) / 50.0)
             s_qual = 0.40 * star + 0.35 * sold + 0.25 * disc
 
-            # 5. Merchant & Logistics (0.12)
-            s_merch = (0.14 if p.get('is_mall') else 0.0) + (0.08 if p.get('is_freeship') else 0.0)
+            # 5. Merchant & Logistics (0.10)
+            s_merch = (0.12 if p.get('is_mall') else 0.0) + (0.08 if p.get('is_freeship') else 0.0)
 
-            jitter = random.uniform(-0.03, 0.03)
+            jitter = random.uniform(-0.02, 0.02)
 
-            final_score = 0.28 * s_ai + 0.28 * s_ctx + 0.16 * s_user + 0.16 * s_qual + 0.12 * s_merch + jitter
+            final_score = 0.35 * s_ai + 0.25 * s_ctx + 0.20 * s_user + 0.10 * s_qual + 0.10 * s_merch + jitter
             p['recommendation_reason'] = reason
             p['ranking_score'] = round(final_score, 5)
             scored.append((p, final_score))
@@ -629,12 +730,46 @@ class RecommendationService:
                 if not target:
                     raise HTTPException(404, 'Sản phẩm không tồn tại.')
                 cid = target['category_id']
-                ordered_cids = [c for c in COMPLEMENTARY_MAP.get(cid, [cid]) if c != cid] + [cid]
-                for cc in ordered_cids[:5]:
+                ordered_cids = COMPLEMENTARY_MAP.get(cid, [cid])
+                # If target is cosmetics (7), prioritize specific skincare complements:
+                if cid == 7:
+                    for kw in ('sữa rửa mặt', 'kem chống nắng', 'serum', 'kem dưỡng', 'son', 'bông tẩy trang'):
+                        for r in db.execute('''SELECT p.*, pr.name province_name FROM products p
+                            LEFT JOIN provinces pr ON pr.id=p.province_id
+                            WHERE p.category_id=7 AND p.name LIKE ? AND p.stock>0 AND p.id!=?
+                            ORDER BY p.rating_star DESC, p.sold_count DESC LIMIT 20''', (f'%{kw}%', target['id'])):
+                            d = dict(r)
+                            if d['id'] not in seen_p:
+                                seen_p.add(d['id'])
+                                products.append(d)
+                # If target is sports (11), prioritize sports accessories:
+                elif cid == 11:
+                    for kw in ('bao vợt', 'vợt', 'cầu lông', 'thảm tập', 'dây kháng lực', 'bình nước', 'túi thể thao'):
+                        for r in db.execute('''SELECT p.*, pr.name province_name FROM products p
+                            LEFT JOIN provinces pr ON pr.id=p.province_id
+                            WHERE p.category_id=11 AND p.name LIKE ? AND p.stock>0 AND p.id!=?
+                            ORDER BY p.rating_star DESC, p.sold_count DESC LIMIT 20''', (f'%{kw}%', target['id'])):
+                            d = dict(r)
+                            if d['id'] not in seen_p:
+                                seen_p.add(d['id'])
+                                products.append(d)
+                # If target is shoes (5), prioritize shoe care & socks:
+                elif cid == 5:
+                    for kw in ('vớ', 'tất', 'lót giày', 'dây giày', 'vệ sinh', 'khử mùi', 'bình nước'):
+                        for r in db.execute('''SELECT p.*, pr.name province_name FROM products p
+                            LEFT JOIN provinces pr ON pr.id=p.province_id
+                            WHERE p.name LIKE ? AND p.stock>0 AND p.id!=?
+                            ORDER BY p.rating_star DESC, p.sold_count DESC LIMIT 20''', (f'%{kw}%', target['id'])):
+                            d = dict(r)
+                            if d['id'] not in seen_p:
+                                seen_p.add(d['id'])
+                                products.append(d)
+                # Query allowed complementary categories:
+                for cc in ordered_cids[:4]:
                     for r in db.execute('''SELECT p.*, pr.name province_name FROM products p
                         LEFT JOIN provinces pr ON pr.id=p.province_id
                         WHERE p.category_id=? AND p.stock>0 AND p.id!=?
-                        ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 45''', (cc, target['id'])):
+                        ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 40''', (cc, target['id'])):
                         d = dict(r)
                         if d['id'] not in seen_p:
                             seen_p.add(d['id'])
@@ -670,25 +805,67 @@ class RecommendationService:
                             products.append(d)
 
             elif touchpoint in ('orders', 'post_purchase'):
-                order_cids = []
+                order_products = []
                 if order_id:
-                    order_items = db.execute('SELECT product_id FROM order_items WHERE order_id=?', (order_id,)).fetchall()
-                    for oi in order_items:
-                        op = db.execute('SELECT category_id FROM products WHERE id=?', (oi[0],)).fetchone()
-                        if op and op[0]: order_cids.append(op[0])
-                if not order_cids and target:
-                    order_cids = [target['category_id']]
-                if not order_cids:
-                    order_cids = [1, 2, 3, 4, 6]
-                for cc in order_cids[:4]:
-                    for comp_c in COMPLEMENTARY_MAP.get(cc, [cc])[:3]:
+                    order_rows = db.execute('''SELECT p.*, pr.name province_name FROM order_items oi
+                        JOIN products p ON p.id=oi.product_id
+                        LEFT JOIN provinces pr ON pr.id=p.province_id
+                        WHERE oi.order_id=?''', (order_id,)).fetchall()
+                    order_products = [dict(r) for r in order_rows]
+                if not order_products and target:
+                    order_products = [target]
+                order_pids = {p['id'] for p in order_products}
+                order_cids = list(dict.fromkeys(p['category_id'] for p in order_products if p.get('category_id')))
+                if not target and order_products:
+                    target = order_products[0]
+
+                comp_cids = []
+                for occ in order_cids:
+                    for cc in COMPLEMENTARY_MAP.get(occ, []):
+                        if cc not in comp_cids: comp_cids.append(cc)
+                if not comp_cids:
+                    comp_cids = [11, 5, 3, 4] if 11 in order_cids else [1, 2, 9]
+
+                # Specific complements for ordered product categories:
+                if 11 in order_cids:
+                    for kw in ('bao vợt', 'vợt', 'cầu lông', 'thảm tập', 'dây kháng lực', 'bình nước', 'túi thể thao', 'giày thể thao'):
                         for r in db.execute('''SELECT p.*, pr.name province_name FROM products p
-                            LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.category_id=? AND p.stock>0
-                            ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 40''', (comp_c,)):
+                            LEFT JOIN provinces pr ON pr.id=p.province_id
+                            WHERE p.category_id=11 AND p.name LIKE ? AND p.stock>0
+                            ORDER BY p.rating_star DESC, p.sold_count DESC LIMIT 20''', (f'%{kw}%',)):
                             d = dict(r)
-                            if d['id'] not in seen_p:
+                            if d['id'] not in seen_p and d['id'] not in order_pids:
                                 seen_p.add(d['id'])
                                 products.append(d)
+                elif 7 in order_cids:
+                    for kw in ('sữa rửa mặt', 'kem chống nắng', 'serum', 'kem dưỡng', 'son', 'bông tẩy trang'):
+                        for r in db.execute('''SELECT p.*, pr.name province_name FROM products p
+                            LEFT JOIN provinces pr ON pr.id=p.province_id
+                            WHERE p.category_id=7 AND p.name LIKE ? AND p.stock>0
+                            ORDER BY p.rating_star DESC, p.sold_count DESC LIMIT 20''', (f'%{kw}%',)):
+                            d = dict(r)
+                            if d['id'] not in seen_p and d['id'] not in order_pids:
+                                seen_p.add(d['id'])
+                                products.append(d)
+                elif 5 in order_cids:
+                    for kw in ('vớ', 'tất', 'lót giày', 'dây giày', 'vệ sinh', 'khử mùi', 'bình nước'):
+                        for r in db.execute('''SELECT p.*, pr.name province_name FROM products p
+                            LEFT JOIN provinces pr ON pr.id=p.province_id
+                            WHERE p.category_id=5 AND p.name LIKE ? AND p.stock>0
+                            ORDER BY p.rating_star DESC, p.sold_count DESC LIMIT 20''', (f'%{kw}%',)):
+                            d = dict(r)
+                            if d['id'] not in seen_p and d['id'] not in order_pids:
+                                seen_p.add(d['id'])
+                                products.append(d)
+
+                for cc in comp_cids[:4]:
+                    for r in db.execute('''SELECT p.*, pr.name province_name FROM products p
+                        LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.category_id=? AND p.stock>0
+                        ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 35''', (cc,)):
+                        d = dict(r)
+                        if d['id'] not in seen_p and d['id'] not in order_pids:
+                            seen_p.add(d['id'])
+                            products.append(d)
 
             else:  # 'home', 'deals', or category browsing
                 if category_id is not None:
@@ -696,38 +873,69 @@ class RecommendationService:
                         LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.category_id=? AND p.stock>0
                         ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 240''', (category_id,))]
                 else:
-                    # Multi-channel recall
-                    products = [dict(r) for r in db.execute('''SELECT p.*, pr.name province_name FROM products p
-                        LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.stock>0
-                        ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 120''')]
-                    seen_p = {p['id'] for p in products}
-                    intent_cats = list(dict.fromkeys(s['category_id'] for s in signals[:6]))
-                    for cid in intent_cats[:4]:
-                        for r in db.execute('''SELECT p.*, pr.name province_name FROM products p
-                            LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.category_id=? AND p.stock>0
-                            ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 50''', (cid,)):
-                            d = dict(r)
-                            if d['id'] not in seen_p:
-                                seen_p.add(d['id'])
-                                products.append(d)
-                    intent_kinds = [product_kind(s.get('product_name') or '') for s in signals[:4] if product_kind(s.get('product_name') or '')]
-                    for kind in list(dict.fromkeys(intent_kinds))[:2]:
-                        for r in db.execute('''SELECT p.*, pr.name province_name FROM products p
-                            LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.name LIKE ? AND p.stock>0
-                            ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 40''', (f'%{kind}%',)):
-                            d = dict(r)
-                            if d['id'] not in seen_p:
-                                seen_p.add(d['id'])
-                                products.append(d)
-                    if intent_cats:
-                        for cid in COMPLEMENTARY_MAP.get(intent_cats[0], [])[:3]:
+                    # Multi-channel personalized recall
+                    purchases = purchase_context(db, user_id) if user_id else {'keys': set(), 'recent_kinds': set(), 'items': []}
+                    purchased_ids = {p['id'] for p in purchases['items']} | {s['product_id'] for s in signals if s.get('action_type') == 'purchase'}
+                    purchased_kinds = purchases['recent_kinds'] | {merchandise_kind({'name': s.get('product_name', '')}) for s in signals if s.get('action_type') == 'purchase' and merchandise_kind({'name': s.get('product_name', '')}) in DURABLE_KINDS}
+
+                    seen_p = set(purchased_ids)
+
+                    # Channel 1: Intent & History Complements
+                    for s in signals[:6]:
+                        p_name = s.get('product_name') or ''
+                        s_cid = s.get('category_id')
+                        k = merchandise_kind({'name': p_name})
+                        if s.get('action_type') == 'purchase' and k in DURABLE_KINDS:
+                            # User bought durable item (e.g. shoes) -> query its accessories/complements!
+                            comp_cids = COMPLEMENTARY_MAP.get(s_cid, [s_cid]) if s_cid else [11, 5, 3]
+                            for cc in comp_cids[:3]:
+                                for comp_k in list(COMPLEMENTS.get(k, set()))[:2]:
+                                    for r in db.execute('''SELECT p.*, pr.name province_name FROM products p
+                                        LEFT JOIN provinces pr ON pr.id=p.province_id
+                                        WHERE p.category_id=? AND p.name LIKE ? AND p.stock>0
+                                        ORDER BY p.rating_star DESC, p.sold_count DESC LIMIT 15''', (cc, f'%{comp_k}%')):
+                                        d = dict(r)
+                                        if d['id'] not in seen_p:
+                                            seen_p.add(d['id'])
+                                            products.append(d)
+                        elif s_cid:
                             for r in db.execute('''SELECT p.*, pr.name province_name FROM products p
                                 LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.category_id=? AND p.stock>0
-                                ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 30''', (cid,)):
+                                ORDER BY p.rating_star DESC, p.sold_count DESC LIMIT 25''', (s_cid,)):
                                 d = dict(r)
                                 if d['id'] not in seen_p:
                                     seen_p.add(d['id'])
                                     products.append(d)
+
+                    # Channel 2: Demographic & Preference Alignment
+                    u_gender = user.get('gender')
+                    demo_cids = []
+                    if u_gender == 'Nam':
+                        demo_cids = [3, 5, 1, 9, 11, 8]
+                    elif u_gender == 'Nữ':
+                        demo_cids = [4, 7, 5, 8, 6]
+                    if user and 'Gia Đình' in user.get('full_name', ''):
+                        demo_cids = [10, 6, 11, 5]
+                    for dc in demo_cids[:4]:
+                        offset = ((user_id or 1) * 11 + dc * 5) % 40
+                        for r in db.execute('''SELECT p.*, pr.name province_name FROM products p
+                            LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.category_id=? AND p.stock>0
+                            ORDER BY p.sold_count DESC LIMIT 20 OFFSET ?''', (dc, offset)):
+                            d = dict(r)
+                            if d['id'] not in seen_p:
+                                seen_p.add(d['id'])
+                                products.append(d)
+
+                    # Channel 3: Broad diverse lifestyle discovery across all 11 categories
+                    cat_offset = ((user_id or 1) * 17 + random.randint(0, 20)) % 50
+                    for cid in range(1, 12):
+                        for r in db.execute('''SELECT p.*, pr.name province_name FROM products p
+                            LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.category_id=? AND p.stock>0
+                            ORDER BY p.sold_count DESC LIMIT 15 OFFSET ?''', (cid, cat_offset)):
+                            d = dict(r)
+                            if d['id'] not in seen_p:
+                                seen_p.add(d['id'])
+                                products.append(d)
 
         metadata = {}
         model = self.model
@@ -754,8 +962,8 @@ class RecommendationService:
                             if p['raw_item_id'] in ai_scores:
                                 p['similarity'] = round(ai_scores[p['raw_item_id']], 6)
                 elif user_id and valid_raw:
-                    preds, extra = model.predict(user_id, valid_raw[:128])
-                    ai_scores = dict(zip(valid_raw[:128], preds))
+                    preds, extra = model.predict(user_id, valid_raw[:220])
+                    ai_scores = dict(zip(valid_raw[:220], preds))
                     metadata.update(extra)
                     model_used = True
                     engine = 'Alibaba MUSE DIN + GSU'
