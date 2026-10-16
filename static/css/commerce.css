@@ -917,3 +917,44 @@
     flex: 1 1 100%;
   }
 }
+
+/* Ensure heart wishlist button never overlaps discount percentage badge */
+.discount,
+.shopee-sale-badge {
+  position: absolute !important;
+  top: 0 !important;
+  right: 0 !important;
+  z-index: 3 !important;
+  pointer-events: none;
+}
+
+.heart-button,
+.store-card .heart-button,
+.native-card .heart-button {
+  position: absolute !important;
+  top: 30px !important;
+  right: 8px !important;
+  z-index: 5 !important;
+}
+
+/* If card does not have discount badge, heart button sits naturally at top: 8px */
+.product-card:not(:has(.discount)):not(:has(.shopee-sale-badge)) .heart-button,
+.store-card:not(:has(.discount)):not(:has(.shopee-sale-badge)) .heart-button,
+.native-card:not(:has(.discount)):not(:has(.shopee-sale-badge)) .heart-button {
+  top: 8px !important;
+}
+
+@media(max-width: 520px) {
+  .heart-button,
+  .store-card .heart-button,
+  .native-card .heart-button {
+    top: 26px !important;
+    right: 6px !important;
+  }
+  .product-card:not(:has(.discount)):not(:has(.shopee-sale-badge)) .heart-button,
+  .store-card:not(:has(.discount)):not(:has(.shopee-sale-badge)) .heart-button,
+  .native-card:not(:has(.discount)):not(:has(.shopee-sale-badge)) .heart-button {
+    top: 6px !important;
+  }
+}
+
