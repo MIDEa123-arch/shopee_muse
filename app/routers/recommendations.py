@@ -35,14 +35,14 @@ def active_demo_interest(db,user_id):
 
 
 @router.get('')
-def recommendations(touchpoint:str=Query('home',pattern='^(home|similar|cart|complementary)$'),product_id:int|None=None,
+def recommendations(touchpoint:str=Query('home',pattern='^(home|similar|cart|complementary|orders|post_purchase|deals)$'),product_id:int|None=None,
                     limit:int=Query(24,ge=1,le=60),category_id:int|None=None,
                     display_category:str=Query('',max_length=40),
                     presentation_policy:str=Query('original',pattern='^(original|contextual|browse|feed)$'),
-                    focus_product_id:int|None=Query(None,ge=1),user=Depends(current_user)):
+                    focus_product_id:int|None=Query(None,ge=1),order_id:int|None=Query(None,ge=1),user=Depends(current_user)):
     if touchpoint in ('similar','complementary') and product_id is None:
         raise HTTPException(422,'Cần chọn sản phẩm để tìm gợi ý liên quan.')
-    return service.recommend(user['id'] if user else None,touchpoint,product_id,limit,category_id,display_category,presentation_policy,focus_product_id)
+    return service.recommend(user['id'] if user else None,touchpoint,product_id,limit,category_id,display_category,presentation_policy,focus_product_id,order_id=order_id)
 
 
 @router.post('/behavior/{product_id}')

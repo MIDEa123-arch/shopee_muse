@@ -63,18 +63,16 @@ async def security_headers(request:Request,call_next):
     if request.method not in ('GET','HEAD','OPTIONS'):
         origin=request.headers.get('origin')
         if origin:
-            netloc = urlsplit(origin).netloc
-            host = request.headers.get('host')
+            origin_url=urlsplit(origin)
+            netloc=origin_url.netloc.casefold()
+            hostname=(origin_url.hostname or '').casefold()
+            host=request.headers.get('host','').casefold()
             is_allowed = (
-                netloc == host
-                or 'vercel.app' in netloc
-                or 'onrender.com' in netloc
-                or 'hf.space' in netloc
-                or 'trycloudflare.com' in netloc
-                or 'localhost' in netloc
-                or '127.0.0.1' in netloc
-                or config.DEMO_MODE
-            )
+                origin_url.scheme in ('http','https') and (
+                    netloc == host
+                    or hostname.endswith(('.vercel.app','.onrender.com','.hf.space','.trycloudflare.com'))
+                    or hostname in ('localhost','127.0.0.1')
+                ))
             if not is_allowed:
                 return JSONResponse({'detail':'Nguồn yêu cầu không hợp lệ.'},status_code=403)
     response=await call_next(request)

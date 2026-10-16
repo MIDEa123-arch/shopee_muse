@@ -80,6 +80,8 @@ def catalog():
             cats = [dict(r) for r in db.execute('SELECT c.*,COUNT(p.id) product_count FROM categories c JOIN products p ON p.category_id=c.id WHERE p.stock>0 AND (p.catalog_source IS NULL OR p.source_feature_complete=1) GROUP BY c.id ORDER BY product_count DESC,c.id')]
             total = db.execute('SELECT COUNT(*) FROM products WHERE stock>0 AND (catalog_source IS NULL OR source_feature_complete=1)').fetchone()[0]
         elif _is_large_vietnam_catalog(info):
+            info={**info,'real_images':False,'real_titles':False,'semantic_mapping_verified':False,
+                  'metadata_role':'illustrative_generated_merchandise_not_original_taobao'}
             cats = [dict(c) for c in db.execute('SELECT * FROM categories WHERE id <= 11 ORDER BY id')]
             for c in cats:
                 c['product_count'] = _CATEGORY_COUNTS_CACHE.get(c['id'], 0)
@@ -128,6 +130,22 @@ def search_suggestions(q:str=Query('',max_length=100),user=Depends(current_user)
         ]
         source_info=catalog_info(db)
         native=source_info['mode']==MODE
+        if _is_large_vietnam_catalog(source_info):
+            from app.recommender.retail import catalog_candidates, _distinct, query_matches
+            if not q.strip():
+                result=service.recommend(user['id'] if user else None,limit=6,write_logs=False)
+                suggested=result['items']
+            else:
+                candidates=[p for p in catalog_candidates(db) if query_matches(p,q)]
+                candidates.sort(key=lambda p:(lexical_score(q,p['name']),p['sold_count'],-p['id']),reverse=True)
+                if user:candidates=service.rank_search_candidates(user['id'],candidates)
+                suggested=_distinct([public_product(p) for p in candidates],6)
+            words=list(dict.fromkeys(p['name'] for p in suggested))
+            return {'history':history,'trending':trending,'personalized':words[:4] or trending[:4],
+                    'autocomplete':words[:8] if q.strip() else [],'products':suggested,
+                    'suggestion_context':{'mode':'typed_query' if q.strip() else 'current_merchandise_context',
+                                          'title':'Sản phẩm phù hợp' if q.strip() else 'Có thể bạn quan tâm',
+                                          'subtitle':'','signals':[]}}
         product_columns={r['name'] for r in db.execute('PRAGMA table_info(products)')}
         has_brand='brand' in product_columns
         if native and not available_categories(db):
@@ -406,6 +424,7 @@ def products(q:str=Query('',max_length=100),category_id:int|None=None,province_i
         source_info=catalog_info(db)
         native=source_info['mode']==MODE
         has_brand=bool(db.execute("SELECT 1 FROM pragma_table_info('products') WHERE name='brand'").fetchone())
+        search_bound=50000 if unique_products and _is_large_vietnam_catalog(source_info) else 25000
 
         clauses=['p.stock>0'];params=[]
         for column,value in [('category_id',category_id),('province_id',province_id)]:
@@ -445,7 +464,7 @@ def products(q:str=Query('',max_length=100),category_id:int|None=None,province_i
         exact_phrase=None
         if not native and not group_query and len(query_terms)>1:
             phrase='% '+normalized_query.replace('\\','\\\\').replace('%','\\%').replace('_','\\_')+'%'
-            if db.execute("SELECT 1 FROM products p WHERE p.id<=25000 AND +p.stock>0 AND search_text(p.name) LIKE ? ESCAPE '\\' LIMIT 1",(phrase,)).fetchone():
+            if db.execute("SELECT 1 FROM products p WHERE p.id<=? AND +p.stock>0 AND search_text(p.name) LIKE ? ESCAPE '\\' LIMIT 1",(search_bound,phrase)).fetchone():
                 exact_phrase=phrase
                 clauses.append("search_text(p.name) LIKE ? ESCAPE '\\'")
                 params.append(phrase)
@@ -465,9 +484,38 @@ def products(q:str=Query('',max_length=100),category_id:int|None=None,province_i
         has_extra_filter = bool(q.strip() or province_id or (min_price and min_price > 0) or max_price is not None or freeship or mall)
         if not native and has_extra_filter:
             clauses[0] = '+p.stock>0'
-            clauses.insert(0, 'p.id <= 25000')
+            clauses.insert(0, f'p.id <= {search_bound}')
             order = order.replace('p.rating_star', '+p.rating_star').replace('p.sold_count', '+p.sold_count')
         where=' WHERE '+' AND '.join(clauses)
+
+        if unique_products and _is_large_vietnam_catalog(source_info):
+            # A retail catalog page must not show 24 color/ID copies whose
+            # generated specifications were removed from the displayed title.
+            # Stream a bounded range and retain one actual matching offer per
+            # model, after province/price/stock/search filters have been applied.
+            from app.recommender.merchandise import identity
+            from app.recommender.retail import query_matches
+            selected=[];seen=set()
+            bounded=where+' AND p.id<=50000'
+            stable_order=order.replace('p.rating_star','+p.rating_star').replace('p.sold_count','+p.sold_count')
+            sql=PRODUCT_SQL.replace('FROM products p','FROM products p NOT INDEXED')
+            for row in db.execute(sql+bounded+' ORDER BY '+stable_order+',p.id',params):
+                product=dict(row);key=identity(product)
+                if q.strip() and not query_matches(product,q):continue
+                if key in seen:continue
+                seen.add(key);selected.append(product)
+            if sort=='relevance' and user and service.model:
+                selected=service.rank_search_candidates(user['id'],selected)
+            total=len(selected);offset=(page-1)*page_size
+            items=[public_product(p) for p in selected[offset:offset+page_size]]
+            if user and q.strip() and page==1:
+                # Preserve the existing explicit-search history behavior.
+                with connection(write=True) as wdb:
+                    wdb.execute('DELETE FROM search_history WHERE user_id=? AND query=?',(user['id'],q.strip()))
+                    wdb.execute('INSERT INTO search_history(user_id,query) VALUES (?,?)',(user['id'],q.strip()))
+            return {'items':items,'total':total,'page':page,'page_size':page_size,
+                    'pages':(total+page_size-1)//page_size,'unique_products':True,
+                    'personalized':any(p.get('recommendation_source')=='ai' for p in items)}
 
         if not has_extra_filter and not category_id and _is_large_vietnam_catalog(source_info):
             total = _GLOBAL_TOTAL_CACHE
@@ -546,8 +594,12 @@ _OFFERS_CACHE = None
 _OFFERS_TIME = 0.0
 
 @router.get('/offers')
-def offers():
+def offers(user=Depends(current_user)):
     global _OFFERS_CACHE, _OFFERS_TIME
+    with connection() as db:
+        if _is_large_vietnam_catalog(catalog_info(db)):
+            from app.recommender.commerce import personalized_deals
+            return personalized_deals(db,user['id'] if user else None,6)
     import time
     now = time.monotonic()
     if _OFFERS_CACHE is not None and now - _OFFERS_TIME < 60.0:

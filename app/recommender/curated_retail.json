@@ -1,0 +1,127 @@
+{
+  "version": 1,
+  "role": "Curated Vietnamese commerce metadata; original Taobao semantic mapping remains unverified. Prices and commerce simulated.",
+  "products": [
+    {
+      "key": "m170",
+      "name": "Chuột không dây Logitech M170",
+      "category_id": 2,
+      "prototype_kind": "mouse",
+      "price": 199000,
+      "image_url": "/static/images/merchandise/m170.png",
+      "source_url": "https://www.logitech.com/en-us/shop/p/m170-wireless-mouse",
+      "brand": "Logitech",
+      "description": "Chuột không dây dùng đầu thu USB, phù hợp cho nhu cầu làm việc hằng ngày. Giá và tồn kho trong cửa hàng trải nghiệm là mô phỏng."
+    },
+    {
+      "key": "m185",
+      "name": "Chuột không dây Logitech M185",
+      "category_id": 2,
+      "prototype_kind": "mouse",
+      "price": 229000,
+      "image_url": "/static/images/merchandise/m185.png",
+      "source_url": "https://www.logitech.com/en-us/shop/p/m185-wireless-mouse",
+      "brand": "Logitech",
+      "description": "Chuột không dây dùng đầu thu USB, phù hợp cho nhu cầu làm việc hằng ngày. Giá và tồn kho trong cửa hàng trải nghiệm là mô phỏng."
+    },
+    {
+      "key": "m220",
+      "name": "Chuột không dây Logitech M220",
+      "category_id": 2,
+      "prototype_kind": "mouse",
+      "price": 299000,
+      "image_url": "/static/images/merchandise/m220.png",
+      "source_url": "https://www.logitech.com/en-us/shop/p/m220-wireless-mouse",
+      "brand": "Logitech",
+      "description": "Chuột không dây dùng đầu thu USB, phù hợp cho nhu cầu làm việc hằng ngày. Giá và tồn kho trong cửa hàng trải nghiệm là mô phỏng."
+    },
+    {
+      "key": "crep-protect-comfort-insoles-ean",
+      "name": "Lót giày Crep Protect Comfort Insoles",
+      "category_id": 5,
+      "prototype_kind": "shoes",
+      "price": 189000,
+      "image_url": "/static/images/merchandise/crep-crep-protect-comfort-insoles-ean.jpg",
+      "source_url": "https://crepprotect.com/products/crep-protect-comfort-insoles-ean",
+      "brand": "Crep Protect",
+      "description": "Phụ kiện chăm sóc và bảo quản giày. Kiểm tra kích thước, chất liệu giày và hướng dẫn của nhà sản xuất trước khi sử dụng. Giá và tồn kho trong cửa hàng trải nghiệm là mô phỏng."
+    },
+    {
+      "key": "crep-protect-sport-insoles",
+      "name": "Lót giày thể thao Crep Protect Sport Insoles",
+      "category_id": 5,
+      "prototype_kind": "shoes",
+      "price": 249000,
+      "image_url": "/static/images/merchandise/crep-crep-protect-sport-insoles.jpg",
+      "source_url": "https://crepprotect.com/products/crep-protect-sport-insoles",
+      "brand": "Crep Protect",
+      "description": "Phụ kiện chăm sóc và bảo quản giày. Kiểm tra kích thước, chất liệu giày và hướng dẫn của nhà sản xuất trước khi sử dụng. Giá và tồn kho trong cửa hàng trải nghiệm là mô phỏng."
+    },
+    {
+      "key": "crep-protect-cure-travel-kit",
+      "name": "Bộ vệ sinh giày Crep Protect Cure Travel Kit",
+      "category_id": 5,
+      "prototype_kind": "shoes",
+      "price": 449000,
+      "image_url": "/static/images/merchandise/crep-crep-protect-cure-travel-kit.jpg",
+      "source_url": "https://crepprotect.com/products/crep-protect-cure-travel-kit",
+      "brand": "Crep Protect",
+      "description": "Phụ kiện chăm sóc và bảo quản giày. Kiểm tra kích thước, chất liệu giày và hướng dẫn của nhà sản xuất trước khi sử dụng. Giá và tồn kho trong cửa hàng trải nghiệm là mô phỏng."
+    },
+    {
+      "key": "crep-protect-pre-treated-laces",
+      "name": "Dây giày Crep Protect Pre-Treated Laces",
+      "category_id": 5,
+      "prototype_kind": "shoes",
+      "price": 129000,
+      "image_url": "/static/images/merchandise/crep-crep-protect-pre-treated-laces.jpg",
+      "source_url": "https://crepprotect.com/products/crep-protect-pre-treated-laces",
+      "brand": "Crep Protect",
+      "description": "Phụ kiện chăm sóc và bảo quản giày. Kiểm tra kích thước, chất liệu giày và hướng dẫn của nhà sản xuất trước khi sử dụng. Giá và tồn kho trong cửa hàng trải nghiệm là mô phỏng."
+    },
+    {
+      "key": "pill",
+      "name": "Viên khử mùi giày Crep Protect Pill",
+      "category_id": 5,
+      "prototype_kind": "shoes",
+      "price": 199000,
+      "image_url": "/static/images/merchandise/crep-pill.png",
+      "source_url": "https://crepprotect.com/products/pill",
+      "brand": "Crep Protect",
+      "description": "Phụ kiện chăm sóc và bảo quản giày. Kiểm tra kích thước, chất liệu giày và hướng dẫn của nhà sản xuất trước khi sử dụng. Giá và tồn kho trong cửa hàng trải nghiệm là mô phỏng."
+    },
+    {
+      "key": "crep-protect-sneaker-bag-upc",
+      "name": "Túi đựng giày Crep Protect Sneaker Bag",
+      "category_id": 5,
+      "prototype_kind": "shoes",
+      "price": 499000,
+      "image_url": "/static/images/merchandise/crep-crep-protect-sneaker-bag-upc.jpg",
+      "source_url": "https://crepprotect.com/products/crep-protect-sneaker-bag-upc",
+      "brand": "Crep Protect",
+      "description": "Phụ kiện chăm sóc và bảo quản giày. Kiểm tra kích thước, chất liệu giày và hướng dẫn của nhà sản xuất trước khi sử dụng. Giá và tồn kho trong cửa hàng trải nghiệm là mô phỏng."
+    },
+    {
+      "key": "crep-protect-wipes",
+      "name": "Khăn lau giày Crep Protect Wipes 12 miếng",
+      "category_id": 5,
+      "prototype_kind": "shoes",
+      "price": 159000,
+      "image_url": "/static/images/merchandise/crep-crep-protect-wipes.jpg",
+      "source_url": "https://crepprotect.com/products/crep-protect-wipes",
+      "brand": "Crep Protect",
+      "description": "Phụ kiện chăm sóc và bảo quản giày. Kiểm tra kích thước, chất liệu giày và hướng dẫn của nhà sản xuất trước khi sử dụng. Giá và tồn kho trong cửa hàng trải nghiệm là mô phỏng."
+    },
+    {
+      "key": "feather-shuttlecock",
+      "name": "Quả cầu lông lông vũ",
+      "category_id": 11,
+      "prototype_kind": "racket",
+      "price": 49000,
+      "image_url": "/static/images/storefront/146.webp",
+      "source_url": "https://dummyjson.com/products/146",
+      "brand": "Mẫu thể thao",
+      "description": "Mẫu cầu lông lông vũ minh họa cho nhu cầu luyện tập. Giá và tồn kho trong cửa hàng trải nghiệm là mô phỏng."
+    }
+  ]
+}

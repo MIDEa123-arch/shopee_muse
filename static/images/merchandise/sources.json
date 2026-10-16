@@ -10,5 +10,107 @@
     "source_url": "https://www.shiseido.co.jp/anessa/products/suncare/perfect_uv_mild/img/product_img_pc.png",
     "product_page": "https://www.shiseido.co.jp/anessa/products/suncare/perfect_uv_mild/",
     "role": "illustration_of_product_type_not_exact_demo_variant"
+  },
+  {
+    "file": "mx-master-3s.png",
+    "source_url": "https://resource.logitech.com/w_480,h_480,c_pad,q_80,f_png,dpr_1.0/d_transparent.gif/content/dam/logitech/en/products/mice/mx-master-3s/2025-update/mx-master-3s-bluetooth-edition-top-view-black-new-1.png",
+    "product_page": "https://www.logitech.com/en-us/products/mice/mx-master-3s.html",
+    "role": "illustration_not_verified_demo_color_or_variant"
+  },
+  {
+    "file": "m331.png",
+    "source_url": "https://resource.logitech.com/w_480,h_480,c_pad,q_80,f_png,dpr_1.0/d_transparent.gif/content/dam/logitech/en/products/mice/m330-wireless-silent-mouse/2024-update/gallery/m330-wireless-mouse-top-view-black-gallery-01.png",
+    "product_page": "https://www.logitech.com/en-us/products/mice/m331-silent-plus-mouse.html",
+    "role": "illustration_not_verified_demo_color_or_variant"
+  },
+  {
+    "file": "racket-bag.png",
+    "source_url": "https://www.yonex.com/media/catalog/product/a/l/all_bag2662_270-1.png?width=480&height=480&fit=bounds",
+    "product_page": "https://www.yonex.com/badminton/bags/compact-series",
+    "role": "illustration_not_verified_demo_color_or_variant"
+  },
+  {
+    "file": "yoga-mat.jpg",
+    "source_url": "https://contents.mediadecathlon.com/p2939822/k$583450201f8b8586ae927c3401603bcc/th%E1%BA%A3m-t%E1%BA%ADp-yoga-8-mm-xanh-%C4%91%E1%BA%ADm-kimjaly-8665059.jpg?f=480x480&format=jpeg&quality=75",
+    "product_page": "https://www.decathlon.vn/",
+    "role": "illustration_not_verified_demo_color_or_variant"
+  },
+  {
+    "file": "pebble-m350.png",
+    "source_url": "https://resource.logitech.com/w_480,h_480,c_pad,q_80,f_png,dpr_1.0/d_transparent.gif/content/dam/logitech/en/products/mice/m350/gallery/m350-lavender-gallery-1.png",
+    "product_page": "https://www.logitech.com/en-ca/shop/p/m350-pebble-wireless-mouse.910-006659",
+    "role": "illustration_not_verified_demo_color_or_variant"
+  },
+  {
+    "file": "g102.png",
+    "source_url": "https://resource.logitechg.com/w_480,h_480,c_pad,q_80,f_png,dpr_1.0/d_transparent.gif/content/dam/gaming/en/products/refreshed-g203/2025-update/g203-mouse-top-angle-black-gallery-1.png",
+    "product_page": "https://www.logitechg.com/en-ph/shop/p/g102-lightsync-rgb-gaming-mouse",
+    "role": "illustration_not_verified_demo_color_or_variant"
+  },
+  {
+    "file": "bottle.jpg",
+    "source_url": "https://www.locknlock.vn/dw/image/v2/BLBT_PRD/on/demandware.static/-/Sites-locknlock-shared-master/default/dwc20377a0/images/thumbnails/1.Beverageware/2.To-go/1.Tumblers/LHC4131BKB-B32180181_1.jpg?sw=480&q=69",
+    "product_page": "https://www.locknlock.vn/vi-vn/binh-giu-nhiet-locknlock-feather-light/LHC4131.html",
+    "role": "illustration_not_verified_demo_color_or_variant"
+  },
+  {
+    "file": "m170.png",
+    "source_url": "https://resource.logitech.com/w_480,h_480,c_pad,q_80,f_png,dpr_1.0/d_transparent.gif/content/dam/logitech/en/products/mice/m171/gallery/m171-gallery-black-1.png",
+    "product_page": "https://www.logitech.com/en-us/shop/p/m170-wireless-mouse",
+    "role": "curated_product_illustration"
+  },
+  {
+    "file": "m185.png",
+    "source_url": "https://resource.logitech.com/w_480,h_480,c_pad,q_80,f_png,dpr_1.0/d_transparent.gif/content/dam/logitech/en/products/mice/m185/gallery/2025-update-assets/m185-grey-top-angle-1.png",
+    "product_page": "https://www.logitech.com/en-us/shop/p/m185-wireless-mouse",
+    "role": "curated_product_illustration"
+  },
+  {
+    "file": "m220.png",
+    "source_url": "https://resource.logitech.com/w_480,h_480,c_pad,q_80,f_png,dpr_1.0/d_transparent.gif/content/dam/logitech/en/products/mice/m220/gallery/m220-charcoal-gallery-1.png",
+    "product_page": "https://www.logitech.com/en-us/shop/p/m220-wireless-mouse",
+    "role": "curated_product_illustration"
+  },
+  {
+    "file": "crep-crep-protect-comfort-insoles-ean.jpg",
+    "source_url": "https://cdn.shopify.com/s/files/1/0631/6644/7787/files/insole-Comfort_401deaac-b9b2-40ea-9ab8-ecc46f91861a.jpg?v=1791903017&width=480",
+    "product_page": "https://crepprotect.com/products/crep-protect-comfort-insoles-ean",
+    "role": "curated_product_illustration"
+  },
+  {
+    "file": "crep-crep-protect-sport-insoles.jpg",
+    "source_url": "https://cdn.shopify.com/s/files/1/0631/6644/7787/files/insole-sport_83182073-4d02-4131-8f15-e09b5b2b4fd8.jpg?v=1791903042&width=480",
+    "product_page": "https://crepprotect.com/products/crep-protect-sport-insoles",
+    "role": "curated_product_illustration"
+  },
+  {
+    "file": "crep-crep-protect-cure-travel-kit.jpg",
+    "source_url": "https://cdn.shopify.com/s/files/1/0631/6644/7787/files/1_97434b13-d4cb-4967-bc47-5f0b8d427c8a.jpg?v=1791902979&width=480",
+    "product_page": "https://crepprotect.com/products/crep-protect-cure-travel-kit",
+    "role": "curated_product_illustration"
+  },
+  {
+    "file": "crep-crep-protect-pre-treated-laces.jpg",
+    "source_url": "https://cdn.shopify.com/s/files/1/0631/6644/7787/files/laces-Cover-v2_6da589ed-30dc-4574-a9bc-947d9e31353f.jpg?v=1791903092&width=480",
+    "product_page": "https://crepprotect.com/products/crep-protect-pre-treated-laces",
+    "role": "curated_product_illustration"
+  },
+  {
+    "file": "crep-pill.png",
+    "source_url": "https://cdn.shopify.com/s/files/1/0631/6644/7787/files/pill_bcd4ebe0-50d2-4e4b-aac7-39baeaa9c179.png?v=1791903065&width=480",
+    "product_page": "https://crepprotect.com/products/pill",
+    "role": "curated_product_illustration"
+  },
+  {
+    "file": "crep-crep-protect-sneaker-bag-upc.jpg",
+    "source_url": "https://cdn.shopify.com/s/files/1/0631/6644/7787/files/1_1e7549b3-921a-448e-9968-138a9c1c3351.jpg?v=1791902943&width=480",
+    "product_page": "https://crepprotect.com/products/crep-protect-sneaker-bag-upc",
+    "role": "curated_product_illustration"
+  },
+  {
+    "file": "crep-crep-protect-wipes.jpg",
+    "source_url": "https://cdn.shopify.com/s/files/1/0631/6644/7787/files/1_a8a79a31-51b7-4c42-b25e-6349e5390ec5.jpg?v=1791902935&width=480",
+    "product_page": "https://crepprotect.com/products/crep-protect-wipes",
+    "role": "curated_product_illustration"
   }
 ]

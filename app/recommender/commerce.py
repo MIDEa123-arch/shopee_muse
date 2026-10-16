@@ -205,6 +205,19 @@ def complementary_bundle(db, user_id=None, focus_product_id=None):
     from app.database import public_product
     from app.recommender.service import service, COMPLEMENTARY_MAP
     displays = presentation_map(str(config.DB_PATH))
+    from app.native_catalog import catalog_info
+    if catalog_info(db)['mode'] in ('vietnam_tiki_v1','amazon_reviews_2023_v1'):
+        from .retail import recommend as retail_recommend
+        if not focus_product_id:
+            row=db.execute('SELECT product_id FROM cart_items WHERE user_id=? AND is_selected=1 ORDER BY id DESC LIMIT 1',(user_id,)).fetchone()
+            if not row:
+                row=db.execute("SELECT i.product_id FROM orders o JOIN order_items i ON i.order_id=o.id WHERE o.user_id=? AND o.order_status!='Đã hủy' ORDER BY o.id DESC,i.id LIMIT 1",(user_id,)).fetchone()
+            focus_product_id=row[0] if row else None
+        if not focus_product_id:return {'focus':None,'items':[],'bundle_label':'Mua kèm tiện hơn'}
+        result=retail_recommend(service,user_id,'complementary',focus_product_id,3,write_logs=False)
+        row=db.execute('SELECT * FROM products WHERE id=?',(focus_product_id,)).fetchone()
+        return {'focus':public_product(row),'items':result['items'],'bundle_label':'Mua kèm tiện hơn',
+                'meta':result['meta'],'total_price':sum(p['price'] for p in result['items'])+(row['price'] if row else 0)}
 
     focus = None
     focus_source = 'direct' if focus_product_id else 'popular'
@@ -728,6 +741,12 @@ def sale_progress(product_id):
 def personalized_deals(db, user_id, limit=12):
     from app.database import public_product
     from app.recommender.service import service
+    from app.native_catalog import catalog_info
+    if catalog_info(db)['mode'] in ('vietnam_tiki_v1','amazon_reviews_2023_v1'):
+        from .retail import recommend as retail_recommend
+        result=retail_recommend(service,user_id,'deals',limit=limit,write_logs=False)
+        for p in result['items']:p['sale_progress']=sale_progress(p['id'])
+        return {**result,'personalized':bool(user_id),'price_affinity':user_price_affinity(db,user_id),'signals':{}}
     displays = presentation_map(str(config.DB_PATH))
     affinity = user_price_affinity(db, user_id)
     in_cart = {r[0] for r in db.execute('SELECT product_id FROM cart_items WHERE user_id=?', (user_id,))} if user_id else set()

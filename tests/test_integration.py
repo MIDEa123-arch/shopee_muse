@@ -96,6 +96,9 @@ class StoreTests(unittest.TestCase):
         self.assertIsNone(self.client.get('/api/auth/me').json()['user'])
         result=self.client.post('/api/auth/demo-login',json={'user_id':1},headers={'Origin':'https://evil.example'})
         self.assertEqual(result.status_code,403)
+        for origin in ('https://demo.vercel.app.evil.example','https://localhost.evil.example'):
+            result=self.client.post('/api/auth/demo-login',json={'user_id':1},headers={'Origin':origin})
+            self.assertEqual(result.status_code,403)
 
     def test_cart_ownership_stock_and_selection(self):
         self.add()

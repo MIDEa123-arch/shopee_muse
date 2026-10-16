@@ -30,7 +30,15 @@ Từ máy Linux hiện tại, copy các file sau sang máy Windows qua ổ cứn
 | `checkpoints/muse_full_training_sparse.ckpt` | `checkpoints\muse_full_training_sparse.ckpt` |
 | Các file cần thiết trong `data/feature_map/` | `data\feature_map\` |
 
-Trước khi copy SQLite, dừng server Linux bằng `systemctl --user stop shopee-taobao.service` và đóng các công cụ đang ghi database. Nếu còn `shopee_muse.db-wal` hoặc `shopee_muse.db-shm`, giữ cả bộ file cùng tên khi copy. Sau khi copy xong có thể bật lại server Linux bằng `systemctl --user start shopee-taobao.service`. Không copy riêng file `.db` đang có tiến trình ghi.
+Trước khi copy SQLite, dừng server Linux hiện tại bằng `systemctl --user stop lumi-commerce.service` và đóng các công cụ đang ghi database. Nếu còn `shopee_muse.db-wal` hoặc `shopee_muse.db-shm`, giữ cả bộ file cùng tên khi copy. Sau khi copy xong có thể bật lại bằng `./start_server.sh` tại thư mục repo. Không copy riêng file `.db` đang có tiến trình ghi.
+
+Nếu dùng database tiếng Việt cũ chưa có nhóm sản phẩm bổ sung, sau khi copy đủ file có thể chạy một lần; script giữ nguyên dòng đã có đơn/giỏ/lịch sử và sao lưu những dòng demo trùng được thay:
+
+```powershell
+.\.venv\Scripts\python.exe -m scripts.install_retail_curated --apply
+```
+
+Không chạy bước này trên database Taobao native. Xem [quy tắc và test case gợi ý hiện tại](TEST_CASE_GOI_Y.md).
 
 Các file `feature_map` cần cho suy luận:
 

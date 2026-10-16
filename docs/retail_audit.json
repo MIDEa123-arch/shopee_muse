@@ -1,0 +1,3547 @@
+{
+  "checked_at": "2026-10-16T18:21:45.365622+00:00",
+  "read_only": true,
+  "checkpoint_ready": true,
+  "semantic_mapping_verified": false,
+  "passed": 249,
+  "failed": 0,
+  "checks": [
+    {
+      "check": "1_home_excludes_owned_models_and_recent_types",
+      "passed": true,
+      "count": 24
+    },
+    {
+      "check": "1_home_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "1_home_checkpoint_actually_used",
+      "passed": true
+    },
+    {
+      "check": "1_home_raw_prediction_values_preserved",
+      "passed": true
+    },
+    {
+      "check": "1_deals_excludes_owned_models_and_recent_types",
+      "passed": true,
+      "count": 24
+    },
+    {
+      "check": "1_deals_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "1_deals_checkpoint_actually_used",
+      "passed": true
+    },
+    {
+      "check": "1_deals_raw_prediction_values_preserved",
+      "passed": true
+    },
+    {
+      "check": "1_category_tab_cannot_bypass_recent_purchase",
+      "passed": true
+    },
+    {
+      "check": "1_purchased_laptop_detail_does_not_resell_laptops",
+      "passed": true
+    },
+    {
+      "check": "1_deals_wrapper_shares_rules",
+      "passed": true
+    },
+    {
+      "check": "1_bundle_wrapper_shares_rules",
+      "passed": true
+    },
+    {
+      "check": "2_home_excludes_owned_models_and_recent_types",
+      "passed": true,
+      "count": 14
+    },
+    {
+      "check": "2_home_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "2_home_checkpoint_actually_used",
+      "passed": true
+    },
+    {
+      "check": "2_home_raw_prediction_values_preserved",
+      "passed": true
+    },
+    {
+      "check": "2_deals_excludes_owned_models_and_recent_types",
+      "passed": true,
+      "count": 13
+    },
+    {
+      "check": "2_deals_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "2_deals_checkpoint_actually_used",
+      "passed": true
+    },
+    {
+      "check": "2_deals_raw_prediction_values_preserved",
+      "passed": true
+    },
+    {
+      "check": "2_category_tab_cannot_bypass_recent_purchase",
+      "passed": true
+    },
+    {
+      "check": "2_deals_wrapper_shares_rules",
+      "passed": true
+    },
+    {
+      "check": "2_bundle_wrapper_shares_rules",
+      "passed": true
+    },
+    {
+      "check": "22_home_excludes_owned_models_and_recent_types",
+      "passed": true,
+      "count": 24
+    },
+    {
+      "check": "22_home_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "22_home_checkpoint_actually_used",
+      "passed": true
+    },
+    {
+      "check": "22_home_raw_prediction_values_preserved",
+      "passed": true
+    },
+    {
+      "check": "22_deals_excludes_owned_models_and_recent_types",
+      "passed": true,
+      "count": 24
+    },
+    {
+      "check": "22_deals_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "22_deals_checkpoint_actually_used",
+      "passed": true
+    },
+    {
+      "check": "22_deals_raw_prediction_values_preserved",
+      "passed": true
+    },
+    {
+      "check": "22_category_tab_cannot_bypass_recent_purchase",
+      "passed": true
+    },
+    {
+      "check": "22_deals_wrapper_shares_rules",
+      "passed": true
+    },
+    {
+      "check": "22_bundle_wrapper_shares_rules",
+      "passed": true
+    },
+    {
+      "check": "order_15_uses_all_its_items",
+      "passed": true
+    },
+    {
+      "check": "order_15_laptop_only_actual_accessory_types",
+      "passed": true
+    },
+    {
+      "check": "order_15_success_and_order_placements_agree",
+      "passed": true
+    },
+    {
+      "check": "order_14_uses_all_its_items",
+      "passed": true
+    },
+    {
+      "check": "order_14_footwear_has_six_related_accessories_and_no_electronics",
+      "passed": true
+    },
+    {
+      "check": "order_14_success_and_order_placements_agree",
+      "passed": true
+    },
+    {
+      "check": "order_13_uses_all_its_items",
+      "passed": true
+    },
+    {
+      "check": "order_13_success_and_order_placements_agree",
+      "passed": true
+    },
+    {
+      "check": "order_12_uses_all_its_items",
+      "passed": true
+    },
+    {
+      "check": "order_12_success_and_order_placements_agree",
+      "passed": true
+    },
+    {
+      "check": "order_11_uses_all_its_items",
+      "passed": true
+    },
+    {
+      "check": "order_11_success_and_order_placements_agree",
+      "passed": true
+    },
+    {
+      "check": "order_10_uses_all_its_items",
+      "passed": true
+    },
+    {
+      "check": "order_10_success_and_order_placements_agree",
+      "passed": true
+    },
+    {
+      "check": "order_9_uses_all_its_items",
+      "passed": true
+    },
+    {
+      "check": "order_9_badminton_has_no_electronics",
+      "passed": true
+    },
+    {
+      "check": "order_9_success_and_order_placements_agree",
+      "passed": true
+    },
+    {
+      "check": "order_8_uses_all_its_items",
+      "passed": true
+    },
+    {
+      "check": "order_8_footwear_has_six_related_accessories_and_no_electronics",
+      "passed": true
+    },
+    {
+      "check": "order_8_success_and_order_placements_agree",
+      "passed": true
+    },
+    {
+      "check": "order_7_uses_all_its_items",
+      "passed": true
+    },
+    {
+      "check": "order_7_success_and_order_placements_agree",
+      "passed": true
+    },
+    {
+      "check": "order_6_uses_all_its_items",
+      "passed": true
+    },
+    {
+      "check": "order_6_success_and_order_placements_agree",
+      "passed": true
+    },
+    {
+      "check": "order_5_uses_all_its_items",
+      "passed": true
+    },
+    {
+      "check": "order_5_success_and_order_placements_agree",
+      "passed": true
+    },
+    {
+      "check": "order_4_uses_all_its_items",
+      "passed": true
+    },
+    {
+      "check": "order_4_cancelled_has_no_recommendations",
+      "passed": true
+    },
+    {
+      "check": "order_3_uses_all_its_items",
+      "passed": true
+    },
+    {
+      "check": "order_3_cancelled_has_no_recommendations",
+      "passed": true
+    },
+    {
+      "check": "order_2_uses_all_its_items",
+      "passed": true
+    },
+    {
+      "check": "order_2_success_and_order_placements_agree",
+      "passed": true
+    },
+    {
+      "check": "order_1_uses_all_its_items",
+      "passed": true
+    },
+    {
+      "check": "order_1_footwear_has_six_related_accessories_and_no_electronics",
+      "passed": true
+    },
+    {
+      "check": "order_1_success_and_order_placements_agree",
+      "passed": true
+    },
+    {
+      "check": "air-fryer_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "air-fryer_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "air-fryer_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "air-purifier_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "air-purifier_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "air-purifier_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "blender_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "blender_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "blender_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "bottle_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "bottle_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "bottle_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "cable_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "cable_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "cable_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "camp-chair_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "camp-chair_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "camp-chair_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "camp-stove_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "camp-stove_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "camp-stove_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "charger_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "charger_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "charger_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "cookware_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "cookware_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "cookware_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "diapers_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "diapers_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "diapers_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "dress_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "dress_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "dress_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "earbuds_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "earbuds_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "earbuds_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "flats_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "flats_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "flats_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "headphones_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "headphones_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "headphones_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "heels_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "heels_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "heels_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "iron_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "iron_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "iron_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "jacket_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "jacket_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "jacket_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "keyboard_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "keyboard_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "keyboard_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "laptop_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "laptop_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "laptop_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "lipstick_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "lipstick_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "lipstick_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "loafers_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "loafers_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "loafers_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "lunchbox_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "lunchbox_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "lunchbox_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "makeup-remover_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "makeup-remover_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "makeup-remover_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "milk_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "milk_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "milk_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "moisturizer_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "moisturizer_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "moisturizer_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "monitor_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "monitor_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "monitor_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "mouse_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "mouse_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "mouse_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "mouse_alternatives_not_limited_by_stock_photos",
+      "passed": true
+    },
+    {
+      "check": "mouse_results_are_named_mice",
+      "passed": true
+    },
+    {
+      "check": "other:set bo vest_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "other:set bo vest_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "other:set bo vest_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "pants_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "pants_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "pants_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "phone_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "phone_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "phone_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "power-bank_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "power-bank_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "power-bank_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "racket_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "racket_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "racket_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "racket-bag_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "racket-bag_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "racket-bag_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "resistance-band_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "resistance-band_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "resistance-band_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "robot-vacuum_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "robot-vacuum_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "robot-vacuum_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "roller_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "roller_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "roller_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "sandals_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "sandals_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "sandals_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "serum_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "serum_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "serum_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "shirt_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "shirt_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "shirt_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "shoe-bag_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "shoe-bag_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "shoe-bag_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "shoe-cleaner_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "shoe-cleaner_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "shoe-cleaner_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "shoe-deodorizer_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "shoe-deodorizer_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "shoe-deodorizer_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "shoe-insole_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "shoe-insole_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "shoe-insole_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "shoelaces_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "shoelaces_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "shoelaces_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "shoes_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "shoes_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "shoes_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "shorts_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "shorts_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "shorts_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "shuttlecock_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "shuttlecock_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "shuttlecock_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "skirt_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "skirt_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "skirt_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "sleeping-bag_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "sleeping-bag_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "sleeping-bag_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "speaker_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "speaker_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "speaker_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "sunscreen_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "sunscreen_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "sunscreen_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "tablet_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "tablet_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "tablet_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "tent_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "tent_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "tent_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "top_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "top_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "top_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "toys_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "toys_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "toys_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "underwear_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "underwear_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "underwear_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "vacuum_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "vacuum_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "vacuum_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "watch_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "watch_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "watch_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "yoga-mat_similar_never_changes_product_type",
+      "passed": true
+    },
+    {
+      "check": "yoga-mat_similar_has_distinct_models",
+      "passed": true
+    },
+    {
+      "check": "yoga-mat_similar_has_no_broken_asset_paths",
+      "passed": true
+    },
+    {
+      "check": "no_customers_orders_carts_history_or_log_rows_changed",
+      "passed": true
+    }
+  ],
+  "coverage": [
+    {
+      "kind": "air-fryer",
+      "catalog_models": 2,
+      "similar_count": 1,
+      "addons_count": 3,
+      "focus_id": 56
+    },
+    {
+      "kind": "air-purifier",
+      "catalog_models": 1,
+      "similar_count": 0,
+      "addons_count": 0,
+      "focus_id": 63
+    },
+    {
+      "kind": "blender",
+      "catalog_models": 1,
+      "similar_count": 0,
+      "addons_count": 2,
+      "focus_id": 17
+    },
+    {
+      "kind": "bottle",
+      "catalog_models": 1,
+      "similar_count": 0,
+      "addons_count": 1,
+      "focus_id": 428
+    },
+    {
+      "kind": "cable",
+      "catalog_models": 2,
+      "similar_count": 1,
+      "addons_count": 4,
+      "focus_id": 59
+    },
+    {
+      "kind": "camp-chair",
+      "catalog_models": 1,
+      "similar_count": 0,
+      "addons_count": 2,
+      "focus_id": 185
+    },
+    {
+      "kind": "camp-stove",
+      "catalog_models": 1,
+      "similar_count": 0,
+      "addons_count": 3,
+      "focus_id": 111
+    },
+    {
+      "kind": "charger",
+      "catalog_models": 3,
+      "similar_count": 2,
+      "addons_count": 1,
+      "focus_id": 109
+    },
+    {
+      "kind": "cookware",
+      "catalog_models": 1,
+      "similar_count": 0,
+      "addons_count": 2,
+      "focus_id": 67
+    },
+    {
+      "kind": "diapers",
+      "catalog_models": 3,
+      "similar_count": 2,
+      "addons_count": 0,
+      "focus_id": 11
+    },
+    {
+      "kind": "dress",
+      "catalog_models": 3,
+      "similar_count": 2,
+      "addons_count": 3,
+      "focus_id": 4
+    },
+    {
+      "kind": "earbuds",
+      "catalog_models": 4,
+      "similar_count": 3,
+      "addons_count": 4,
+      "focus_id": 84
+    },
+    {
+      "kind": "flats",
+      "catalog_models": 1,
+      "similar_count": 0,
+      "addons_count": 6,
+      "focus_id": 221
+    },
+    {
+      "kind": "headphones",
+      "catalog_models": 3,
+      "similar_count": 2,
+      "addons_count": 4,
+      "focus_id": 96
+    },
+    {
+      "kind": "heels",
+      "catalog_models": 1,
+      "similar_count": 0,
+      "addons_count": 4,
+      "focus_id": 304
+    },
+    {
+      "kind": "iron",
+      "catalog_models": 1,
+      "similar_count": 0,
+      "addons_count": 0,
+      "focus_id": 138
+    },
+    {
+      "kind": "jacket",
+      "catalog_models": 3,
+      "similar_count": 1,
+      "addons_count": 6,
+      "focus_id": 13
+    },
+    {
+      "kind": "keyboard",
+      "catalog_models": 8,
+      "similar_count": 6,
+      "addons_count": 6,
+      "focus_id": 15
+    },
+    {
+      "kind": "laptop",
+      "catalog_models": 26,
+      "similar_count": 6,
+      "addons_count": 6,
+      "focus_id": 20
+    },
+    {
+      "kind": "lipstick",
+      "catalog_models": 3,
+      "similar_count": 2,
+      "addons_count": 4,
+      "focus_id": 29
+    },
+    {
+      "kind": "loafers",
+      "catalog_models": 1,
+      "similar_count": 0,
+      "addons_count": 6,
+      "focus_id": 47
+    },
+    {
+      "kind": "lunchbox",
+      "catalog_models": 1,
+      "similar_count": 0,
+      "addons_count": 1,
+      "focus_id": 26
+    },
+    {
+      "kind": "makeup-remover",
+      "catalog_models": 1,
+      "similar_count": 0,
+      "addons_count": 0,
+      "focus_id": 3
+    },
+    {
+      "kind": "milk",
+      "catalog_models": 3,
+      "similar_count": 0,
+      "addons_count": 0,
+      "focus_id": 1
+    },
+    {
+      "kind": "moisturizer",
+      "catalog_models": 1,
+      "similar_count": 0,
+      "addons_count": 5,
+      "focus_id": 250
+    },
+    {
+      "kind": "monitor",
+      "catalog_models": 3,
+      "similar_count": 2,
+      "addons_count": 6,
+      "focus_id": 21
+    },
+    {
+      "kind": "mouse",
+      "catalog_models": 7,
+      "similar_count": 6,
+      "addons_count": 4,
+      "focus_id": 157
+    },
+    {
+      "kind": "other:set bo vest",
+      "catalog_models": 1,
+      "similar_count": 0,
+      "addons_count": 0,
+      "focus_id": 218
+    },
+    {
+      "kind": "pants",
+      "catalog_models": 4,
+      "similar_count": 2,
+      "addons_count": 6,
+      "focus_id": 2
+    },
+    {
+      "kind": "phone",
+      "catalog_models": 12,
+      "similar_count": 6,
+      "addons_count": 6,
+      "focus_id": 9
+    },
+    {
+      "kind": "power-bank",
+      "catalog_models": 1,
+      "similar_count": 0,
+      "addons_count": 3,
+      "focus_id": 106
+    },
+    {
+      "kind": "racket",
+      "catalog_models": 3,
+      "similar_count": 2,
+      "addons_count": 5,
+      "focus_id": 8
+    },
+    {
+      "kind": "racket-bag",
+      "catalog_models": 1,
+      "similar_count": 0,
+      "addons_count": 5,
+      "focus_id": 71
+    },
+    {
+      "kind": "resistance-band",
+      "catalog_models": 1,
+      "similar_count": 0,
+      "addons_count": 4,
+      "focus_id": 7
+    },
+    {
+      "kind": "robot-vacuum",
+      "catalog_models": 2,
+      "similar_count": 1,
+      "addons_count": 0,
+      "focus_id": 46
+    },
+    {
+      "kind": "roller",
+      "catalog_models": 1,
+      "similar_count": 0,
+      "addons_count": 4,
+      "focus_id": 74
+    },
+    {
+      "kind": "sandals",
+      "catalog_models": 3,
+      "similar_count": 2,
+      "addons_count": 0,
+      "focus_id": 14
+    },
+    {
+      "kind": "serum",
+      "catalog_models": 1,
+      "similar_count": 0,
+      "addons_count": 5,
+      "focus_id": 148
+    },
+    {
+      "kind": "shirt",
+      "catalog_models": 3,
+      "similar_count": 0,
+      "addons_count": 6,
+      "focus_id": 52
+    },
+    {
+      "kind": "shoe-bag",
+      "catalog_models": 1,
+      "similar_count": 0,
+      "addons_count": 2,
+      "focus_id": 49910
+    },
+    {
+      "kind": "shoe-cleaner",
+      "catalog_models": 2,
+      "similar_count": 1,
+      "addons_count": 2,
+      "focus_id": 49903
+    },
+    {
+      "kind": "shoe-deodorizer",
+      "catalog_models": 1,
+      "similar_count": 0,
+      "addons_count": 3,
+      "focus_id": 49931
+    },
+    {
+      "kind": "shoe-insole",
+      "catalog_models": 2,
+      "similar_count": 1,
+      "addons_count": 3,
+      "focus_id": 49972
+    },
+    {
+      "kind": "shoelaces",
+      "catalog_models": 1,
+      "similar_count": 0,
+      "addons_count": 3,
+      "focus_id": 49941
+    },
+    {
+      "kind": "shoes",
+      "catalog_models": 6,
+      "similar_count": 5,
+      "addons_count": 6,
+      "focus_id": 12
+    },
+    {
+      "kind": "shorts",
+      "catalog_models": 1,
+      "similar_count": 0,
+      "addons_count": 6,
+      "focus_id": 219
+    },
+    {
+      "kind": "shuttlecock",
+      "catalog_models": 1,
+      "similar_count": 0,
+      "addons_count": 1,
+      "focus_id": 49928
+    },
+    {
+      "kind": "skirt",
+      "catalog_models": 1,
+      "similar_count": 0,
+      "addons_count": 4,
+      "focus_id": 91
+    },
+    {
+      "kind": "sleeping-bag",
+      "catalog_models": 1,
+      "similar_count": 0,
+      "addons_count": 3,
+      "focus_id": 50
+    },
+    {
+      "kind": "speaker",
+      "catalog_models": 4,
+      "similar_count": 3,
+      "addons_count": 4,
+      "focus_id": 51
+    },
+    {
+      "kind": "sunscreen",
+      "catalog_models": 4,
+      "similar_count": 3,
+      "addons_count": 2,
+      "focus_id": 22
+    },
+    {
+      "kind": "tablet",
+      "catalog_models": 3,
+      "similar_count": 2,
+      "addons_count": 6,
+      "focus_id": 139
+    },
+    {
+      "kind": "tent",
+      "catalog_models": 1,
+      "similar_count": 0,
+      "addons_count": 3,
+      "focus_id": 104
+    },
+    {
+      "kind": "top",
+      "catalog_models": 3,
+      "similar_count": 2,
+      "addons_count": 6,
+      "focus_id": 80
+    },
+    {
+      "kind": "toys",
+      "catalog_models": 4,
+      "similar_count": 3,
+      "addons_count": 0,
+      "focus_id": 48
+    },
+    {
+      "kind": "underwear",
+      "catalog_models": 1,
+      "similar_count": 0,
+      "addons_count": 0,
+      "focus_id": 98
+    },
+    {
+      "kind": "vacuum",
+      "catalog_models": 1,
+      "similar_count": 0,
+      "addons_count": 0,
+      "focus_id": 41
+    },
+    {
+      "kind": "watch",
+      "catalog_models": 7,
+      "similar_count": 6,
+      "addons_count": 0,
+      "focus_id": 16
+    },
+    {
+      "kind": "yoga-mat",
+      "catalog_models": 2,
+      "similar_count": 1,
+      "addons_count": 3,
+      "focus_id": 28
+    }
+  ],
+  "examples": {
+    "user_1_home": {
+      "count": 24,
+      "meta": {
+        "history_length": 1000,
+        "scl_coverage": 1.0,
+        "cold_start": false,
+        "touchpoint": "home",
+        "rule_version": "retail-context-v2",
+        "engine": "Alibaba MUSE + merchandise context",
+        "strategy": "bounded model recall → ownership/spec filtering → MUSE ranking → model diversity",
+        "score_type": "p_click",
+        "checkpoint_loaded": true,
+        "model_used": true,
+        "candidate_count": 56,
+        "semantic_mapping_verified": false,
+        "checkpoint_scores_unchanged": true,
+        "context_policy": "home_merchandise_constraints",
+        "focus_product_ids": [],
+        "focus_names": [],
+        "order_id": null,
+        "purchase_policy": {
+          "excluded_models": 5,
+          "recent_durable_types": [
+            "earbuds",
+            "flats",
+            "headphones",
+            "heels",
+            "laptop",
+            "loafers",
+            "sandals",
+            "shoes"
+          ],
+          "durable_cooldown_days": 30,
+          "cancelled_orders_excluded": true,
+          "category_bypass": false
+        },
+        "retrieval": {
+          "catalog_rows_scanned_max": 50000,
+          "representatives": 236,
+          "after_ownership": 163,
+          "after_context": 56,
+          "eligible_models": 37,
+          "requested": 24,
+          "returned": 24,
+          "deduplicate_by": "model_not_photo",
+          "broader_price": false
+        },
+        "has_more": true,
+        "inference_ms": 11.01,
+        "latency_ms": 66.36
+      },
+      "items": [
+        {
+          "id": 520,
+          "name": "Chuột không dây Logitech M331 Silent Plus",
+          "price": 303000,
+          "image_url": "/static/images/merchandise/m331.png",
+          "p_click": 0.2191416,
+          "ranking_score": 0.996
+        },
+        {
+          "id": 2223,
+          "name": "Chuột không dây Logitech Pebble M350",
+          "price": 257000,
+          "image_url": "/static/images/merchandise/pebble-m350.png",
+          "p_click": 0.1709852,
+          "ranking_score": 0.9345455
+        },
+        {
+          "id": 49812,
+          "name": "Chuột không dây Logitech M220",
+          "price": 299000,
+          "image_url": "/static/images/merchandise/m220.png",
+          "p_click": 0.191067,
+          "ranking_score": 0.9118182
+        },
+        {
+          "id": 4902,
+          "name": "Chuột công thái học không dây Logitech MX Master 3S",
+          "price": 257000,
+          "image_url": "/static/images/merchandise/mx-master-3s.png",
+          "p_click": 0.1606399,
+          "ranking_score": 0.9042727
+        },
+        {
+          "id": 109,
+          "name": "Củ sạc đa cổng Anker Prime 67W GaN",
+          "price": 339000,
+          "image_url": "/static/images/storefront/104.webp",
+          "p_click": 0.2168215,
+          "ranking_score": 0.8880724
+        },
+        {
+          "id": 378,
+          "name": "Bàn phím cơ Keychron V1 Hotswap",
+          "price": 2283000,
+          "image_url": "/static/images/catalog/4dc029dea4e0a8b5.jpg",
+          "p_click": 0.2080886,
+          "ranking_score": 0.7631408
+        },
+        {
+          "id": 428,
+          "name": "Bình giữ nhiệt Lock&Lock LHC4131 450ml",
+          "price": 335000,
+          "image_url": "/static/images/merchandise/bottle.jpg",
+          "p_click": 0.1353726,
+          "ranking_score": 0.7444431
+        },
+        {
+          "id": 72,
+          "name": "Màn hình máy tính LG UltraGear 24GN65R",
+          "price": 3868000,
+          "image_url": "/static/images/catalog/d6945fbd35812139.jpg",
+          "p_click": 0.1961176,
+          "ranking_score": 0.7427772
+        },
+        {
+          "id": 453,
+          "name": "Bàn phím cơ Keychron K4 Pro 96%",
+          "price": 2242000,
+          "image_url": "/static/images/catalog/76b08251e39e41f3.jpg",
+          "p_click": 0.1957155,
+          "ranking_score": 0.7403226
+        },
+        {
+          "id": 1486,
+          "name": "Củ sạc nhanh Apple 20W Type-C",
+          "price": 465000,
+          "image_url": "/static/images/catalog/2ef69a8e8bbebf1e.jpg",
+          "p_click": 0.1437687,
+          "ranking_score": 0.7298906
+        },
+        {
+          "id": 1420,
+          "name": "Bàn phím cơ Keychron K2 Pro QMK/VIA",
+          "price": 2161000,
+          "image_url": "/static/images/catalog/76b08251e39e41f3.jpg",
+          "p_click": 0.1722415,
+          "ranking_score": 0.7120499
+        },
+        {
+          "id": 49941,
+          "name": "Dây giày Crep Protect Pre-Treated Laces",
+          "price": 129000,
+          "image_url": "/static/images/merchandise/crep-crep-protect-pre-treated-laces.jpg",
+          "p_click": 0.2008676,
+          "ranking_score": 0.6977706
+        },
+        {
+          "id": 21,
+          "name": "Màn hình LG 27MP400-B 27 inch",
+          "price": 2938000,
+          "image_url": "/static/images/catalog/d6945fbd35812139.jpg",
+          "p_click": 0.1577144,
+          "ranking_score": 0.6694135
+        },
+        {
+          "id": 426,
+          "name": "Màn hình LG UltraGear 27GR75Q 2K 165Hz",
+          "price": 3367000,
+          "image_url": "/static/images/catalog/d6945fbd35812139.jpg",
+          "p_click": 0.1454603,
+          "ranking_score": 0.6158681
+        },
+        {
+          "id": 49910,
+          "name": "Túi đựng giày Crep Protect Sneaker Bag",
+          "price": 499000,
+          "image_url": "/static/images/merchandise/crep-crep-protect-sneaker-bag-upc.jpg",
+          "p_click": 0.1562444,
+          "ranking_score": 0.5886796
+        },
+        {
+          "id": 49972,
+          "name": "Lót giày thể thao Crep Protect Sport Insoles",
+          "price": 249000,
+          "image_url": "/static/images/merchandise/crep-crep-protect-sport-insoles.jpg",
+          "p_click": 0.1509411,
+          "ranking_score": 0.5832251
+        },
+        {
+          "id": 49903,
+          "name": "Khăn lau giày Crep Protect Wipes 12 miếng",
+          "price": 159000,
+          "image_url": "/static/images/merchandise/crep-crep-protect-wipes.jpg",
+          "p_click": 0.1324096,
+          "ranking_score": 0.5068615
+        },
+        {
+          "id": 49957,
+          "name": "Bộ vệ sinh giày Crep Protect Cure Travel Kit",
+          "price": 449000,
+          "image_url": "/static/images/merchandise/crep-crep-protect-cure-travel-kit.jpg",
+          "p_click": 0.1207129,
+          "ranking_score": 0.4686796
+        },
+        {
+          "id": 49931,
+          "name": "Viên khử mùi giày Crep Protect Pill",
+          "price": 199000,
+          "image_url": "/static/images/merchandise/crep-pill.png",
+          "p_click": 0.1145945,
+          "ranking_score": 0.452316
+        },
+        {
+          "id": 106,
+          "name": "Pin sạc dự phòng Anker 20000mAh 22.5W",
+          "price": 320000,
+          "image_url": "/static/images/storefront/105.webp",
+          "p_click": 0.1565792,
+          "ranking_score": 0.4473129
+        },
+        {
+          "id": 49990,
+          "name": "Lót giày Crep Protect Comfort Insoles",
+          "price": 189000,
+          "image_url": "/static/images/merchandise/crep-crep-protect-comfort-insoles-ean.jpg",
+          "p_click": 0.1139574,
+          "ranking_score": 0.4468615
+        },
+        {
+          "id": 34,
+          "name": "Gel chống nắng dưỡng ẩm Anessa Perfect UV Gel 90g",
+          "price": 589000,
+          "image_url": "/static/images/merchandise/anessa-mild.png",
+          "p_click": 0.1798469,
+          "ranking_score": 0.3524458
+        },
+        {
+          "id": 122,
+          "name": "Kem chống nắng cho da nhạy cảm em bé Anessa Moisture",
+          "price": 513000,
+          "image_url": "/static/images/merchandise/anessa-mild.png",
+          "p_click": 0.1780355,
+          "ranking_score": 0.3499912
+        },
+        {
+          "id": 26,
+          "name": "Hộp cơm cắm điện Lock&Lock đa năng",
+          "price": 314000,
+          "image_url": "/static/images/placeholder.svg",
+          "p_click": 0.1400326,
+          "ranking_score": 0.341218
+        }
+      ]
+    },
+    "user_1_deals": {
+      "count": 24,
+      "meta": {
+        "history_length": 1000,
+        "scl_coverage": 1.0,
+        "cold_start": false,
+        "touchpoint": "deals",
+        "rule_version": "retail-context-v2",
+        "engine": "Alibaba MUSE + merchandise context",
+        "strategy": "bounded model recall → ownership/spec filtering → MUSE ranking → model diversity",
+        "score_type": "p_click",
+        "checkpoint_loaded": true,
+        "model_used": true,
+        "candidate_count": 43,
+        "semantic_mapping_verified": false,
+        "checkpoint_scores_unchanged": true,
+        "context_policy": "deals_merchandise_constraints",
+        "focus_product_ids": [],
+        "focus_names": [],
+        "order_id": null,
+        "purchase_policy": {
+          "excluded_models": 5,
+          "recent_durable_types": [
+            "earbuds",
+            "flats",
+            "headphones",
+            "heels",
+            "laptop",
+            "loafers",
+            "sandals",
+            "shoes"
+          ],
+          "durable_cooldown_days": 30,
+          "cancelled_orders_excluded": true,
+          "category_bypass": false
+        },
+        "retrieval": {
+          "catalog_rows_scanned_max": 50000,
+          "representatives": 236,
+          "after_ownership": 163,
+          "after_context": 43,
+          "eligible_models": 26,
+          "requested": 24,
+          "returned": 24,
+          "deduplicate_by": "model_not_photo",
+          "broader_price": false
+        },
+        "has_more": true,
+        "inference_ms": 8.59,
+        "latency_ms": 59.64
+      },
+      "items": [
+        {
+          "id": 2223,
+          "name": "Chuột không dây Logitech Pebble M350",
+          "price": 257000,
+          "image_url": "/static/images/merchandise/pebble-m350.png",
+          "p_click": 0.1709852,
+          "ranking_score": 0.95
+        },
+        {
+          "id": 4902,
+          "name": "Chuột công thái học không dây Logitech MX Master 3S",
+          "price": 257000,
+          "image_url": "/static/images/merchandise/mx-master-3s.png",
+          "p_click": 0.1606399,
+          "ranking_score": 0.9184286
+        },
+        {
+          "id": 109,
+          "name": "Củ sạc đa cổng Anker Prime 67W GaN",
+          "price": 339000,
+          "image_url": "/static/images/storefront/104.webp",
+          "p_click": 0.2168215,
+          "ranking_score": 0.893527
+        },
+        {
+          "id": 378,
+          "name": "Bàn phím cơ Keychron V1 Hotswap",
+          "price": 2283000,
+          "image_url": "/static/images/catalog/4dc029dea4e0a8b5.jpg",
+          "p_click": 0.2080886,
+          "ranking_score": 0.766907
+        },
+        {
+          "id": 72,
+          "name": "Màn hình máy tính LG UltraGear 24GN65R",
+          "price": 3868000,
+          "image_url": "/static/images/catalog/d6945fbd35812139.jpg",
+          "p_click": 0.1961176,
+          "ranking_score": 0.7486213
+        },
+        {
+          "id": 453,
+          "name": "Bàn phím cơ Keychron K4 Pro 96%",
+          "price": 2242000,
+          "image_url": "/static/images/catalog/76b08251e39e41f3.jpg",
+          "p_click": 0.1957155,
+          "ranking_score": 0.7444785
+        },
+        {
+          "id": 428,
+          "name": "Bình giữ nhiệt Lock&Lock LHC4131 450ml",
+          "price": 335000,
+          "image_url": "/static/images/merchandise/bottle.jpg",
+          "p_click": 0.1353726,
+          "ranking_score": 0.742495
+        },
+        {
+          "id": 1486,
+          "name": "Củ sạc nhanh Apple 20W Type-C",
+          "price": 465000,
+          "image_url": "/static/images/catalog/2ef69a8e8bbebf1e.jpg",
+          "p_click": 0.1437687,
+          "ranking_score": 0.7363841
+        },
+        {
+          "id": 232,
+          "name": "Bàn phím cơ Akko 3087 v2 DS",
+          "price": 844000,
+          "image_url": "/static/images/catalog/2e7ad74f07692aea.jpg",
+          "p_click": 0.1596993,
+          "ranking_score": 0.6873356
+        },
+        {
+          "id": 21,
+          "name": "Màn hình LG 27MP400-B 27 inch",
+          "price": 2938000,
+          "image_url": "/static/images/catalog/d6945fbd35812139.jpg",
+          "p_click": 0.1577144,
+          "ranking_score": 0.6801927
+        },
+        {
+          "id": 426,
+          "name": "Màn hình LG UltraGear 27GR75Q 2K 165Hz",
+          "price": 3367000,
+          "image_url": "/static/images/catalog/d6945fbd35812139.jpg",
+          "p_click": 0.1454603,
+          "ranking_score": 0.6240499
+        },
+        {
+          "id": 106,
+          "name": "Pin sạc dự phòng Anker 20000mAh 22.5W",
+          "price": 320000,
+          "image_url": "/static/images/storefront/105.webp",
+          "p_click": 0.1565792,
+          "ranking_score": 0.4530271
+        },
+        {
+          "id": 34,
+          "name": "Gel chống nắng dưỡng ẩm Anessa Perfect UV Gel 90g",
+          "price": 589000,
+          "image_url": "/static/images/merchandise/anessa-mild.png",
+          "p_click": 0.1798469,
+          "ranking_score": 0.3603678
+        },
+        {
+          "id": 122,
+          "name": "Kem chống nắng cho da nhạy cảm em bé Anessa Moisture",
+          "price": 513000,
+          "image_url": "/static/images/merchandise/anessa-mild.png",
+          "p_click": 0.1780355,
+          "ranking_score": 0.356225
+        },
+        {
+          "id": 26,
+          "name": "Hộp cơm cắm điện Lock&Lock đa năng",
+          "price": 314000,
+          "image_url": "/static/images/placeholder.svg",
+          "p_click": 0.1400326,
+          "ranking_score": 0.3426465
+        },
+        {
+          "id": 148,
+          "name": "Serum cấp ẩm phục hồi da Hyalu B5 30ml",
+          "price": 452000,
+          "image_url": "/static/images/catalog/c6a786615a7ef26b.jpg",
+          "p_click": 0.1648175,
+          "ranking_score": 0.2964389
+        },
+        {
+          "id": 5681,
+          "name": "Chuột gaming Logitech G102 Lightsync RGB",
+          "price": 257000,
+          "image_url": "/static/images/merchandise/g102.png",
+          "p_click": 0.1329957,
+          "ranking_score": 0.797
+        },
+        {
+          "id": 3515,
+          "name": "Chuột không dây Logitech M331 Silent Plus",
+          "price": 257000,
+          "image_url": "/static/images/merchandise/m331.png",
+          "p_click": 0.1169649,
+          "ranking_score": 0.7418571
+        },
+        {
+          "id": 448,
+          "name": "Củ sạc nhanh Anker 511 Nano 3 30W Type-C",
+          "price": 320000,
+          "image_url": "/static/images/catalog/2ef69a8e8bbebf1e.jpg",
+          "p_click": 0.1243133,
+          "ranking_score": 0.6730984
+        },
+        {
+          "id": 282,
+          "name": "Bàn phím cơ không dây Akko 5075B Plus",
+          "price": 1079000,
+          "image_url": "/static/images/catalog/2e7ad74f07692aea.jpg",
+          "p_click": 0.1506587,
+          "ranking_score": 0.6526213
+        },
+        {
+          "id": 152,
+          "name": "Bàn phím cơ Keychron K2 Pro QMK/VIA",
+          "price": 1591000,
+          "image_url": "/static/images/catalog/76b08251e39e41f3.jpg",
+          "p_click": 0.1484268,
+          "ranking_score": 0.6454785
+        },
+        {
+          "id": 307,
+          "name": "Bàn phím cơ Keychron K8 Pro Không dây",
+          "price": 1713000,
+          "image_url": "/static/images/catalog/2e7ad74f07692aea.jpg",
+          "p_click": 0.1477329,
+          "ranking_score": 0.6373356
+        },
+        {
+          "id": 81,
+          "name": "Bàn phím cơ Akko 3098B Plus Multi-modes",
+          "price": 863000,
+          "image_url": "/static/images/catalog/2e7ad74f07692aea.jpg",
+          "p_click": 0.1465975,
+          "ranking_score": 0.6301927
+        },
+        {
+          "id": 371,
+          "name": "Bàn phím cơ Akko MonsGeek M1W Nhôm CNC",
+          "price": 961000,
+          "image_url": "/static/images/catalog/76b08251e39e41f3.jpg",
+          "p_click": 0.1217996,
+          "ranking_score": 0.5311927
+        }
+      ]
+    },
+    "user_2_home": {
+      "count": 14,
+      "meta": {
+        "history_length": 1000,
+        "scl_coverage": 1.0,
+        "cold_start": false,
+        "touchpoint": "home",
+        "rule_version": "retail-context-v2",
+        "engine": "Alibaba MUSE + merchandise context",
+        "strategy": "bounded model recall → ownership/spec filtering → MUSE ranking → model diversity",
+        "score_type": "p_click",
+        "checkpoint_loaded": true,
+        "model_used": true,
+        "candidate_count": 18,
+        "semantic_mapping_verified": false,
+        "checkpoint_scores_unchanged": true,
+        "context_policy": "home_merchandise_constraints",
+        "focus_product_ids": [],
+        "focus_names": [],
+        "order_id": null,
+        "purchase_policy": {
+          "excluded_models": 3,
+          "recent_durable_types": [
+            "charger",
+            "phone"
+          ],
+          "durable_cooldown_days": 30,
+          "cancelled_orders_excluded": true,
+          "category_bypass": false
+        },
+        "retrieval": {
+          "catalog_rows_scanned_max": 50000,
+          "representatives": 236,
+          "after_ownership": 209,
+          "after_context": 18,
+          "eligible_models": 14,
+          "requested": 24,
+          "returned": 14,
+          "deduplicate_by": "model_not_photo",
+          "broader_price": false
+        },
+        "has_more": false,
+        "inference_ms": 9.48,
+        "latency_ms": 46.6
+      },
+      "items": [
+        {
+          "id": 106,
+          "name": "Pin sạc dự phòng Anker 20000mAh 22.5W",
+          "price": 320000,
+          "image_url": "/static/images/storefront/105.webp",
+          "p_click": 0.157678,
+          "ranking_score": 0.9294118
+        },
+        {
+          "id": 129,
+          "name": "Tai nghe gaming Logitech G435 Lightspeed",
+          "price": 356000,
+          "image_url": "/static/images/catalog/868823f810e6d8bf.jpg",
+          "p_click": 0.2132428,
+          "ranking_score": 0.7246359
+        },
+        {
+          "id": 162,
+          "name": "Tai nghe chụp tai Sony WH-CH520",
+          "price": 1350000,
+          "image_url": "/static/images/catalog/50867512f65f1c41.jpg",
+          "p_click": 0.1702351,
+          "ranking_score": 0.7079889
+        },
+        {
+          "id": 1609,
+          "name": "Tai nghe Apple AirPods 3 MagSafe",
+          "price": 562000,
+          "image_url": "/static/images/catalog/6b21cdaff41ae221.jpg",
+          "p_click": 0.1589591,
+          "ranking_score": 0.6521451
+        },
+        {
+          "id": 96,
+          "name": "Tai nghe chống ồn Sony WH-1000XM5",
+          "price": 1102000,
+          "image_url": "/static/images/catalog/868823f810e6d8bf.jpg",
+          "p_click": 0.1425026,
+          "ranking_score": 0.6207536
+        },
+        {
+          "id": 84,
+          "name": "Tai nghe Apple AirPods Pro 2",
+          "price": 508000,
+          "image_url": "/static/images/catalog/18971a1f250371e5.jpg",
+          "p_click": 0.1456572,
+          "ranking_score": 0.618851
+        },
+        {
+          "id": 181,
+          "name": "Tai nghe true wireless Sony WF-1000XM5",
+          "price": 1350000,
+          "image_url": "/static/images/catalog/6b21cdaff41ae221.jpg",
+          "p_click": 0.1405675,
+          "ranking_score": 0.5825569
+        },
+        {
+          "id": 70,
+          "name": "Loa mini JBL Go 3",
+          "price": 905000,
+          "image_url": "/static/images/catalog/c366d5473a83e25f.jpg",
+          "p_click": 0.1690533,
+          "ranking_score": 0.5076153
+        },
+        {
+          "id": 112,
+          "name": "Loa bluetooth JBL Charge 5 chống nước",
+          "price": 975000,
+          "image_url": "/static/images/catalog/c366d5473a83e25f.jpg",
+          "p_click": 0.140435,
+          "ranking_score": 0.402733
+        },
+        {
+          "id": 26,
+          "name": "Hộp cơm cắm điện Lock&Lock đa năng",
+          "price": 314000,
+          "image_url": "/static/images/placeholder.svg",
+          "p_click": 0.1381293,
+          "ranking_score": 0.3678322
+        },
+        {
+          "id": 177,
+          "name": "Loa di động JBL Flip 6 âm thanh vòm",
+          "price": 784000,
+          "image_url": "/static/images/catalog/c366d5473a83e25f.jpg",
+          "p_click": 0.1306445,
+          "ranking_score": 0.3477918
+        },
+        {
+          "id": 428,
+          "name": "Bình giữ nhiệt Lock&Lock LHC4131 450ml",
+          "price": 335000,
+          "image_url": "/static/images/merchandise/bottle.jpg",
+          "p_click": 0.1153751,
+          "ranking_score": 0.2795969
+        },
+        {
+          "id": 51,
+          "name": "Loa bluetooth di động Sony SRS-XB100",
+          "price": 1432000,
+          "image_url": "/static/images/catalog/b896abe9f620f2f2.jpg",
+          "p_click": 0.1108595,
+          "ranking_score": 0.2772036
+        },
+        {
+          "id": 151,
+          "name": "Tai nghe true wireless JBL Wave 200TWS",
+          "price": 992000,
+          "image_url": "/static/images/catalog/18971a1f250371e5.jpg",
+          "p_click": 0.1067459,
+          "ranking_score": 0.4050863
+        }
+      ]
+    },
+    "user_2_deals": {
+      "count": 13,
+      "meta": {
+        "history_length": 1000,
+        "scl_coverage": 1.0,
+        "cold_start": false,
+        "touchpoint": "deals",
+        "rule_version": "retail-context-v2",
+        "engine": "Alibaba MUSE + merchandise context",
+        "strategy": "bounded model recall → ownership/spec filtering → MUSE ranking → model diversity",
+        "score_type": "p_click",
+        "checkpoint_loaded": true,
+        "model_used": true,
+        "candidate_count": 17,
+        "semantic_mapping_verified": false,
+        "checkpoint_scores_unchanged": true,
+        "context_policy": "deals_merchandise_constraints",
+        "focus_product_ids": [],
+        "focus_names": [],
+        "order_id": null,
+        "purchase_policy": {
+          "excluded_models": 3,
+          "recent_durable_types": [
+            "charger",
+            "phone"
+          ],
+          "durable_cooldown_days": 30,
+          "cancelled_orders_excluded": true,
+          "category_bypass": false
+        },
+        "retrieval": {
+          "catalog_rows_scanned_max": 50000,
+          "representatives": 236,
+          "after_ownership": 209,
+          "after_context": 17,
+          "eligible_models": 13,
+          "requested": 24,
+          "returned": 13,
+          "deduplicate_by": "model_not_photo",
+          "broader_price": false
+        },
+        "has_more": false,
+        "inference_ms": 7.93,
+        "latency_ms": 45.32
+      },
+      "items": [
+        {
+          "id": 106,
+          "name": "Pin sạc dự phòng Anker 20000mAh 22.5W",
+          "price": 320000,
+          "image_url": "/static/images/storefront/105.webp",
+          "p_click": 0.157678,
+          "ranking_score": 0.94375
+        },
+        {
+          "id": 129,
+          "name": "Tai nghe gaming Logitech G435 Lightspeed",
+          "price": 356000,
+          "image_url": "/static/images/catalog/868823f810e6d8bf.jpg",
+          "p_click": 0.2132428,
+          "ranking_score": 0.7246359
+        },
+        {
+          "id": 162,
+          "name": "Tai nghe chụp tai Sony WH-CH520",
+          "price": 1350000,
+          "image_url": "/static/images/catalog/50867512f65f1c41.jpg",
+          "p_click": 0.1702351,
+          "ranking_score": 0.7068859
+        },
+        {
+          "id": 1609,
+          "name": "Tai nghe Apple AirPods 3 MagSafe",
+          "price": 562000,
+          "image_url": "/static/images/catalog/6b21cdaff41ae221.jpg",
+          "p_click": 0.1589591,
+          "ranking_score": 0.6675863
+        },
+        {
+          "id": 96,
+          "name": "Tai nghe chống ồn Sony WH-1000XM5",
+          "price": 1102000,
+          "image_url": "/static/images/catalog/868823f810e6d8bf.jpg",
+          "p_click": 0.1425026,
+          "ranking_score": 0.6328859
+        },
+        {
+          "id": 84,
+          "name": "Tai nghe Apple AirPods Pro 2",
+          "price": 508000,
+          "image_url": "/static/images/catalog/18971a1f250371e5.jpg",
+          "p_click": 0.1456572,
+          "ranking_score": 0.6320863
+        },
+        {
+          "id": 181,
+          "name": "Tai nghe true wireless Sony WF-1000XM5",
+          "price": 1350000,
+          "image_url": "/static/images/catalog/6b21cdaff41ae221.jpg",
+          "p_click": 0.1405675,
+          "ranking_score": 0.5935863
+        },
+        {
+          "id": 112,
+          "name": "Loa bluetooth JBL Charge 5 chống nước",
+          "price": 975000,
+          "image_url": "/static/images/catalog/c366d5473a83e25f.jpg",
+          "p_click": 0.140435,
+          "ranking_score": 0.4126594
+        },
+        {
+          "id": 26,
+          "name": "Hộp cơm cắm điện Lock&Lock đa năng",
+          "price": 314000,
+          "image_url": "/static/images/placeholder.svg",
+          "p_click": 0.1381293,
+          "ranking_score": 0.3766558
+        },
+        {
+          "id": 177,
+          "name": "Loa di động JBL Flip 6 âm thanh vòm",
+          "price": 784000,
+          "image_url": "/static/images/catalog/c366d5473a83e25f.jpg",
+          "p_click": 0.1306445,
+          "ranking_score": 0.3544094
+        },
+        {
+          "id": 428,
+          "name": "Bình giữ nhiệt Lock&Lock LHC4131 450ml",
+          "price": 335000,
+          "image_url": "/static/images/merchandise/bottle.jpg",
+          "p_click": 0.1153751,
+          "ranking_score": 0.2829058
+        },
+        {
+          "id": 51,
+          "name": "Loa bluetooth di động Sony SRS-XB100",
+          "price": 1432000,
+          "image_url": "/static/images/catalog/b896abe9f620f2f2.jpg",
+          "p_click": 0.1108595,
+          "ranking_score": 0.2794094
+        },
+        {
+          "id": 151,
+          "name": "Tai nghe true wireless JBL Wave 200TWS",
+          "price": 992000,
+          "image_url": "/static/images/catalog/18971a1f250371e5.jpg",
+          "p_click": 0.1067459,
+          "ranking_score": 0.4050863
+        }
+      ]
+    },
+    "user_22_home": {
+      "count": 24,
+      "meta": {
+        "history_length": 6,
+        "scl_coverage": 1.0,
+        "cold_start": true,
+        "touchpoint": "home",
+        "rule_version": "retail-context-v2",
+        "engine": "Alibaba MUSE + merchandise context",
+        "strategy": "bounded model recall → ownership/spec filtering → MUSE ranking → model diversity",
+        "score_type": "p_click",
+        "checkpoint_loaded": true,
+        "model_used": true,
+        "candidate_count": 91,
+        "semantic_mapping_verified": false,
+        "checkpoint_scores_unchanged": true,
+        "context_policy": "home_merchandise_constraints",
+        "focus_product_ids": [],
+        "focus_names": [],
+        "order_id": null,
+        "purchase_policy": {
+          "excluded_models": 1,
+          "recent_durable_types": [
+            "racket"
+          ],
+          "durable_cooldown_days": 30,
+          "cancelled_orders_excluded": true,
+          "category_bypass": false
+        },
+        "retrieval": {
+          "catalog_rows_scanned_max": 50000,
+          "representatives": 236,
+          "after_ownership": 233,
+          "after_context": 91,
+          "eligible_models": 61,
+          "requested": 24,
+          "returned": 24,
+          "deduplicate_by": "model_not_photo",
+          "broader_price": false
+        },
+        "has_more": true,
+        "inference_ms": 10.84,
+        "latency_ms": 94.71
+      },
+      "items": [
+        {
+          "id": 428,
+          "name": "Bình giữ nhiệt Lock&Lock LHC4131 450ml",
+          "price": 335000,
+          "image_url": "/static/images/merchandise/bottle.jpg",
+          "p_click": 0.1302019,
+          "ranking_score": 0.8823333
+        },
+        {
+          "id": 49928,
+          "name": "Quả cầu lông lông vũ",
+          "price": 49000,
+          "image_url": "/static/images/storefront/146.webp",
+          "p_click": 0.1481136,
+          "ranking_score": 0.8712915
+        },
+        {
+          "id": 492,
+          "name": "Giày sneaker Biti's Hunter Street x Vietmax",
+          "price": 839000,
+          "image_url": "/static/images/catalog/bb7b4acbe4fe7832.jpg",
+          "p_click": 0.1228892,
+          "ranking_score": 0.8446667
+        },
+        {
+          "id": 241,
+          "name": "Giày chạy bộ Biti's Hunter Core Gen 2",
+          "price": 779000,
+          "image_url": "/static/images/storefront/89.webp",
+          "p_click": 0.1192661,
+          "ranking_score": 0.8313333
+        },
+        {
+          "id": 450,
+          "name": "Giày thể thao nam nữ Biti's Hunter X Không dây",
+          "price": 779000,
+          "image_url": "/static/images/storefront/91.webp",
+          "p_click": 0.0999219,
+          "ranking_score": 0.78
+        },
+        {
+          "id": 71,
+          "name": "Bao vợt cầu lông Yonex 2 ngăn chuyên nghiệp",
+          "price": 1694000,
+          "image_url": "/static/images/merchandise/racket-bag.png",
+          "p_click": 0.0825348,
+          "ranking_score": 0.6982915
+        },
+        {
+          "id": 475,
+          "name": "MacBook Air M1 13 inch",
+          "price": 15901000,
+          "image_url": "/static/images/storefront/78.webp",
+          "p_click": 0.1583037,
+          "ranking_score": 0.6258178
+        },
+        {
+          "id": 234,
+          "name": "Laptop Cyborg 15 A12VF",
+          "price": 11894000,
+          "image_url": "/static/images/storefront/79.webp",
+          "p_click": 0.1569242,
+          "ranking_score": 0.6184845
+        },
+        {
+          "id": 640,
+          "name": "Laptop Modern 14 C12MO",
+          "price": 13741000,
+          "image_url": "/static/images/storefront/78.webp",
+          "p_click": 0.1549087,
+          "ranking_score": 0.6124845
+        },
+        {
+          "id": 292,
+          "name": "Laptop ThinkPad E14 Gen 5",
+          "price": 13993000,
+          "image_url": "/static/images/storefront/78.webp",
+          "p_click": 0.155857,
+          "ranking_score": 0.6118178
+        },
+        {
+          "id": 378,
+          "name": "Bàn phím cơ Keychron V1 Hotswap",
+          "price": 2283000,
+          "image_url": "/static/images/catalog/4dc029dea4e0a8b5.jpg",
+          "p_click": 0.1695519,
+          "ranking_score": 0.433412
+        },
+        {
+          "id": 72,
+          "name": "Màn hình máy tính LG UltraGear 24GN65R",
+          "price": 3868000,
+          "image_url": "/static/images/catalog/d6945fbd35812139.jpg",
+          "p_click": 0.1649058,
+          "ranking_score": 0.4260787
+        },
+        {
+          "id": 1420,
+          "name": "Bàn phím cơ Keychron K2 Pro QMK/VIA",
+          "price": 2161000,
+          "image_url": "/static/images/catalog/76b08251e39e41f3.jpg",
+          "p_click": 0.1634368,
+          "ranking_score": 0.4247454
+        },
+        {
+          "id": 453,
+          "name": "Bàn phím cơ Keychron K4 Pro 96%",
+          "price": 2242000,
+          "image_url": "/static/images/catalog/76b08251e39e41f3.jpg",
+          "p_click": 0.1560323,
+          "ranking_score": 0.4157454
+        },
+        {
+          "id": 21,
+          "name": "Màn hình LG 27MP400-B 27 inch",
+          "price": 2938000,
+          "image_url": "/static/images/catalog/d6945fbd35812139.jpg",
+          "p_click": 0.1525135,
+          "ranking_score": 0.3990787
+        },
+        {
+          "id": 80,
+          "name": "Áo thun nam Cotton Compact",
+          "price": 170000,
+          "image_url": "/static/images/catalog/5d701df089bfda2e.jpg",
+          "p_click": 0.1728213,
+          "ranking_score": 0.3833752
+        },
+        {
+          "id": 4902,
+          "name": "Chuột công thái học không dây Logitech MX Master 3S",
+          "price": 257000,
+          "image_url": "/static/images/merchandise/mx-master-3s.png",
+          "p_click": 0.1445795,
+          "ranking_score": 0.3737454
+        },
+        {
+          "id": 84,
+          "name": "Tai nghe Apple AirPods Pro 2",
+          "price": 508000,
+          "image_url": "/static/images/catalog/18971a1f250371e5.jpg",
+          "p_click": 0.142053,
+          "ranking_score": 0.363412
+        },
+        {
+          "id": 49823,
+          "name": "Chuột không dây Logitech M185",
+          "price": 229000,
+          "image_url": "/static/images/merchandise/m185.png",
+          "p_click": 0.15363,
+          "ranking_score": 0.3567454
+        },
+        {
+          "id": 520,
+          "name": "Chuột không dây Logitech M331 Silent Plus",
+          "price": 303000,
+          "image_url": "/static/images/merchandise/m331.png",
+          "p_click": 0.1412604,
+          "ranking_score": 0.3527454
+        },
+        {
+          "id": 162,
+          "name": "Tai nghe chụp tai Sony WH-CH520",
+          "price": 1350000,
+          "image_url": "/static/images/catalog/50867512f65f1c41.jpg",
+          "p_click": 0.1393254,
+          "ranking_score": 0.3457454
+        },
+        {
+          "id": 1609,
+          "name": "Tai nghe Apple AirPods 3 MagSafe",
+          "price": 562000,
+          "image_url": "/static/images/catalog/6b21cdaff41ae221.jpg",
+          "p_click": 0.1345806,
+          "ranking_score": 0.3347454
+        },
+        {
+          "id": 129,
+          "name": "Tai nghe gaming Logitech G435 Lightspeed",
+          "price": 356000,
+          "image_url": "/static/images/catalog/868823f810e6d8bf.jpg",
+          "p_click": 0.1273732,
+          "ranking_score": 0.301412
+        },
+        {
+          "id": 181,
+          "name": "Tai nghe true wireless Sony WF-1000XM5",
+          "price": 1350000,
+          "image_url": "/static/images/catalog/6b21cdaff41ae221.jpg",
+          "p_click": 0.1232484,
+          "ranking_score": 0.2857454
+        }
+      ]
+    },
+    "user_22_deals": {
+      "count": 24,
+      "meta": {
+        "history_length": 6,
+        "scl_coverage": 1.0,
+        "cold_start": true,
+        "touchpoint": "deals",
+        "rule_version": "retail-context-v2",
+        "engine": "Alibaba MUSE + merchandise context",
+        "strategy": "bounded model recall → ownership/spec filtering → MUSE ranking → model diversity",
+        "score_type": "p_click",
+        "checkpoint_loaded": true,
+        "model_used": true,
+        "candidate_count": 79,
+        "semantic_mapping_verified": false,
+        "checkpoint_scores_unchanged": true,
+        "context_policy": "deals_merchandise_constraints",
+        "focus_product_ids": [],
+        "focus_names": [],
+        "order_id": null,
+        "purchase_policy": {
+          "excluded_models": 1,
+          "recent_durable_types": [
+            "racket"
+          ],
+          "durable_cooldown_days": 30,
+          "cancelled_orders_excluded": true,
+          "category_bypass": false
+        },
+        "retrieval": {
+          "catalog_rows_scanned_max": 50000,
+          "representatives": 236,
+          "after_ownership": 233,
+          "after_context": 79,
+          "eligible_models": 53,
+          "requested": 24,
+          "returned": 24,
+          "deduplicate_by": "model_not_photo",
+          "broader_price": false
+        },
+        "has_more": true,
+        "inference_ms": 9.44,
+        "latency_ms": 91.81
+      },
+      "items": [
+        {
+          "id": 428,
+          "name": "Bình giữ nhiệt Lock&Lock LHC4131 450ml",
+          "price": 335000,
+          "image_url": "/static/images/merchandise/bottle.jpg",
+          "p_click": 0.1302019,
+          "ranking_score": 0.8951538
+        },
+        {
+          "id": 492,
+          "name": "Giày sneaker Biti's Hunter Street x Vietmax",
+          "price": 839000,
+          "image_url": "/static/images/catalog/bb7b4acbe4fe7832.jpg",
+          "p_click": 0.1228892,
+          "ranking_score": 0.8518462
+        },
+        {
+          "id": 241,
+          "name": "Giày chạy bộ Biti's Hunter Core Gen 2",
+          "price": 779000,
+          "image_url": "/static/images/storefront/89.webp",
+          "p_click": 0.1192661,
+          "ranking_score": 0.8364615
+        },
+        {
+          "id": 71,
+          "name": "Bao vợt cầu lông Yonex 2 ngăn chuyên nghiệp",
+          "price": 1694000,
+          "image_url": "/static/images/merchandise/racket-bag.png",
+          "p_click": 0.0825348,
+          "ranking_score": 0.6923941
+        },
+        {
+          "id": 475,
+          "name": "MacBook Air M1 13 inch",
+          "price": 15901000,
+          "image_url": "/static/images/storefront/78.webp",
+          "p_click": 0.1583037,
+          "ranking_score": 0.6314589
+        },
+        {
+          "id": 234,
+          "name": "Laptop Cyborg 15 A12VF",
+          "price": 11894000,
+          "image_url": "/static/images/storefront/79.webp",
+          "p_click": 0.1569242,
+          "ranking_score": 0.6236127
+        },
+        {
+          "id": 292,
+          "name": "Laptop ThinkPad E14 Gen 5",
+          "price": 13993000,
+          "image_url": "/static/images/storefront/78.webp",
+          "p_click": 0.155857,
+          "ranking_score": 0.6159204
+        },
+        {
+          "id": 207,
+          "name": "Laptop Thin GF63 12VE",
+          "price": 14796000,
+          "image_url": "/static/images/storefront/78.webp",
+          "p_click": 0.1508304,
+          "ranking_score": 0.6083819
+        },
+        {
+          "id": 378,
+          "name": "Bàn phím cơ Keychron V1 Hotswap",
+          "price": 2283000,
+          "image_url": "/static/images/catalog/4dc029dea4e0a8b5.jpg",
+          "p_click": 0.1695519,
+          "ranking_score": 0.4367454
+        },
+        {
+          "id": 72,
+          "name": "Màn hình máy tính LG UltraGear 24GN65R",
+          "price": 3868000,
+          "image_url": "/static/images/catalog/d6945fbd35812139.jpg",
+          "p_click": 0.1649058,
+          "ranking_score": 0.4288992
+        },
+        {
+          "id": 453,
+          "name": "Bàn phím cơ Keychron K4 Pro 96%",
+          "price": 2242000,
+          "image_url": "/static/images/catalog/76b08251e39e41f3.jpg",
+          "p_click": 0.1560323,
+          "ranking_score": 0.4203607
+        },
+        {
+          "id": 21,
+          "name": "Màn hình LG 27MP400-B 27 inch",
+          "price": 2938000,
+          "image_url": "/static/images/catalog/d6945fbd35812139.jpg",
+          "p_click": 0.1525135,
+          "ranking_score": 0.4088223
+        },
+        {
+          "id": 307,
+          "name": "Bàn phím cơ Keychron K8 Pro Không dây",
+          "price": 1713000,
+          "image_url": "/static/images/catalog/2e7ad74f07692aea.jpg",
+          "p_click": 0.1472671,
+          "ranking_score": 0.40113
+        },
+        {
+          "id": 4902,
+          "name": "Chuột công thái học không dây Logitech MX Master 3S",
+          "price": 257000,
+          "image_url": "/static/images/merchandise/mx-master-3s.png",
+          "p_click": 0.1445795,
+          "ranking_score": 0.3837454
+        },
+        {
+          "id": 84,
+          "name": "Tai nghe Apple AirPods Pro 2",
+          "price": 508000,
+          "image_url": "/static/images/catalog/18971a1f250371e5.jpg",
+          "p_click": 0.142053,
+          "ranking_score": 0.3713607
+        },
+        {
+          "id": 162,
+          "name": "Tai nghe chụp tai Sony WH-CH520",
+          "price": 1350000,
+          "image_url": "/static/images/catalog/50867512f65f1c41.jpg",
+          "p_click": 0.1393254,
+          "ranking_score": 0.3549761
+        },
+        {
+          "id": 2223,
+          "name": "Chuột không dây Logitech Pebble M350",
+          "price": 257000,
+          "image_url": "/static/images/merchandise/pebble-m350.png",
+          "p_click": 0.1368743,
+          "ranking_score": 0.35213
+        },
+        {
+          "id": 1609,
+          "name": "Tai nghe Apple AirPods 3 MagSafe",
+          "price": 562000,
+          "image_url": "/static/images/catalog/6b21cdaff41ae221.jpg",
+          "p_click": 0.1345806,
+          "ranking_score": 0.3462838
+        },
+        {
+          "id": 129,
+          "name": "Tai nghe gaming Logitech G435 Lightspeed",
+          "price": 356000,
+          "image_url": "/static/images/catalog/868823f810e6d8bf.jpg",
+          "p_click": 0.1273732,
+          "ranking_score": 0.3116684
+        },
+        {
+          "id": 181,
+          "name": "Tai nghe true wireless Sony WF-1000XM5",
+          "price": 1350000,
+          "image_url": "/static/images/catalog/6b21cdaff41ae221.jpg",
+          "p_click": 0.1232484,
+          "ranking_score": 0.2934377
+        },
+        {
+          "id": 219,
+          "name": "Quần short nam thể thao Daily Pants",
+          "price": 193000,
+          "image_url": "/static/images/placeholder.svg",
+          "p_click": 0.1101406,
+          "ranking_score": 0.2756096
+        },
+        {
+          "id": 426,
+          "name": "Màn hình LG UltraGear 27GR75Q 2K 165Hz",
+          "price": 3367000,
+          "image_url": "/static/images/catalog/d6945fbd35812139.jpg",
+          "p_click": 0.1124898,
+          "ranking_score": 0.25213
+        },
+        {
+          "id": 96,
+          "name": "Tai nghe chống ồn Sony WH-1000XM5",
+          "price": 1102000,
+          "image_url": "/static/images/catalog/868823f810e6d8bf.jpg",
+          "p_click": 0.1074667,
+          "ranking_score": 0.2328992
+        },
+        {
+          "id": 113,
+          "name": "Áo polo nam công nghệ Cafe khử mùi",
+          "price": 225000,
+          "image_url": "/static/images/catalog/2670373ec285b0f0.jpg",
+          "p_click": 0.0834242,
+          "ranking_score": 0.1198367
+        }
+      ]
+    },
+    "order_15_laptop": {
+      "count": 12,
+      "meta": {
+        "history_length": 1000,
+        "scl_coverage": 1.0,
+        "cold_start": false,
+        "touchpoint": "orders",
+        "rule_version": "retail-context-v2",
+        "engine": "Alibaba MUSE + merchandise context",
+        "strategy": "bounded model recall → ownership/spec filtering → MUSE ranking → model diversity",
+        "score_type": "p_click",
+        "checkpoint_loaded": true,
+        "model_used": true,
+        "candidate_count": 30,
+        "semantic_mapping_verified": false,
+        "checkpoint_scores_unchanged": true,
+        "context_policy": "orders_merchandise_constraints",
+        "focus_product_ids": [
+          20
+        ],
+        "focus_names": [
+          "Laptop Inspiron 3520 - Titan Gray"
+        ],
+        "order_id": 15,
+        "purchase_policy": {
+          "excluded_models": 5,
+          "recent_durable_types": [
+            "earbuds",
+            "flats",
+            "headphones",
+            "heels",
+            "laptop",
+            "loafers",
+            "sandals",
+            "shoes"
+          ],
+          "durable_cooldown_days": 30,
+          "cancelled_orders_excluded": true,
+          "category_bypass": false
+        },
+        "retrieval": {
+          "catalog_rows_scanned_max": 50000,
+          "representatives": 236,
+          "after_ownership": 164,
+          "after_context": 30,
+          "eligible_models": 18,
+          "requested": 12,
+          "returned": 12,
+          "deduplicate_by": "model_not_photo",
+          "broader_price": false
+        },
+        "has_more": true,
+        "inference_ms": 7.88,
+        "latency_ms": 54.11
+      },
+      "items": [
+        {
+          "id": 520,
+          "name": "Chuột không dây Logitech M331 Silent Plus",
+          "price": 303000,
+          "image_url": "/static/images/merchandise/m331.png",
+          "p_click": 0.2191416,
+          "similarity": -0.020405,
+          "ranking_score": 0.801
+        },
+        {
+          "id": 378,
+          "name": "Bàn phím cơ Keychron V1 Hotswap",
+          "price": 2283000,
+          "image_url": "/static/images/catalog/4dc029dea4e0a8b5.jpg",
+          "p_click": 0.2080886,
+          "similarity": -0.025105,
+          "ranking_score": 0.7946552
+        },
+        {
+          "id": 72,
+          "name": "Màn hình máy tính LG UltraGear 24GN65R",
+          "price": 3868000,
+          "image_url": "/static/images/catalog/d6945fbd35812139.jpg",
+          "p_click": 0.1961176,
+          "similarity": 0.140491,
+          "ranking_score": 0.7699655
+        },
+        {
+          "id": 453,
+          "name": "Bàn phím cơ Keychron K4 Pro 96%",
+          "price": 2242000,
+          "image_url": "/static/images/catalog/76b08251e39e41f3.jpg",
+          "p_click": 0.1957155,
+          "similarity": -0.137044,
+          "ranking_score": 0.7626207
+        },
+        {
+          "id": 1420,
+          "name": "Bàn phím cơ Keychron K2 Pro QMK/VIA",
+          "price": 2161000,
+          "image_url": "/static/images/catalog/76b08251e39e41f3.jpg",
+          "p_click": 0.1722415,
+          "similarity": 0.078505,
+          "ranking_score": 0.7305862
+        },
+        {
+          "id": 2223,
+          "name": "Chuột không dây Logitech Pebble M350",
+          "price": 257000,
+          "image_url": "/static/images/merchandise/pebble-m350.png",
+          "p_click": 0.1709852,
+          "similarity": -0.051598,
+          "ranking_score": 0.7222414
+        },
+        {
+          "id": 49812,
+          "name": "Chuột không dây Logitech M220",
+          "price": 299000,
+          "image_url": "/static/images/merchandise/m220.png",
+          "p_click": 0.191067,
+          "similarity": 0.051338,
+          "ranking_score": 0.7032759
+        },
+        {
+          "id": 4902,
+          "name": "Chuột công thái học không dây Logitech MX Master 3S",
+          "price": 257000,
+          "image_url": "/static/images/merchandise/mx-master-3s.png",
+          "p_click": 0.1606399,
+          "similarity": 0.126821,
+          "ranking_score": 0.6985517
+        },
+        {
+          "id": 49823,
+          "name": "Chuột không dây Logitech M185",
+          "price": 229000,
+          "image_url": "/static/images/merchandise/m185.png",
+          "p_click": 0.1756428,
+          "similarity": -0.006761,
+          "ranking_score": 0.692931
+        },
+        {
+          "id": 232,
+          "name": "Bàn phím cơ Akko 3087 v2 DS",
+          "price": 844000,
+          "image_url": "/static/images/catalog/2e7ad74f07692aea.jpg",
+          "p_click": 0.1596993,
+          "similarity": 0.002789,
+          "ranking_score": 0.6902069
+        },
+        {
+          "id": 21,
+          "name": "Màn hình LG 27MP400-B 27 inch",
+          "price": 2938000,
+          "image_url": "/static/images/catalog/d6945fbd35812139.jpg",
+          "p_click": 0.1577144,
+          "similarity": 0.269404,
+          "ranking_score": 0.6798621
+        },
+        {
+          "id": 49911,
+          "name": "Chuột không dây Logitech M170",
+          "price": 199000,
+          "image_url": "/static/images/merchandise/m170.png",
+          "p_click": 0.1679793,
+          "similarity": 0.057304,
+          "ranking_score": 0.6618966
+        }
+      ]
+    },
+    "order_14_footwear": {
+      "count": 8,
+      "meta": {
+        "history_length": 1000,
+        "scl_coverage": 1.0,
+        "cold_start": false,
+        "touchpoint": "orders",
+        "rule_version": "retail-context-v2",
+        "engine": "Alibaba MUSE + merchandise context",
+        "strategy": "bounded model recall → ownership/spec filtering → MUSE ranking → model diversity",
+        "score_type": "p_click",
+        "checkpoint_loaded": true,
+        "model_used": true,
+        "candidate_count": 8,
+        "semantic_mapping_verified": false,
+        "checkpoint_scores_unchanged": true,
+        "context_policy": "orders_merchandise_constraints",
+        "focus_product_ids": [
+          474556
+        ],
+        "focus_names": [
+          "Giày thể thao Nike Court Vision Low - Đen Black/White"
+        ],
+        "order_id": 14,
+        "purchase_policy": {
+          "excluded_models": 5,
+          "recent_durable_types": [
+            "earbuds",
+            "flats",
+            "headphones",
+            "heels",
+            "laptop",
+            "loafers",
+            "sandals",
+            "shoes"
+          ],
+          "durable_cooldown_days": 30,
+          "cancelled_orders_excluded": true,
+          "category_bypass": false
+        },
+        "retrieval": {
+          "catalog_rows_scanned_max": 50000,
+          "representatives": 236,
+          "after_ownership": 164,
+          "after_context": 8,
+          "eligible_models": 8,
+          "requested": 12,
+          "returned": 8,
+          "deduplicate_by": "model_not_photo",
+          "broader_price": false
+        },
+        "has_more": false,
+        "inference_ms": 6.72,
+        "latency_ms": 42.6
+      },
+      "items": [
+        {
+          "id": 49941,
+          "name": "Dây giày Crep Protect Pre-Treated Laces",
+          "price": 129000,
+          "image_url": "/static/images/merchandise/crep-crep-protect-pre-treated-laces.jpg",
+          "p_click": 0.2008676,
+          "similarity": -0.016296,
+          "ranking_score": 0.755
+        },
+        {
+          "id": 49910,
+          "name": "Túi đựng giày Crep Protect Sneaker Bag",
+          "price": 499000,
+          "image_url": "/static/images/merchandise/crep-crep-protect-sneaker-bag-upc.jpg",
+          "p_click": 0.1562444,
+          "similarity": 0.110152,
+          "ranking_score": 0.7121429
+        },
+        {
+          "id": 428,
+          "name": "Bình giữ nhiệt Lock&Lock LHC4131 450ml",
+          "price": 335000,
+          "image_url": "/static/images/merchandise/bottle.jpg",
+          "p_click": 0.1353726,
+          "similarity": 0.116852,
+          "ranking_score": 0.6754286
+        },
+        {
+          "id": 49972,
+          "name": "Lót giày thể thao Crep Protect Sport Insoles",
+          "price": 249000,
+          "image_url": "/static/images/merchandise/crep-crep-protect-sport-insoles.jpg",
+          "p_click": 0.1509411,
+          "similarity": 0.017304,
+          "ranking_score": 0.6692857
+        },
+        {
+          "id": 49903,
+          "name": "Khăn lau giày Crep Protect Wipes 12 miếng",
+          "price": 159000,
+          "image_url": "/static/images/merchandise/crep-crep-protect-wipes.jpg",
+          "p_click": 0.1324096,
+          "similarity": -0.0128,
+          "ranking_score": 0.5835714
+        },
+        {
+          "id": 49957,
+          "name": "Bộ vệ sinh giày Crep Protect Cure Travel Kit",
+          "price": 449000,
+          "image_url": "/static/images/merchandise/crep-crep-protect-cure-travel-kit.jpg",
+          "p_click": 0.1207129,
+          "similarity": 0.04188,
+          "ranking_score": 0.5407143
+        },
+        {
+          "id": 49931,
+          "name": "Viên khử mùi giày Crep Protect Pill",
+          "price": 199000,
+          "image_url": "/static/images/merchandise/crep-pill.png",
+          "p_click": 0.1145945,
+          "similarity": -0.114954,
+          "ranking_score": 0.4978571
+        },
+        {
+          "id": 49990,
+          "name": "Lót giày Crep Protect Comfort Insoles",
+          "price": 189000,
+          "image_url": "/static/images/merchandise/crep-crep-protect-comfort-insoles-ean.jpg",
+          "p_click": 0.1139574,
+          "similarity": 0.165058,
+          "ranking_score": 0.455
+        }
+      ]
+    },
+    "order_9_badminton": {
+      "count": 6,
+      "meta": {
+        "history_length": 6,
+        "scl_coverage": 1.0,
+        "cold_start": true,
+        "touchpoint": "orders",
+        "rule_version": "retail-context-v2",
+        "engine": "Alibaba MUSE + merchandise context",
+        "strategy": "bounded model recall → ownership/spec filtering → MUSE ranking → model diversity",
+        "score_type": "p_click",
+        "checkpoint_loaded": true,
+        "model_used": true,
+        "candidate_count": 6,
+        "semantic_mapping_verified": false,
+        "checkpoint_scores_unchanged": true,
+        "context_policy": "orders_merchandise_constraints",
+        "focus_product_ids": [
+          1078435
+        ],
+        "focus_names": [
+          "Vợt cầu lông Yonex Astrox 88D Pro - Đen phối Đỏ Ruby"
+        ],
+        "order_id": 9,
+        "purchase_policy": {
+          "excluded_models": 1,
+          "recent_durable_types": [
+            "racket"
+          ],
+          "durable_cooldown_days": 30,
+          "cancelled_orders_excluded": true,
+          "category_bypass": false
+        },
+        "retrieval": {
+          "catalog_rows_scanned_max": 50000,
+          "representatives": 236,
+          "after_ownership": 233,
+          "after_context": 6,
+          "eligible_models": 6,
+          "requested": 12,
+          "returned": 6,
+          "deduplicate_by": "model_not_photo",
+          "broader_price": false
+        },
+        "has_more": false,
+        "inference_ms": 3.88,
+        "latency_ms": 45.21
+      },
+      "items": [
+        {
+          "id": 49928,
+          "name": "Quả cầu lông lông vũ",
+          "price": 49000,
+          "image_url": "/static/images/storefront/146.webp",
+          "p_click": 0.1481136,
+          "similarity": 0.009185,
+          "ranking_score": 0.95
+        },
+        {
+          "id": 428,
+          "name": "Bình giữ nhiệt Lock&Lock LHC4131 450ml",
+          "price": 335000,
+          "image_url": "/static/images/merchandise/bottle.jpg",
+          "p_click": 0.1302019,
+          "similarity": -0.111259,
+          "ranking_score": 0.744
+        },
+        {
+          "id": 71,
+          "name": "Bao vợt cầu lông Yonex 2 ngăn chuyên nghiệp",
+          "price": 1694000,
+          "image_url": "/static/images/merchandise/racket-bag.png",
+          "p_click": 0.0825348,
+          "similarity": 0.2164,
+          "ranking_score": 0.697
+        },
+        {
+          "id": 492,
+          "name": "Giày sneaker Biti's Hunter Street x Vietmax",
+          "price": 839000,
+          "image_url": "/static/images/catalog/bb7b4acbe4fe7832.jpg",
+          "p_click": 0.1228892,
+          "similarity": 0.039136,
+          "ranking_score": 0.683
+        },
+        {
+          "id": 241,
+          "name": "Giày chạy bộ Biti's Hunter Core Gen 2",
+          "price": 779000,
+          "image_url": "/static/images/storefront/89.webp",
+          "p_click": 0.1192661,
+          "similarity": 0.130725,
+          "ranking_score": 0.623
+        },
+        {
+          "id": 450,
+          "name": "Giày thể thao nam nữ Biti's Hunter X Không dây",
+          "price": 779000,
+          "image_url": "/static/images/storefront/91.webp",
+          "p_click": 0.0999219,
+          "similarity": -0.017494,
+          "ranking_score": 0.565
+        }
+      ]
+    },
+    "order_8_footwear": {
+      "count": 8,
+      "meta": {
+        "history_length": 1000,
+        "scl_coverage": 1.0,
+        "cold_start": false,
+        "touchpoint": "orders",
+        "rule_version": "retail-context-v2",
+        "engine": "Alibaba MUSE + merchandise context",
+        "strategy": "bounded model recall → ownership/spec filtering → MUSE ranking → model diversity",
+        "score_type": "p_click",
+        "checkpoint_loaded": true,
+        "model_used": true,
+        "candidate_count": 8,
+        "semantic_mapping_verified": false,
+        "checkpoint_scores_unchanged": true,
+        "context_policy": "orders_merchandise_constraints",
+        "focus_product_ids": [
+          44529
+        ],
+        "focus_names": [
+          "Giày chạy bộ Biti's Hunter Core Gen 2 - All Black"
+        ],
+        "order_id": 8,
+        "purchase_policy": {
+          "excluded_models": 1,
+          "recent_durable_types": [
+            "flats",
+            "heels",
+            "loafers",
+            "sandals",
+            "shoes"
+          ],
+          "durable_cooldown_days": 30,
+          "cancelled_orders_excluded": true,
+          "category_bypass": false
+        },
+        "retrieval": {
+          "catalog_rows_scanned_max": 50000,
+          "representatives": 236,
+          "after_ownership": 216,
+          "after_context": 8,
+          "eligible_models": 8,
+          "requested": 12,
+          "returned": 8,
+          "deduplicate_by": "model_not_photo",
+          "broader_price": false
+        },
+        "has_more": false,
+        "inference_ms": 6.87,
+        "latency_ms": 45.82
+      },
+      "items": [
+        {
+          "id": 49941,
+          "name": "Dây giày Crep Protect Pre-Treated Laces",
+          "price": 129000,
+          "image_url": "/static/images/merchandise/crep-crep-protect-pre-treated-laces.jpg",
+          "p_click": 0.2653857,
+          "similarity": 0.119662,
+          "ranking_score": 0.755
+        },
+        {
+          "id": 49972,
+          "name": "Lót giày thể thao Crep Protect Sport Insoles",
+          "price": 249000,
+          "image_url": "/static/images/merchandise/crep-crep-protect-sport-insoles.jpg",
+          "p_click": 0.1536248,
+          "similarity": 0.260536,
+          "ranking_score": 0.7121429
+        },
+        {
+          "id": 428,
+          "name": "Bình giữ nhiệt Lock&Lock LHC4131 450ml",
+          "price": 335000,
+          "image_url": "/static/images/merchandise/bottle.jpg",
+          "p_click": 0.1217541,
+          "similarity": 0.06289,
+          "ranking_score": 0.6754286
+        },
+        {
+          "id": 49910,
+          "name": "Túi đựng giày Crep Protect Sneaker Bag",
+          "price": 499000,
+          "image_url": "/static/images/merchandise/crep-crep-protect-sneaker-bag-upc.jpg",
+          "p_click": 0.1298237,
+          "similarity": 0.038509,
+          "ranking_score": 0.6692857
+        },
+        {
+          "id": 49931,
+          "name": "Viên khử mùi giày Crep Protect Pill",
+          "price": 199000,
+          "image_url": "/static/images/merchandise/crep-pill.png",
+          "p_click": 0.1183041,
+          "similarity": -0.038178,
+          "ranking_score": 0.5835714
+        },
+        {
+          "id": 49957,
+          "name": "Bộ vệ sinh giày Crep Protect Cure Travel Kit",
+          "price": 449000,
+          "image_url": "/static/images/merchandise/crep-crep-protect-cure-travel-kit.jpg",
+          "p_click": 0.1059598,
+          "similarity": 0.01881,
+          "ranking_score": 0.5407143
+        },
+        {
+          "id": 49903,
+          "name": "Khăn lau giày Crep Protect Wipes 12 miếng",
+          "price": 159000,
+          "image_url": "/static/images/merchandise/crep-crep-protect-wipes.jpg",
+          "p_click": 0.088174,
+          "similarity": -0.00186,
+          "ranking_score": 0.4978571
+        },
+        {
+          "id": 49990,
+          "name": "Lót giày Crep Protect Comfort Insoles",
+          "price": 189000,
+          "image_url": "/static/images/merchandise/crep-crep-protect-comfort-insoles-ean.jpg",
+          "p_click": 0.0795825,
+          "similarity": 0.031897,
+          "ranking_score": 0.455
+        }
+      ]
+    },
+    "order_1_footwear": {
+      "count": 8,
+      "meta": {
+        "history_length": 1000,
+        "scl_coverage": 1.0,
+        "cold_start": false,
+        "touchpoint": "orders",
+        "rule_version": "retail-context-v2",
+        "engine": "Alibaba MUSE + merchandise context",
+        "strategy": "bounded model recall → ownership/spec filtering → MUSE ranking → model diversity",
+        "score_type": "p_click",
+        "checkpoint_loaded": true,
+        "model_used": true,
+        "candidate_count": 8,
+        "semantic_mapping_verified": false,
+        "checkpoint_scores_unchanged": true,
+        "context_policy": "orders_merchandise_constraints",
+        "focus_product_ids": [
+          965
+        ],
+        "focus_names": [
+          "Giày Thể Thao Sneaker Nam Cổ Thấp Đế Đệm Êm Ái Đi Học Đi Chơi"
+        ],
+        "order_id": 1,
+        "purchase_policy": {
+          "excluded_models": 5,
+          "recent_durable_types": [
+            "earbuds",
+            "flats",
+            "headphones",
+            "heels",
+            "laptop",
+            "loafers",
+            "sandals",
+            "shoes"
+          ],
+          "durable_cooldown_days": 30,
+          "cancelled_orders_excluded": true,
+          "category_bypass": false
+        },
+        "retrieval": {
+          "catalog_rows_scanned_max": 50000,
+          "representatives": 236,
+          "after_ownership": 164,
+          "after_context": 8,
+          "eligible_models": 8,
+          "requested": 12,
+          "returned": 8,
+          "deduplicate_by": "model_not_photo",
+          "broader_price": false
+        },
+        "has_more": false,
+        "inference_ms": 6.72,
+        "latency_ms": 45.58
+      },
+      "items": [
+        {
+          "id": 49941,
+          "name": "Dây giày Crep Protect Pre-Treated Laces",
+          "price": 129000,
+          "image_url": "/static/images/merchandise/crep-crep-protect-pre-treated-laces.jpg",
+          "p_click": 0.2008676,
+          "similarity": 0.023036,
+          "ranking_score": 0.755
+        },
+        {
+          "id": 49910,
+          "name": "Túi đựng giày Crep Protect Sneaker Bag",
+          "price": 499000,
+          "image_url": "/static/images/merchandise/crep-crep-protect-sneaker-bag-upc.jpg",
+          "p_click": 0.1562444,
+          "similarity": -0.063126,
+          "ranking_score": 0.7121429
+        },
+        {
+          "id": 428,
+          "name": "Bình giữ nhiệt Lock&Lock LHC4131 450ml",
+          "price": 335000,
+          "image_url": "/static/images/merchandise/bottle.jpg",
+          "p_click": 0.1353726,
+          "similarity": 0.015369,
+          "ranking_score": 0.6754286
+        },
+        {
+          "id": 49972,
+          "name": "Lót giày thể thao Crep Protect Sport Insoles",
+          "price": 249000,
+          "image_url": "/static/images/merchandise/crep-crep-protect-sport-insoles.jpg",
+          "p_click": 0.1509411,
+          "similarity": 0.016427,
+          "ranking_score": 0.6692857
+        },
+        {
+          "id": 49903,
+          "name": "Khăn lau giày Crep Protect Wipes 12 miếng",
+          "price": 159000,
+          "image_url": "/static/images/merchandise/crep-crep-protect-wipes.jpg",
+          "p_click": 0.1324096,
+          "similarity": 0.121174,
+          "ranking_score": 0.5835714
+        },
+        {
+          "id": 49957,
+          "name": "Bộ vệ sinh giày Crep Protect Cure Travel Kit",
+          "price": 449000,
+          "image_url": "/static/images/merchandise/crep-crep-protect-cure-travel-kit.jpg",
+          "p_click": 0.1207129,
+          "similarity": -0.119636,
+          "ranking_score": 0.5407143
+        },
+        {
+          "id": 49931,
+          "name": "Viên khử mùi giày Crep Protect Pill",
+          "price": 199000,
+          "image_url": "/static/images/merchandise/crep-pill.png",
+          "p_click": 0.1145945,
+          "similarity": -0.054719,
+          "ranking_score": 0.4978571
+        },
+        {
+          "id": 49990,
+          "name": "Lót giày Crep Protect Comfort Insoles",
+          "price": 189000,
+          "image_url": "/static/images/merchandise/crep-crep-protect-comfort-insoles-ean.jpg",
+          "p_click": 0.1139574,
+          "similarity": -0.112131,
+          "ranking_score": 0.455
+        }
+      ]
+    },
+    "mouse_detail": {
+      "count": 6,
+      "meta": {
+        "touchpoint": "similar",
+        "rule_version": "retail-context-v2",
+        "engine": "Alibaba MUSE + merchandise context",
+        "strategy": "bounded model recall → ownership/spec filtering → MUSE ranking → model diversity",
+        "score_type": "cosine_similarity",
+        "checkpoint_loaded": true,
+        "model_used": true,
+        "candidate_count": 9,
+        "semantic_mapping_verified": false,
+        "checkpoint_scores_unchanged": true,
+        "context_policy": "similar_merchandise_constraints",
+        "focus_product_ids": [
+          157
+        ],
+        "focus_names": [
+          "Chuột công thái học không dây Logitech MX Master 3S - Hồng phấn"
+        ],
+        "order_id": null,
+        "purchase_policy": {
+          "excluded_models": 0,
+          "recent_durable_types": [],
+          "durable_cooldown_days": 30,
+          "cancelled_orders_excluded": true,
+          "category_bypass": false
+        },
+        "retrieval": {
+          "catalog_rows_scanned_max": 50000,
+          "representatives": 236,
+          "after_ownership": 236,
+          "after_context": 9,
+          "eligible_models": 6,
+          "requested": 6,
+          "returned": 6,
+          "deduplicate_by": "model_not_photo",
+          "broader_price": false
+        },
+        "has_more": false,
+        "inference_ms": 0.24,
+        "latency_ms": 24.26
+      },
+      "items": [
+        {
+          "id": 2223,
+          "name": "Chuột không dây Logitech Pebble M350",
+          "price": 257000,
+          "image_url": "/static/images/merchandise/pebble-m350.png",
+          "similarity": 0.108724,
+          "ranking_score": 0.7635891
+        },
+        {
+          "id": 49812,
+          "name": "Chuột không dây Logitech M220",
+          "price": 299000,
+          "image_url": "/static/images/merchandise/m220.png",
+          "similarity": 0.13916,
+          "ranking_score": 0.7481159
+        },
+        {
+          "id": 5681,
+          "name": "Chuột gaming Logitech G102 Lightsync RGB",
+          "price": 257000,
+          "image_url": "/static/images/merchandise/g102.png",
+          "similarity": 0.140897,
+          "ranking_score": 0.7214224
+        },
+        {
+          "id": 520,
+          "name": "Chuột không dây Logitech M331 Silent Plus",
+          "price": 303000,
+          "image_url": "/static/images/merchandise/m331.png",
+          "similarity": 0.038476,
+          "ranking_score": 0.7145396
+        },
+        {
+          "id": 49911,
+          "name": "Chuột không dây Logitech M170",
+          "price": 199000,
+          "image_url": "/static/images/merchandise/m170.png",
+          "similarity": 0.134333,
+          "ranking_score": 0.5907557
+        },
+        {
+          "id": 49823,
+          "name": "Chuột không dây Logitech M185",
+          "price": 229000,
+          "image_url": "/static/images/merchandise/m185.png",
+          "similarity": 0.092524,
+          "ranking_score": 0.5594626
+        }
+      ]
+    },
+    "mouse_addons": {
+      "count": 4,
+      "meta": {
+        "touchpoint": "complementary",
+        "rule_version": "retail-context-v2",
+        "engine": "Alibaba MUSE + merchandise context",
+        "strategy": "bounded model recall → ownership/spec filtering → MUSE ranking → model diversity",
+        "score_type": "cosine_similarity",
+        "checkpoint_loaded": true,
+        "model_used": true,
+        "candidate_count": 8,
+        "semantic_mapping_verified": false,
+        "checkpoint_scores_unchanged": true,
+        "context_policy": "complementary_merchandise_constraints",
+        "focus_product_ids": [
+          157
+        ],
+        "focus_names": [
+          "Chuột công thái học không dây Logitech MX Master 3S - Hồng phấn"
+        ],
+        "order_id": null,
+        "purchase_policy": {
+          "excluded_models": 0,
+          "recent_durable_types": [],
+          "durable_cooldown_days": 30,
+          "cancelled_orders_excluded": true,
+          "category_bypass": false
+        },
+        "retrieval": {
+          "catalog_rows_scanned_max": 50000,
+          "representatives": 236,
+          "after_ownership": 236,
+          "after_context": 8,
+          "eligible_models": 4,
+          "requested": 6,
+          "returned": 4,
+          "deduplicate_by": "model_not_photo",
+          "broader_price": false
+        },
+        "has_more": false,
+        "inference_ms": 0.24,
+        "latency_ms": 41.02
+      },
+      "items": [
+        {
+          "id": 282,
+          "name": "Bàn phím cơ không dây Akko 5075B Plus",
+          "price": 1079000,
+          "image_url": "/static/images/catalog/2e7ad74f07692aea.jpg",
+          "similarity": 0.173736,
+          "ranking_score": 0.8271429
+        },
+        {
+          "id": 81,
+          "name": "Bàn phím cơ Akko 3098B Plus Multi-modes",
+          "price": 863000,
+          "image_url": "/static/images/catalog/2e7ad74f07692aea.jpg",
+          "similarity": 0.245827,
+          "ranking_score": 0.804
+        },
+        {
+          "id": 1252,
+          "name": "Bàn phím cơ Akko 3087 v2 DS",
+          "price": 1098000,
+          "image_url": "/static/images/catalog/2e7ad74f07692aea.jpg",
+          "similarity": 0.134546,
+          "ranking_score": 0.7172857
+        },
+        {
+          "id": 15,
+          "name": "Bàn phím cơ Akko MonsGeek M1W Nhôm CNC",
+          "price": 1059000,
+          "image_url": "/static/images/catalog/76b08251e39e41f3.jpg",
+          "similarity": 0.003806,
+          "ranking_score": 0.5468571
+        }
+      ]
+    }
+  },
+  "limits": [
+    "Functional constraints, not customer relevance accuracy.",
+    "Generated Vietnamese labels are not verified Taobao metadata.",
+    "At most 50,000 raw catalog rows and 320 scored candidates per request.",
+    "No training and no production order/cart mutations."
+  ]
+}

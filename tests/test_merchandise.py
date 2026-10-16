@@ -39,6 +39,11 @@ class IdentityTests(unittest.TestCase):
         self.assertEqual(kind(item('Tai nghe Samsung Galaxy Buds FE')), 'earbuds')
         self.assertEqual(kind(item('Nước tẩy trang Effaclar')), 'makeup-remover')
         self.assertNotEqual(kind(item('Nước tẩy trang Effaclar')),kind(item('Sữa rửa mặt CeraVe')))
+        self.assertEqual(kind(item('Máy tính bảng Xiaomi Pad 6 màn hình 2.8K 144Hz')),'tablet')
+        self.assertEqual(kind(item('Samsung Galaxy Z Flip6 5G màn hình ngoài lớn')),'phone')
+        self.assertEqual(kind(item('Màn hình LG UltraGear 27GR75Q 2K')),'monitor')
+        self.assertNotEqual(kind(item('Quần lót nam Boxer')),kind(item('Quần tây nam')))
+        self.assertNotEqual(kind(item('Giày búp bê đính nơ')),kind(item('Giày chạy bộ Nike')))
 
     def test_phone_and_laptop_accessory_compatibility(self):
         phone=item('Apple iPhone 15 Pro 128GB',30000000)
@@ -51,7 +56,11 @@ class IdentityTests(unittest.TestCase):
         self.assertFalse(is_complement(item('Laptop Dell XPS',20000000),phone))
         laptop=item('Laptop Dell XPS',20000000,1)
         self.assertFalse(is_complement(item('Củ sạc Apple 20W Type-C'),laptop))
-        self.assertTrue(is_complement(item('Củ sạc Anker 67W GaN'),laptop))
+        self.assertFalse(is_complement(item('Củ sạc Anker 67W GaN'),laptop))
+        self.assertTrue(is_complement(item('Củ sạc Type-C PD 67W'),item('Laptop sạc USB-C PD 65W',20000000,1)))
+        self.assertFalse(is_complement(item('Cáp sạc Type-C to Lightning Apple'),item('Samsung Galaxy S24 Ultra',20000000)))
+        self.assertFalse(is_complement(item('Cáp sạc Type-C to Type-C'),item('Apple iPhone 14 Pro',20000000)))
+        self.assertTrue(is_complement(item('Cáp sạc Type-C to Lightning Apple'),item('Apple iPhone 14 Pro',20000000)))
 
     def test_type_matched_images_are_stable_across_catalog_variants(self):
         serum=item('Serum Hyalu B5 (Dưỡng da) - Đen',category=7)
@@ -127,10 +136,10 @@ class PurchaseTests(unittest.TestCase):
         self.assertEqual(result['meta']['purchase_policy']['excluded_models'],1)
         self.assertIn(kind(result['items'][0]),{'charger','earbuds','headphones','power-bank','cable','phone-case'})
 
-    def test_manual_category_allows_alternatives_but_never_same_owned_model(self):
+    def test_home_category_cannot_bypass_owned_type_cooldown(self):
         self.purchase(1)
         result=self.svc.recommend(1,category_id=9,limit=24)
-        self.assertTrue(any(kind(p)=='phone' for p in result['items']))
+        self.assertFalse(any(kind(p)=='phone' for p in result['items']))
         self.assertFalse({1,2}&{p['id'] for p in result['items']})
 
     def test_bought_charger_does_not_trigger_another_charger_after_bought_phone(self):

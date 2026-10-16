@@ -38,6 +38,12 @@ def kind(product):
         ('charger', ('cu sac', 'de sac', 'sac nhanh', 'sac da cong')),
         ('laptop-bag', ('balo laptop', 'tui laptop', 'tui chong soc laptop')),
         ('racket-bag', ('bao vot',)),
+        ('shuttlecock', ('qua cau long','cau long long vu')),
+        ('shoe-insole', ('lot giay','insole')),
+        ('shoe-cleaner', ('ve sinh giay','lau giay','khan lau giay')),
+        ('shoe-bag', ('tui dung giay','sneaker bag')),
+        ('shoelaces', ('day giay','laces')),
+        ('shoe-deodorizer', ('khu mui giay','vien khu mui')),
         ('keyboard', ('ban phim',)), ('mouse', ('chuot ',)),
         ('monitor', ('man hinh ',)), ('tablet', ('may tinh bang', 'ipad ', 'xiaomi pad', 'galaxy tab')),
         ('laptop', ('laptop', 'macbook')),
@@ -49,7 +55,7 @@ def kind(product):
         ('sunscreen', ('chong nang',)), ('serum', ('serum',)),
         ('makeup-remover', ('tay trang',)), ('cleanser', ('sua rua mat',)), ('moisturizer', ('kem duong',)),
         ('lipstick', ('son ',)),
-        ('air-fryer', ('noi chien',)), ('vacuum', ('hut bui',)),
+        ('air-fryer', ('noi chien',)), ('robot-vacuum',('robot hut bui',)), ('vacuum', ('hut bui',)),
         ('air-purifier', ('may loc khong khi',)), ('blender', ('may xay',)),
         ('iron', ('ban ui',)), ('cookware', ('chao', 'noi inox')),
         ('lunchbox', ('hop com',)), ('bottle', ('binh giu nhiet', 'binh nuoc')),
@@ -60,8 +66,10 @@ def kind(product):
         ('tent', ('leu cam trai',)), ('sleeping-bag', ('tui ngu',)),
         ('camp-stove', ('bep gas',)), ('camp-chair', ('ghe xep',)),
         ('sandals', ('sandal', 'dep ')), ('heels', ('giay cao got',)),
+        ('flats',('giay bup be',)), ('loafers',('giay luoi',)),
         ('shoes', ('giay ',)), ('socks', ('vo ', 'tat ')),
         ('dress', ('dam ', 'vay maxi', 'vay dam')), ('skirt', ('chan vay',)),
+        ('underwear',('quan lot','boxer')), ('shorts',('quan short',)),
         ('pants', ('quan ',)), ('shirt', ('ao so mi',)),
         ('jacket', ('ao khoac', 'ao hoodie', 'ao blazer', 'ao cardigan')),
         ('top', ('ao thun', 'ao polo', 'ao kieu', 'ao croptop')),
@@ -69,6 +77,7 @@ def kind(product):
         ('glasses', ('kinh mat', 'kinh ram',)),
     )
     for label, terms in rules:
+        if label=='monitor' and not name.startswith('man hinh '):continue
         if any(term in name for term in terms):
             return label
     return 'other:' + ' '.join(name.split()[:3])
@@ -89,18 +98,25 @@ COMPLEMENTS = {
     'serum': {'cleanser', 'sunscreen', 'moisturizer'},
     'moisturizer': {'cleanser', 'sunscreen', 'serum'},
     'cleanser': {'sunscreen', 'serum', 'moisturizer'}, 'lipstick': {'cleanser', 'sunscreen'},
-    'shoes': {'socks', 'bottle', 'bag'}, 'sandals': {'bag', 'glasses'},
+    'shoes': {'socks', 'bottle', 'shoe-insole','shoe-cleaner','shoe-bag','shoelaces','shoe-deodorizer'}, 'sandals': {'bag', 'glasses'},
     'heels': {'bag', 'dress', 'skirt'},
     'shirt': {'pants', 'shoes', 'watch', 'wallet'}, 'top': {'pants', 'shoes', 'watch'},
     'pants': {'shirt', 'top', 'shoes', 'wallet'}, 'jacket': {'top', 'pants', 'shoes'},
+    'shorts': {'top','bottle','shoes'}, 'underwear': set(),
     'dress': {'heels', 'sandals', 'bag'}, 'skirt': {'top', 'heels', 'bag'},
     'watch': {'wallet', 'glasses'}, 'wallet': {'watch', 'glasses'}, 'bag': {'wallet', 'glasses'},
     'air-fryer': {'cookware', 'lunchbox', 'bottle'},
     'cookware': {'lunchbox', 'bottle'}, 'blender': {'bottle', 'lunchbox'},
-    'vacuum': set(), 'iron': set(), 'air-purifier': set(),
+    'vacuum': set(), 'robot-vacuum':set(), 'iron': set(), 'air-purifier': set(),
     'lunchbox': {'bottle'}, 'bottle': {'lunchbox'},
-    'milk': {'diapers', 'toys'}, 'diapers': {'milk', 'toys'}, 'toys': set(),
-    'racket': {'racket-bag', 'bottle', 'shoes'}, 'racket-bag': {'bottle', 'shoes'},
+    # Stage/size/age compatibility is absent. Do not infer feeding or infant
+    # toy suitability from a shared category or a high click score.
+    'milk': set(), 'diapers': set(), 'toys': set(),
+    'racket': {'racket-bag', 'bottle', 'shoes','shuttlecock'}, 'racket-bag': {'bottle', 'shoes','shuttlecock'},
+    'shuttlecock': {'racket-bag','bottle'},
+    'shoe-insole': {'socks','shoe-cleaner','shoe-bag'},
+    'shoe-cleaner': {'shoe-bag','shoelaces'}, 'shoelaces': {'shoe-cleaner','shoe-bag'},
+    'shoe-bag': {'shoe-cleaner','socks'}, 'shoe-deodorizer': {'shoe-cleaner','shoe-bag'},
     'yoga-mat': {'resistance-band', 'roller', 'bottle'},
     'roller': {'yoga-mat', 'resistance-band', 'bottle'},
     'resistance-band': {'yoga-mat', 'roller', 'bottle'},
@@ -111,7 +127,11 @@ COMPLEMENTS = {
 DURABLE_KINDS = {'phone', 'tablet', 'laptop', 'earbuds', 'headphones', 'speaker', 'monitor',
                  'keyboard', 'mouse', 'watch', 'air-fryer', 'blender', 'vacuum', 'iron',
                  'air-purifier', 'racket', 'tent', 'yoga-mat', 'shoes', 'heels', 'sandals',
-                 'charger', 'wireless-charger', 'power-bank', 'phone-case', 'laptop-bag'}
+                 'charger', 'wireless-charger', 'power-bank', 'phone-case', 'laptop-bag',
+                 'flats','loafers','robot-vacuum'}
+FOOTWEAR_KINDS={'shoes','sandals','heels','flats','loafers'}
+for _footwear_type in ('flats','loafers'):
+    COMPLEMENTS[_footwear_type]=COMPLEMENTS['shoes']
 
 
 def is_complement(candidate, focus):
@@ -121,16 +141,36 @@ def is_complement(candidate, focus):
     focus_name = normalized(focus['name'])
     if kind(focus) == 'laptop' and kind(candidate) == 'charger':
         watts = re.search(r'\b(\d+)w\b', name)
-        if not watts or int(watts[1]) < 45:
+        # Wattage alone does not establish that an Inspiron/gaming laptop can
+        # charge through USB-C. Generated parentheses are not evidence either.
+        focus_title=normalized(display_name(focus['name']))
+        candidate_title=normalized(display_name(candidate['name']))
+        if ('pd' not in focus_title.split() or 'pd' not in candidate_title.split()
+                or not watts or int(watts[1]) < 45):
             return False
     if kind(focus) == 'phone' and re.search(r'iphone (?:1[5-9]|[2-9][0-9])\b', focus_name) and 'lightning' in name:
         return False
+    if kind(candidate)=='cable':
+        if kind(focus)=='phone':
+            legacy_iphone=bool(re.search(r'iphone (?:[6-9]|1[0-4]|se)\b',focus_name))
+            if legacy_iphone and 'lightning' not in name:return False
+            if not legacy_iphone and ('lightning' in name or not any(t in name for t in ('type c','usb c'))):return False
+        elif 'lightning' in name and 'lightning' not in focus_name:
+            return False
     if kind(candidate) == 'phone-case':
         model = re.search(r'iphone \d+(?: pro)?(?: max| plus| mini)?', name)
         focus_model = re.search(r'iphone \d+(?: pro)?(?: max| plus| mini)?', focus_name)
         # A case for the base model need not fit its Pro/Plus version.
         if not model or not focus_model or model[0] != focus_model[0]:
             return False
+    if kind(focus)=='racket' and kind(candidate)=='shoes':
+        if not any(t in name for t in ('the thao','chay bo','cau long','tennis','sneaker')):
+            return False
+    if kind(candidate)=='shoelaces' and any(t in focus_name for t in ('khong day','slip on','giay luoi')):
+        return False
+    if kind(focus)=='racket' and kind(candidate)=='racket-bag':
+        return candidate.get('price',0)<=max(1200000,focus.get('price',0))
+    if kind(candidate)=='shuttlecock' and 'cau long' not in focus_name:return False
     return candidate.get('price', 0) <= max(1200000, focus.get('price', 0) * 0.5)
 
 
@@ -149,6 +189,8 @@ def purchase_context(db, user_id):
     recent_kinds={kind(p) for p in rows if p['recent_purchase'] and kind(p) in DURABLE_KINDS}
     if recent_kinds & {'earbuds','headphones'}:
         recent_kinds.update({'earbuds','headphones'})
+    if recent_kinds & FOOTWEAR_KINDS:recent_kinds.update(FOOTWEAR_KINDS)
+    if recent_kinds & {'vacuum','robot-vacuum'}:recent_kinds.update({'vacuum','robot-vacuum'})
     return {'keys': {identity(p) for p in rows},
             'recent_kinds': recent_kinds,
             'items': rows}
@@ -201,6 +243,11 @@ def illustration_pools():
         'cleanser': ['/static/images/catalog/bcb8cd41bc9c1300.jpg'],
         'moisturizer': ['/static/images/catalog/42b2f8a7cabd17ed.jpg'],
         'women_pants': ['/static/images/catalog/820c3f01a6b76fb4.jpg'],
+        'racket-bag': ['/static/images/merchandise/racket-bag.png'],
+        'yoga-mat': ['/static/images/merchandise/yoga-mat.jpg'],
+        'bottle': ['/static/images/merchandise/bottle.jpg'],
+        'robot-vacuum':pools.get('vacuum',[]),
+        'vacuum':[],
     })
     source_types = {'smartphones': 'phone', 'tablets': 'tablet', 'laptops': 'laptop',
                     'fragrances': 'fragrance', 'mens-shirts': 'men_shirt',
@@ -236,6 +283,14 @@ def merchandise_image(product):
                'vacuum': 'vacuum', 'glasses': 'sunglasses'}
     family = kind(product)
     name=normalized(display_name(product.get('name')))
+    if family=='mouse':
+        photo=next((filename for token,filename in (
+            ('mx master 3s','mx-master-3s.png'),('m331','m331.png'),
+            ('pebble m350','pebble-m350.png'),('g102','g102.png')) if token in name),None)
+        if photo:
+            from app import config
+            path='/static/images/merchandise/'+photo
+            if (config.ROOT/path.lstrip('/')).is_file():return path
     if family=='sunscreen':
         filename='anessa-milk.png' if 'perfect uv milk' in name else 'anessa-mild.png'
         return '/static/images/merchandise/'+filename

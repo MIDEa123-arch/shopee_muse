@@ -38,6 +38,18 @@ def quote(body:Checkout,user=Depends(require_user)):
 def serialize_order(db,row):
     data=dict(row)
     data['items']=[dict(r) for r in db.execute('SELECT * FROM order_items WHERE order_id=?',(row['id'],))]
+    from app.native_catalog import catalog_info
+    if catalog_info(db)['mode'] in ('vietnam_tiki_v1','amazon_reviews_2023_v1'):
+        from app.database import public_product
+        for item in data['items']:
+            product=db.execute('SELECT * FROM products WHERE id=?',(item['product_id'],)).fetchone()
+            if not product:continue
+            snapshot=dict(product);snapshot['name']=item['product_name'] or snapshot['name']
+            # Correct a historically mislabelled illustration only at display;
+            # the original order name, price, shop and stored image stay intact.
+            item['snapshot_image_url']=item['image_url']
+            item['image_url']=public_product(snapshot)['image_url']
+            item['image_is_illustrative']=True
     return data
 
 

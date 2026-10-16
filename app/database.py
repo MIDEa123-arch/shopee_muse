@@ -231,12 +231,17 @@ def public_product(row):
     result = dict(row)
     if result.get("raw_item_id") is not None:
         result['raw_item_id'] = str(result['raw_item_id'])
+    if result.get('catalog_source')=='retail-curated':
+        result.update(commerce_simulated=True,image_kind='curated_product_photo',image_is_illustrative=True)
+        result['images']=json.loads(result.get('images_json') or '[]') or [result['image_url']]
+        result['is_mall']=bool(result.get('is_mall'));result['is_freeship']=bool(result.get('is_freeship'))
+        return result
     if result.get('catalog_source') in ('amazon-2023', 'tiki-vn'):
         from app.recommender.merchandise import display_name, merchandise_image
         result['commerce_simulated'] = True
         result['image_kind'] = 'illustrative_product_family'
         result['image_is_illustrative'] = True
-        clean_name = display_name(result.get('name'))
+        clean_name = display_name(result.get('name')).split(' - ',1)[0]
         if clean_name:
             result['name'] = clean_name
             result['description'] = f'{clean_name}. Kiểm tra màu sắc, phiên bản, giá và số lượng trước khi đặt hàng.'

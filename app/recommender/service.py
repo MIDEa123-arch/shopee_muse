@@ -434,11 +434,14 @@ class RecommendationService:
                     candidate.pop(key,None)
         return candidates
 
-    def recommend(self,user_id=None,touchpoint='home',product_id=None,limit=24,category_id=None,display_category='',presentation_policy='original',focus_product_id=None,*,write_logs=True):
+    def recommend(self,user_id=None,touchpoint='home',product_id=None,limit=24,category_id=None,display_category='',presentation_policy='original',focus_product_id=None,*,write_logs=True,order_id=None):
         with connection() as db:
             cinfo=catalog_info(db)
             native=cinfo['mode']==MODE
             retail=cinfo['mode'] in ('vietnam_tiki_v1','amazon_reviews_2023_v1')
+        if retail:
+            from .retail import recommend as retail_recommend
+            return retail_recommend(self,user_id,touchpoint,product_id,limit,category_id,order_id=order_id,write_logs=write_logs)
         if native:
             return native_ranking.recommend(self,user_id,touchpoint,product_id,limit,category_id,display_category=display_category,presentation_policy=presentation_policy,focus_product_id=focus_product_id,write_logs=write_logs)
         start=time.perf_counter()
@@ -708,7 +711,19 @@ class RecommendationService:
                         feed_signals.append({'action_type':'purchase','category_id':owned['category_id'],
                             'product_id':owned['id'],'product_name':owned['name'],'product_price':owned['price'],
                             'category_name':f"Danh mục {owned['category_id']}"})
-            top, intent_summary = build_shopee_feed(ranked, feed_signals, limit=limit, retail=retail)
+            if retail:
+                top, intent_summary = build_shopee_feed(ranked, feed_signals, limit=limit, retail=True)
+            else:
+                # Legacy demo contracts: stable prefixes and original photo
+                # identities. Retail uses the separate model-identity pipeline.
+                legacy_ranked,intent_summary,_=apply_customer_intent(ranked,feed_signals)
+                selected=next((s for s in feed_signals if s['action_type']=='demo_interest'),None)
+                if selected:
+                    legacy_ranked.sort(key=lambda pair:pair[0]['category_id']==selected['category_id'],reverse=True)
+                    for p,_ in legacy_ranked:
+                        if p['category_id']==selected['category_id']:
+                            p['recommendation_reason']='Ưu tiên '+selected['category_name']
+                top=unique_models([public_product(p) for p,_ in legacy_ranked])[:limit]
             if retail:
                 just_bought=[p for p in purchases['items'][:4] if p.get('hot_purchase')]
                 accessories=[p for p,_ in ranked if any(is_complement(p,owned) for owned in just_bought)][:3]
@@ -729,6 +744,8 @@ class RecommendationService:
         if retail:
             top=unique_models(top,exclude=[dict(target)] if target else [])
             top=[p for p in top if p.get('image_url')!='/static/images/placeholder.svg']
+        else:
+            top=unique_models(top)
         active_interest=next(({'category_id':row['category_id'],'category_name':row['category_name'],
                                'product_id':row['product_id']} for row in signals
                               if row['action_type']=='demo_interest'),None)
