@@ -1,5 +1,7 @@
 """Visible merchandise constraints, separate from model inputs and score math."""
 import json
+import random
+import re
 from collections import Counter
 
 from fastapi import HTTPException
@@ -779,18 +781,28 @@ def personalized_deals(db, user_id, limit=12):
             cat_s = cat_weights.get(p['category_id'], 0.0) / max_cat_w if cat_weights else 0.0
             disc_s = min(p.get('discount_percent', 0) / 60.0, 1.0)
             price_fit = 0.12 if (use_price and affinity['min_price'] <= p['price'] <= affinity['max_price']) else 0.0
-            return 0.45 * pc + 0.35 * cat_s + 0.20 * disc_s + price_fit
+            jitter = random.uniform(-0.06, 0.06)
+            return 0.45 * pc + 0.35 * cat_s + 0.20 * disc_s + price_fit + jitter
+
+        def core_deal_title(name: str) -> str:
+            s = re.sub(r'[\(\[\{].*?[\)\]\}]', ' ', name or '')
+            if ' - ' in s:
+                s = s.split(' - ')[0]
+            return ' '.join(s.split()).lower()
 
         candidates.sort(key=lambda p: (deal_score(p), p.get('discount_percent', 0), p.get('sold_count', 0)), reverse=True)
 
         items = []
-        seen_photos = set()
         seen_names = set()
+        seen_cores = set()
         cat_cap = Counter()
         for pass_idx in (1, 2):
             for p in candidates:
                 cname = p['name'].strip().lower()
-                if cname in seen_names:
+                core = core_deal_title(p['name'])
+                if cname in seen_names or (core and core in seen_cores):
+                    continue
+                if pass_idx == 1 and cat_cap[p['category_id']] >= 2:
                     continue
                 rid = p['raw_item_id']
                 if rid in p_click_map:
@@ -804,10 +816,9 @@ def personalized_deals(db, user_id, limit=12):
                 else:
                     p['recommendation_reason'] = f"Deal hot hôm nay · Giảm {p['discount_percent']}%"
                 item = public_product(p)
-                if pass_idx == 1 and (item['image_url'] in seen_photos or cat_cap[p['category_id']] >= 3):
-                    continue
                 seen_names.add(cname)
-                seen_photos.add(item['image_url'])
+                if core:
+                    seen_cores.add(core)
                 cat_cap[p['category_id']] += 1
                 item['sale_progress'] = sale_progress(p['id'])
                 items.append(item)

@@ -1,7 +1,9 @@
 import logging
 import math
+import random
+import re
 import time
-from collections import OrderedDict
+from collections import Counter, OrderedDict
 from threading import Lock
 from fastapi import HTTPException
 from app.database import connection,public_product
@@ -165,6 +167,196 @@ CATEGORY_COMPLEMENTS = {
     10: ('khăn ướt', 'bình sữa', 'sữa', 'đồ chơi'),
     11: ('thảm tập', 'con lăn', 'dây kháng lực', 'bình nước', 'túi thể thao'),
 }
+
+
+def core_product_title(name: str) -> str:
+    s = re.sub(r'[\(\[\{].*?[\)\]\}]', ' ', name or '')
+    if ' - ' in s:
+        s = s.split(' - ')[0]
+    return ' '.join(s.split()).lower()
+
+
+def build_shopee_feed(ranked, signals, limit=24):
+    """Build a balanced, harmonious Shopee/Taobao style feed:
+    - High-intent items (sub-kind or category): ~4-5 items (approx 20% of feed)
+    - Complementary cross-category items: ~3 items
+    - Diverse lifestyle & popular discovery: ~16 items across various categories
+    - Interleaved smoothly across the feed (no continuous wall of identical items)
+    - Exploration jitter so every page reload rotates fresh discoveries
+    - Deduplication strictly by core product name (no photo filtering restriction)
+    """
+    if not ranked:
+        return [], []
+
+    # 1. Deduplicate candidates by product name & core title, apply subtle exploration jitter for reload freshness
+    unique_candidates = []
+    seen_names = set()
+    seen_cores = set()
+    for product, score in ranked:
+        name = product['name'].strip().casefold()
+        core = core_product_title(product['name'])
+        if name in seen_names or (core and core in seen_cores):
+            continue
+        seen_names.add(name)
+        if core:
+            seen_cores.add(core)
+        jitter = random.uniform(-0.04, 0.04)
+        unique_candidates.append((product, score + jitter))
+
+    # 2. Extract recent customer intent
+    strengths = {}
+    names = {}
+    kind_strengths = {}
+    for index, row in enumerate(signals or []):
+        cat = row['category_id']
+        weight = ACTION_WEIGHTS.get(row['action_type'], 1.0) * (0.86**index)
+        strengths[cat] = strengths.get(cat, 0) + weight
+        names[cat] = row.get('category_name') or f"Danh mục {cat}"
+        p_name = row.get('product_name') or ''
+        k = product_kind(p_name)
+        if k:
+            kind_strengths[k] = kind_strengths.get(k, 0) + weight
+
+    intent_cat = max(strengths, key=strengths.get) if strengths else None
+    intent_kind = max(kind_strengths, key=kind_strengths.get) if kind_strengths else None
+    comp_cats = set(COMPLEMENTARY_MAP.get(intent_cat, [])) - {intent_cat} if intent_cat else set()
+
+    # 3. Partition candidates into 3 distinct pools
+    intent_pool = []
+    comp_pool = []
+    explore_pool = []
+
+    for product, score in unique_candidates:
+        cid = product['category_id']
+        p_kind = product_kind(product['name'])
+
+        if intent_cat and (cid == intent_cat or (intent_kind and p_kind == intent_kind)):
+            if intent_kind and p_kind == intent_kind:
+                product['recommendation_reason'] = f"Gợi ý theo sở thích về {intent_kind.title()}"
+                intent_pool.insert(0, (product, score + 100000))
+            else:
+                product['recommendation_reason'] = f"Hợp với hoạt động gần đây về {names.get(cid, '')}"
+                intent_pool.append((product, score))
+        elif cid in comp_cats:
+            product['recommendation_reason'] = "Phụ kiện & gợi ý phối hợp phù hợp"
+            comp_pool.append((product, score))
+        else:
+            product['recommendation_reason'] = "Gợi ý thịnh hành hôm nay"
+            explore_pool.append((product, score))
+
+    intent_pool.sort(key=lambda x: x[1], reverse=True)
+    comp_pool.sort(key=lambda x: x[1], reverse=True)
+    explore_pool.sort(key=lambda x: x[1], reverse=True)
+
+    # 4. Balanced Quotas: ~4-5 intent items (20%), ~3 complementary, remainder explore
+    intent_target = min(5, len(intent_pool)) if intent_cat else 0
+    comp_target = min(3, len(comp_pool)) if comp_cats else 0
+
+    # Interleaving schedule: 'I'=Intent, 'C'=Complementary, 'E'=Explore
+    schedule = [
+        'I', 'E', 'C', 'E',
+        'I', 'E', 'E', 'C',
+        'I', 'E', 'E', 'E',
+        'I', 'E', 'C', 'E',
+        'I', 'E', 'E', 'E',
+        'E', 'E', 'E', 'E',
+        'E', 'E', 'E', 'E',
+        'E', 'E', 'E', 'E'
+    ]
+
+    feed = []
+    feed_names = set()
+    feed_cores = set()
+    explore_cat_count = Counter()
+    intent_idx = 0
+    comp_idx = 0
+    explore_idx = 0
+
+    for slot in schedule:
+        chosen = None
+        if slot == 'I' and intent_idx < intent_target:
+            while intent_idx < len(intent_pool):
+                cand = intent_pool[intent_idx][0]
+                intent_idx += 1
+                c_name = cand['name'].strip().casefold()
+                c_core = core_product_title(cand['name'])
+                if c_name not in feed_names and (not c_core or c_core not in feed_cores):
+                    chosen = cand
+                    break
+        elif slot == 'C' and comp_idx < comp_target:
+            while comp_idx < len(comp_pool):
+                cand = comp_pool[comp_idx][0]
+                comp_idx += 1
+                c_name = cand['name'].strip().casefold()
+                c_core = core_product_title(cand['name'])
+                if c_name not in feed_names and (not c_core or c_core not in feed_cores):
+                    chosen = cand
+                    break
+        else:
+            # First attempt: pick explore item with category count < 2 for maximum variety
+            cur_idx = explore_idx
+            found = False
+            while cur_idx < len(explore_pool):
+                cand = explore_pool[cur_idx][0]
+                c_name = cand['name'].strip().casefold()
+                c_core = core_product_title(cand['name'])
+                if c_name not in feed_names and (not c_core or c_core not in feed_cores):
+                    if explore_cat_count[cand['category_id']] < 2:
+                        chosen = cand
+                        explore_cat_count[cand['category_id']] += 1
+                        explore_pool.pop(cur_idx)
+                        found = True
+                        break
+                cur_idx += 1
+            if not found and explore_idx < len(explore_pool):
+                while explore_idx < len(explore_pool):
+                    cand = explore_pool[explore_idx][0]
+                    explore_idx += 1
+                    c_name = cand['name'].strip().casefold()
+                    c_core = core_product_title(cand['name'])
+                    if c_name not in feed_names and (not c_core or c_core not in feed_cores):
+                        chosen = cand
+                        explore_cat_count[cand['category_id']] += 1
+                        break
+
+        if not chosen:
+            # Fallback to any remaining unused candidate
+            for p, _ in unique_candidates:
+                c_name = p['name'].strip().casefold()
+                c_core = core_product_title(p['name'])
+                if c_name not in feed_names and (not c_core or c_core not in feed_cores):
+                    chosen = p
+                    break
+
+        if chosen:
+            c_name = chosen['name'].strip().casefold()
+            c_core = core_product_title(chosen['name'])
+            feed_names.add(c_name)
+            if c_core:
+                feed_cores.add(c_core)
+            feed.append(public_product(chosen))
+            if len(feed) >= limit:
+                break
+
+    if len(feed) < limit:
+        for p, _ in unique_candidates:
+            c_name = p['name'].strip().casefold()
+            c_core = core_product_title(p['name'])
+            if c_name not in feed_names and (not c_core or c_core not in feed_cores):
+                feed_names.add(c_name)
+                if c_core:
+                    feed_cores.add(c_core)
+                feed.append(public_product(p))
+                if len(feed) >= limit:
+                    break
+
+    summary = []
+    if strengths:
+        peak = max(strengths.values())
+        summary = [{'category_id': c, 'category_name': names[c], 'strength': round(v / peak, 3)}
+                   for c, v in sorted(strengths.items(), key=lambda x: x[1], reverse=True)]
+
+    return feed, summary
 
 
 class RecommendationService:
@@ -476,45 +668,21 @@ class RecommendationService:
             p['recommendation_source']='ai' if model_used else 'catalog'
         inference_ms=(time.perf_counter()-inference_start)*1000
         ranked=sorted(zip(products,scores),key=lambda x:(x[1],x[0]['sold_count'],-x[0]['id']),reverse=True)
-        intent_summary=[]
-        intent_caps={}
-        if touchpoint=='home' and user_id:
-            ranked,intent_summary,intent_caps=apply_customer_intent(ranked,signals)
-        if touchpoint in ('similar','cart','complementary'):
-            photos=set();unique=[]
-            for product,score in ranked:
-                photo=product['image_url'] or product['id']
-                if photo not in photos:
-                    photos.add(photo);unique.append((product,score))
-            ranked=unique
-        ranked=diversify(ranked,intent_caps=intent_caps)
-        top = []
-        visible_photo_counts = {}
-        visible_names = set()
-        last_photo = None
-        for product, _ in ranked:
-            item = public_product(product)
-            photo = item.get('image_url') or item['id']
-            name = item['name'].strip().casefold()
-            if name in visible_names:
-                continue
-            if visible_photo_counts.get(photo, 0) >= 2 or (photo == last_photo and len(top) > 0):
-                continue
-            visible_photo_counts[photo] = visible_photo_counts.get(photo, 0) + 1
-            last_photo = photo
-            visible_names.add(name)
-            top.append(item)
-            if len(top) >= limit:
-                break
-        if len(top) < limit:
+        intent_summary = []
+        if touchpoint == 'home':
+            top, intent_summary = build_shopee_feed(ranked, signals, limit=limit)
+        else:
+            top = []
+            visible_names = set()
             for product, _ in ranked:
                 item = public_product(product)
                 name = item['name'].strip().casefold()
-                if name not in visible_names:
-                    visible_names.add(name)
-                    top.append(item)
-                    if len(top) >= limit:
-                        break
+                if name in visible_names:
+                    continue
+                visible_names.add(name)
+                top.append(item)
+                if len(top) >= limit:
+                    break
         active_interest=next(({'category_id':row['category_id'],'category_name':row['category_name'],
                                'product_id':row['product_id']} for row in signals
                               if row['action_type']=='demo_interest'),None)
