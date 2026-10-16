@@ -57,9 +57,9 @@ async def security_headers(request:Request,call_next):
     response.headers['X-Content-Type-Options']='nosniff'
     response.headers['X-Frame-Options']='DENY'
     response.headers['Referrer-Policy']='strict-origin-when-cross-origin'
-    response.headers['Content-Security-Policy']="default-src 'self'; script-src 'self'; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self' https://images.unsplash.com data:; connect-src 'self'; font-src 'self'; frame-ancestors 'none'; form-action 'self'; base-uri 'self'"
+    response.headers['Content-Security-Policy']="default-src 'self'; script-src 'self'; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self' https://salt.tikicdn.com https://*.tikicdn.com https://m.media-amazon.com https://images.unsplash.com data:; connect-src 'self'; font-src 'self'; frame-ancestors 'none'; form-action 'self'; base-uri 'self'"
     response.headers['Server-Timing']=f'app;dur={(time.perf_counter()-start)*1000:.2f}'
-    if request.url.path.startswith('/api/'):
+    if request.url.path.startswith('/api/') and not request.url.path.startswith('/api/item-art/'):
         response.headers['Cache-Control']='no-store'
     return response
 

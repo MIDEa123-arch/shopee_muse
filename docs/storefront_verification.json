@@ -1,0 +1,73 @@
+{
+  "verified_at": "2026-10-15T19:08:04.775277+00:00",
+  "unit_tests": {
+    "passed": 58,
+    "failed": 0,
+    "duration_seconds": 39.456,
+    "log": "/tmp/lumi-unit-final.log"
+  },
+  "model_invariance": {
+    "profiles": 8,
+    "scores_per_profile": 8192,
+    "exactly_equal_scores": 65536,
+    "top_60_item_ids_order_and_scores_equal": true,
+    "semantic_accuracy_of_illustrative_goods_evaluated": false
+  },
+  "installation": {
+    "all_24_protected_tables_unchanged": true,
+    "sqlite_quick_check": "ok",
+    "foreign_key_issues": [],
+    "presentation_count": 11611,
+    "backup": "/home/midea/Projects/shopee_muse/data/backups/before-storefront-20261016-020604.db",
+    "checkpoints_unchanged": true,
+    "checkpoint_sha256": {
+      "muse_full_training_dense.ckpt": "ac3b7fce48232977f072c81d6056fc0cdd381de9582a88fa417bb4217e30844b",
+      "muse_full_training_sparse.ckpt": "5add00cb287d635418dbfcad74f778565dd58224aa8fe585a3531abb589309bd"
+    }
+  },
+  "browser": {
+    "status": "passed",
+    "flows": [
+      "guest sees paired goods and disclosure; quick add opens login",
+      "all eight profiles retain actual checkpoint inference and AI badges",
+      "profile comparison, stable load more and display filtering without fake history",
+      "measured original-data quality explained; technical metrics confined to Lab",
+      "detail, SCL neighbours, favorite, quantity, cart and real interaction update",
+      "wishlist, Vietnamese title search, category, prices, AI sorting and pagination",
+      "cart AI additions, selection, checkout, order and cancellation/refund",
+      "home, feed, detail, catalog, cart and checkout fit 320/390/768/1440 without Chinese text or broken photos",
+      "503 recovery preserves home, buying and cart; retry restores recommendations",
+      "addresses, vouchers and account remain functional",
+      "registered customer uses actual cold-start inference",
+      "buy now keeps quantity; simulated delivery and verified-order review appear in detail"
+    ],
+    "javascript_errors": [],
+    "screenshots": "/tmp/lumi-preview"
+  },
+  "live_read_only_smoke": {
+    "status": "passed",
+    "health": {
+      "status": "ok",
+      "demo_mode": true,
+      "model_ready": true,
+      "recommendation_engine": "Alibaba MUSE / PyTorch CPU"
+    },
+    "paired_templates": 157,
+    "display_categories": 8,
+    "live_read_only_AI_comparison": true,
+    "guest_stays_guest": true,
+    "widths": [
+      320,
+      390,
+      768,
+      1440
+    ],
+    "javascript_errors": []
+  },
+  "runtime": {
+    "workers": 1,
+    "memory_max_bytes": 1677721600,
+    "swap_max_bytes": 134217728,
+    "live_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+  }
+}

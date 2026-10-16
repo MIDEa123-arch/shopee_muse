@@ -31,6 +31,7 @@ def claim(voucher_id:int,user=Depends(require_user)):
 @router.post('/checkout/quote')
 def quote(body:Checkout,user=Depends(require_user)):
     with connection() as db:
+        db.execute('BEGIN')
         return calculate(db,user['id'],body)
 
 
@@ -56,6 +57,8 @@ def place(body:OrderCreate,user=Depends(require_user)):
                 raise HTTPException(409,'Mã yêu cầu đã được dùng với nội dung khác.')
             return serialize_order(db,previous)
         bill=calculate(db,user['id'],body)
+        if body.quote_token!=bill['quote_token']:
+            raise HTTPException(409,'Sản phẩm, địa chỉ hoặc ưu đãi đã thay đổi. Vui lòng kiểm tra lại đơn trước khi đặt hàng.')
         if body.expected_total is not None and body.expected_total!=bill['total']:
             raise HTTPException(409,'Tổng thanh toán đã thay đổi. Vui lòng xem lại báo giá trước khi đặt hàng.')
         if body.payment_method=='ShopeePay':
@@ -81,7 +84,8 @@ def place(body:OrderCreate,user=Depends(require_user)):
             db.execute('''INSERT INTO order_items(order_id,product_id,quantity,unit_price,product_name,image_url,shop_name)
                 VALUES (?,?,?,?,?,?,?)''',(order_id,item['id'],item['quantity'],item['price'],item['name'],item['image_url'],item['shop_name']))
             record_behavior(db,user,item,'purchase')
-            db.execute('DELETE FROM cart_items WHERE id=? AND user_id=?',(item['cart_item_id'],user['id']))
+            if 'cart_item_id' in item:
+                db.execute('DELETE FROM cart_items WHERE id=? AND user_id=?',(item['cart_item_id'],user['id']))
         db.execute("INSERT INTO notifications(user_id,title,content,type) VALUES (?,?,?,'order')",(user['id'],'Đặt hàng thành công',f'Đơn {code} đang chờ shop xác nhận. Theo dõi trong Đơn mua.'))
         db.execute('INSERT INTO audit_events(user_id,action,entity_id) VALUES (?,?,?)',(user['id'],'order.created',code))
         return serialize_order(db,db.execute('SELECT * FROM orders WHERE id=?',(order_id,)).fetchone())
@@ -106,6 +110,25 @@ def cancel(order_id:int,user=Depends(require_user)):
             db.execute('UPDATE products SET stock=stock+?,sold_count=MAX(0,sold_count-?) WHERE id=?',(item['quantity'],item['quantity'],item['product_id']))
         db.execute("INSERT INTO notifications(user_id,title,content,type) VALUES (?,?,?,'order')",(user['id'],'Đã hủy đơn hàng',f"Đơn {row['order_code']} đã được hủy. Tiền ví demo, Xu và voucher đã được hoàn lại nếu có."))
         db.execute('INSERT INTO audit_events(user_id,action,entity_id) VALUES (?,?,?)',(user['id'],'order.cancelled',row['order_code']))
+    return {'ok':True}
+
+
+@router.post('/orders/{order_id}/reorder')
+def reorder(order_id:int,user=Depends(require_user)):
+    with connection(write=True) as db:
+        if not db.execute('SELECT 1 FROM orders WHERE id=? AND user_id=?',(order_id,user['id'])).fetchone():
+            raise HTTPException(404,'Đơn hàng không tồn tại.')
+        rows=db.execute('''SELECT p.*,i.quantity ordered_quantity,COALESCE(c.quantity,0) cart_quantity
+            FROM order_items i JOIN products p ON p.id=i.product_id
+            LEFT JOIN cart_items c ON c.product_id=p.id AND c.user_id=? WHERE i.order_id=?''',(user['id'],order_id)).fetchall()
+        for item in rows:
+            quantity=item['ordered_quantity']+item['cart_quantity']
+            if quantity>min(item['stock'],99):
+                raise HTTPException(409,f"{item['name']} không đủ tồn kho. Giỏ hàng chưa được thay đổi.")
+            db.execute('''INSERT INTO cart_items(user_id,product_id,quantity) VALUES (?,?,?)
+                ON CONFLICT(user_id,product_id) DO UPDATE SET quantity=excluded.quantity,is_selected=1''',
+                (user['id'],item['id'],quantity))
+            record_behavior(db,user,item,'add_to_cart')
     return {'ok':True}
 
 

@@ -5,6 +5,7 @@ from app.seed_data import SAMPLE_PROFILES
 from app.database import connection, public_product
 from app.schemas import Address, Profile
 from app.security import require_user, safe_user
+from app.services.behavior import record_behavior
 
 router=APIRouter(prefix='/api/account',tags=['account'])
 
@@ -104,9 +105,11 @@ def wishlist(user=Depends(require_user)):
 @router.put('/wishlist/{product_id}')
 def toggle_wishlist(product_id:int,user=Depends(require_user)):
     with connection(write=True) as db:
-        if not db.execute('SELECT 1 FROM products WHERE id=?',(product_id,)).fetchone():
+        product=db.execute('SELECT * FROM products WHERE id=?',(product_id,)).fetchone()
+        if not product:
             raise HTTPException(404,'Sản phẩm không tồn tại.')
         if db.execute('DELETE FROM wishlist WHERE user_id=? AND product_id=?',(user['id'],product_id)).rowcount:
             return {'saved':False}
         db.execute('INSERT INTO wishlist VALUES (?,?)',(user['id'],product_id))
+        record_behavior(db,user,product,'favorite')
         return {'saved':True}

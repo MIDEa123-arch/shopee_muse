@@ -40,9 +40,15 @@ def register(body: Register,request: Request,response: Response):
         rate_limit(db,request,'register',5)
     try:
         with connection(write=True) as db:
-            uid=db.execute('''INSERT INTO users(full_name,email,phone,password_hash,member_tier,shopee_coins,wallet_balance)
-                VALUES (?,?,?,?,'Thành viên Mới',0,0)''',(body.full_name.strip(),email,body.phone,hash_password(body.password))).lastrowid
-            db.execute("INSERT INTO notifications(user_id,title,content,type) VALUES (?,'Chào mừng bạn!','Thêm địa chỉ nhận hàng để bắt đầu mua sắm.','system')",(uid,))
+            uid=db.execute('''INSERT INTO users(full_name,email,phone,password_hash,member_tier,shopee_coins,wallet_balance,gender,birth_year)
+                VALUES (?,?,?,?,'Thành viên Mới',0,0,?,?)''',(body.full_name.strip(),email,body.phone,hash_password(body.password),body.gender or 'Khác',body.birth_year)).lastrowid
+            db.execute('''INSERT INTO addresses(user_id,recipient_name,phone,province_id,detail,is_default)
+                VALUES (?,?,?,1,'123 Đường Nguyễn Huệ, Phường Bến Nghé, Quận 1',1)''',
+                (uid, body.full_name.strip(), body.phone))
+            welcome_vouchers = db.execute("SELECT id FROM vouchers WHERE code IN ('VOUCHERMUSE30K', 'TAOBAO30K', 'FREESHIP')").fetchall()
+            for v in welcome_vouchers:
+                db.execute("INSERT OR IGNORE INTO user_vouchers(user_id, voucher_id, status) VALUES (?, ?, 'available')", (uid, v[0]))
+            db.execute("INSERT INTO notifications(user_id,title,content,type) VALUES (?,'Chào mừng bạn!','Tài khoản đã sẵn sàng với địa chỉ nhận hàng và ưu đãi chào bạn mới.','system')",(uid,))
             create_session(db,response,uid)
             return {'user':safe_user(db.execute('SELECT * FROM users WHERE id=?',(uid,)).fetchone())}
     except sqlite3.IntegrityError:

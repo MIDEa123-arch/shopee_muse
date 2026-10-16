@@ -1,0 +1,155 @@
+{
+  "schema_version": 2,
+  "run_status": "completed",
+  "evaluated_at": "2026-10-15T16:42:17.839577+00:00",
+  "scope": "sampled_taobao_test",
+  "sampling": {
+    "seed": 20261015,
+    "requested_samples": 2048,
+    "method": "Random shards without replacement; one random contiguous window in a random row group per shard. Original labels and histories; no class balancing.",
+    "total_test_rows": 22979465,
+    "shards": [
+      {
+        "file": "test-shard-000013.parquet",
+        "row_group": 20,
+        "offset": 6640,
+        "rows": 512
+      },
+      {
+        "file": "test-shard-000019.parquet",
+        "row_group": 0,
+        "offset": 3934,
+        "rows": 512
+      },
+      {
+        "file": "test-shard-000028.parquet",
+        "row_group": 38,
+        "offset": 7700,
+        "rows": 512
+      },
+      {
+        "file": "test-shard-000036.parquet",
+        "row_group": 1,
+        "offset": 3773,
+        "rows": 512
+      }
+    ]
+  },
+  "artifacts": {
+    "muse_full_training_dense.ckpt": {
+      "bytes": 515829,
+      "mtime_ns": 1791760020000000000
+    },
+    "muse_full_training_sparse.ckpt": {
+      "bytes": 2714598309,
+      "mtime_ns": 1792036020338236215
+    },
+    "129_1_sorted_map.npy": {
+      "bytes": 55437496,
+      "mtime_ns": 1791714308429335416
+    },
+    "130_1_sorted_map.npy": {
+      "bytes": 216,
+      "mtime_ns": 1791714307400293412
+    },
+    "130_2_sorted_map.npy": {
+      "bytes": 152,
+      "mtime_ns": 1791714307099576532
+    },
+    "130_3_sorted_map.npy": {
+      "bytes": 520,
+      "mtime_ns": 1791714307069604750
+    },
+    "130_4_sorted_map.npy": {
+      "bytes": 4072,
+      "mtime_ns": 1791714308943864011
+    },
+    "130_5_sorted_map.npy": {
+      "bytes": 176,
+      "mtime_ns": 1791714309237600689
+    },
+    "150_2_180_sorted_map.npy": {
+      "bytes": 1946904288,
+      "mtime_ns": 1791714358350053646
+    },
+    "150_2_180_sorted_map_p90.npy": {
+      "bytes": 283668112,
+      "mtime_ns": 1791714346184055680
+    },
+    "151_2_180_sorted_map.npy": {
+      "bytes": 211304,
+      "mtime_ns": 1791714320575809732
+    },
+    "213_sorted_map.npy": {
+      "bytes": 4464,
+      "mtime_ns": 1791714320439900493
+    },
+    "214_sorted_map.npy": {
+      "bytes": 1096,
+      "mtime_ns": 1791714323108173498
+    },
+    "scl_emb_int8_p90_keys.npy": {
+      "bytes": 283667864,
+      "mtime_ns": 1791714348408252684
+    },
+    "scl_emb_int8_p90_values.npy": {
+      "bytes": 4538683904,
+      "mtime_ns": 1791714428962207700
+    }
+  },
+  "checkpoint_sha256": {
+    "muse_full_training_dense.ckpt": "ac3b7fce48232977f072c81d6056fc0cdd381de9582a88fa417bb4217e30844b",
+    "muse_full_training_sparse.ckpt": "5add00cb287d635418dbfcad74f778565dd58224aa8fe585a3531abb589309bd"
+  },
+  "predictions_sha256": "625ed39e3897de03d4b09027365b8424434c947e07d17a08deb40a42d3e9909e",
+  "serving_sha256": "9f74401927008410fa7e37dbef0c092e80384e9e87a68a4f461664b0636ec48a",
+  "metrics": {
+    "sample_size": 2048,
+    "users": 207,
+    "positives": 298,
+    "negatives": 1750,
+    "click_rate": 0.1455078125,
+    "auc": 0.6201907957813998,
+    "gauc": 0.5923665477411033,
+    "gauc_eligible_users": 119,
+    "gauc_eligible_impressions": 1625,
+    "log_loss": 0.40376974332442117,
+    "constant_ctr_log_loss": 0.4148371374854042,
+    "brier_score": 0.12160984112533896,
+    "mean_predicted_click_rate": 0.14667025495418784,
+    "threshold": 0.5,
+    "accuracy": 0.8544921875,
+    "always_no_click_accuracy": 0.8544921875,
+    "balanced_accuracy": 0.5,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "confusion_matrix": {
+      "tp": 0,
+      "fp": 0,
+      "tn": 1750,
+      "fn": 298
+    },
+    "precision_at_10": 0.17727272727272728,
+    "precision_at_10_random_baseline": 0.14734330151765673,
+    "precision_at_10_eligible_users": 22,
+    "precision_at_10_lift": 1.2031271557430385,
+    "target_scl_coverage": 1.0,
+    "history_scl_coverage": 0.91137548828125
+  },
+  "timing": {
+    "inference_seconds": 76.70140485999582,
+    "wall_seconds": 86.74606900700019,
+    "peak_rss_mib": 2616.72265625
+  },
+  "limitations": [
+    "Sampled offline impressions, not the full test set or production traffic.",
+    "Sample windows cluster by user; do not infer independent-trial confidence intervals.",
+    "AUC is pairwise ranking with half credit for ties, not product recommendation accuracy or click probability.",
+    "GAUC weights only users with both click and no-click observations by their impression counts.",
+    "Precision@10 uses only users with >=20 sampled candidates and both labels; candidate sets are observed test impressions.",
+    "Constant CTR baseline uses this sample prevalence; accuracy at 0.5 is compared with always-no-click.",
+    "Vietnamese demo names/photos/categories do not match the original Taobao metadata. No labeled Vietnamese shopping evaluation is available.",
+    "Serving retrieval, category intent boosts, diversity and commerce rules are outside this checkpoint evaluation."
+  ]
+}

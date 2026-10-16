@@ -21,7 +21,7 @@ with sync_playwright() as p:
     page.locator('#home-products .product-card').first.wait_for()
     page.locator('.debug-toggle').click()
     page.locator('#debug-panel').get_by_text('CHECKPOINT LOADED').wait_for()
-    page.locator('#home-products .product-score').first.wait_for()
+    page.locator('#debug-panel .product-score').first.wait_for()
     page.screenshot(path=str(output/'muse-lab.png'),full_page=True)
     page.locator('#home-products .product-card-main').first.click()
     page.locator('#modal .detail-title').wait_for()
@@ -63,7 +63,7 @@ with sync_playwright() as p:
     page.get_by_text('Đã lưu địa chỉ nhận hàng.',exact=True).wait_for()
     page.get_by_text('Người nhận kiểm thử giao diện',exact=False).first.wait_for()
     page.set_viewport_size({'width':390,'height':844})
-    page.locator('[data-action="home"]').first.click()
+    page.locator('.mobile-nav [data-action="home"]').click()
     page.locator('#home-products .product-card').first.wait_for()
     if page.is_checked('#debug-toggle'):
         page.locator('.debug-toggle').click()
