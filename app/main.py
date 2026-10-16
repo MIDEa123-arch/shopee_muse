@@ -50,7 +50,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"https://.*\.vercel\.app|https://.*\.onrender\.com|https://.*\.hf\.space|http://localhost:.*|http://127\.0\.0\.1:.*",
+    allow_origin_regex=r"https://.*\.vercel\.app|https://.*\.onrender\.com|https://.*\.hf\.space|https://.*\.trycloudflare\.com|http://localhost:.*|http://127\.0\.0\.1:.*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -70,6 +70,7 @@ async def security_headers(request:Request,call_next):
                 or 'vercel.app' in netloc
                 or 'onrender.com' in netloc
                 or 'hf.space' in netloc
+                or 'trycloudflare.com' in netloc
                 or 'localhost' in netloc
                 or '127.0.0.1' in netloc
                 or config.DEMO_MODE
@@ -85,7 +86,7 @@ async def security_headers(request:Request,call_next):
     response.headers['Content-Security-Policy']=(
         "default-src 'self'; script-src 'self'; style-src 'self'; style-src-attr 'unsafe-inline'; "
         "img-src 'self' https://salt.tikicdn.com https://*.tikicdn.com https://m.media-amazon.com https://images.unsplash.com data:; "
-        "connect-src 'self' https://*.onrender.com https://*.vercel.app https://*.hf.space; "
+        "connect-src 'self' https://*.onrender.com https://*.vercel.app https://*.hf.space https://*.trycloudflare.com; "
         "font-src 'self'; frame-ancestors 'self' https://huggingface.co https://*.hf.space; form-action 'self'; base-uri 'self'"
     )
     response.headers['Server-Timing']=f'app;dur={(time.perf_counter()-start)*1000:.2f}'
