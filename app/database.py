@@ -232,44 +232,17 @@ def public_product(row):
     if result.get("raw_item_id") is not None:
         result['raw_item_id'] = str(result['raw_item_id'])
     if result.get('catalog_source') in ('amazon-2023', 'tiki-vn'):
-        result['commerce_simulated'] = False
-        result['image_kind'] = 'vietnamese_product'
-        clean_name = re.sub(r'\s*\([^)]*\)', '', result.get('name') or '').strip()
-        clean_name = re.sub(r'\s+', ' ', clean_name)
+        from app.recommender.merchandise import display_name, merchandise_image
+        result['commerce_simulated'] = True
+        result['image_kind'] = 'illustrative_product_family'
+        result['image_is_illustrative'] = True
+        clean_name = display_name(result.get('name'))
         if clean_name:
             result['name'] = clean_name
             result['description'] = f'{clean_name}. Kiểm tra màu sắc, phiên bản, giá và số lượng trước khi đặt hàng.'
 
-        cat_id = result.get('category_id') or 1
-        prod_id = result.get('id') or 1
-        nl = (result.get('name') or '').lower()
-
-        # Context-aware precise image selection by product name keyword
-        if cat_id == 2:
-            if any(k in nl for k in ('tai nghe', 'headphone', 'earphone', 'airpods', 'tws', 'chup tai', 'nhet tai', 'in-ear', 'wf-', 'wh-')):
-                pool = HEADPHONE_IMAGES
-            elif any(k in nl for k in ('loa', 'soundbar', 'bluetooth speaker')):
-                pool = SPEAKER_IMAGES
-            else:
-                pool = HEADPHONE_IMAGES
-        elif cat_id == 1:
-            if any(k in nl for k in ('ban phim', 'bàn phím', 'keyboard', 'keychron')):
-                pool = KEYBOARD_IMAGES
-            elif any(k in nl for k in ('chuot', 'chuột', 'mouse', 'logitech')):
-                pool = MOUSE_IMAGES
-            else:
-                pool = LAPTOP_IMAGES
-        else:
-            pool = VERIFIED_CATEGORY_IMAGES.get(cat_id) or VERIFIED_CATEGORY_IMAGES[1]
-
-        curr_img = result.get('image_url') or ''
-        if not curr_img or curr_img not in pool:
-            img = pool[prod_id % len(pool)]
-            result['image_url'] = img
-            result['images'] = [img]
-        else:
-            result['image_url'] = curr_img
-            result['images'] = [curr_img]
+        result['image_url'] = merchandise_image(result)
+        result['images'] = [result['image_url']]
 
         op, price = result.get('original_price') or 0, result.get('price') or 0
         result['discount_percent'] = round((op - price) * 100 / op) if op > price > 0 else 0

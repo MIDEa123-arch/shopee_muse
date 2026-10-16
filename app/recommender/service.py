@@ -14,6 +14,8 @@ from .evaluation import evaluation_summary
 from .catalog import curated_demo_titles,product_kind,has_matching_demo_photo
 from app.native_catalog import catalog_info,MODE
 from .native import native_ranking
+from .merchandise import (kind as merchandise_kind, identity, COMPLEMENTS,
+                          is_complement, purchase_context, exclude_owned, unique_models)
 
 
 def diversify(ranked, intent_caps=None):
@@ -170,13 +172,10 @@ CATEGORY_COMPLEMENTS = {
 
 
 def core_product_title(name: str) -> str:
-    s = re.sub(r'[\(\[\{].*?[\)\]\}]', ' ', name or '')
-    if ' - ' in s:
-        s = s.split(' - ')[0]
-    return ' '.join(s.split()).lower()
+    return identity({'name': name})
 
 
-def build_shopee_feed(ranked, signals, limit=24):
+def build_shopee_feed(ranked, signals, limit=24, retail=False):
     """Build a balanced, harmonious Shopee/Taobao style feed:
     - High-intent items (sub-kind or category): ~4-5 items (approx 20% of feed)
     - Complementary cross-category items: ~3 items
@@ -200,7 +199,7 @@ def build_shopee_feed(ranked, signals, limit=24):
         seen_names.add(name)
         if core:
             seen_cores.add(core)
-        jitter = random.uniform(-0.04, 0.04)
+        jitter = 0 if retail else random.uniform(-0.04, 0.04)
         unique_candidates.append((product, score + jitter))
 
     # 2. Extract recent customer intent
@@ -213,9 +212,11 @@ def build_shopee_feed(ranked, signals, limit=24):
         strengths[cat] = strengths.get(cat, 0) + weight
         names[cat] = row.get('category_name') or f"Danh mục {cat}"
         p_name = row.get('product_name') or ''
-        k = product_kind(p_name)
-        if k:
-            kind_strengths[k] = kind_strengths.get(k, 0) + weight
+        k = merchandise_kind({'name':p_name}) if retail else product_kind(p_name)
+        target_types=COMPLEMENTS.get(k,set()) if retail and row['action_type']=='purchase' else {k}
+        for target_type in sorted(target_types):
+            if target_type:
+                kind_strengths[target_type] = kind_strengths.get(target_type, 0) + weight
 
     intent_cat = max(strengths, key=strengths.get) if strengths else None
     intent_kind = max(kind_strengths, key=kind_strengths.get) if kind_strengths else None
@@ -228,16 +229,17 @@ def build_shopee_feed(ranked, signals, limit=24):
 
     for product, score in unique_candidates:
         cid = product['category_id']
-        p_kind = product_kind(product['name'])
+        p_kind = merchandise_kind(product) if retail else product_kind(product['name'])
 
-        if intent_cat and (cid == intent_cat or (intent_kind and p_kind == intent_kind)):
+        if intent_cat and ((not retail and cid == intent_cat) or (intent_kind and p_kind == intent_kind)):
             if intent_kind and p_kind == intent_kind:
                 product['recommendation_reason'] = f"Gợi ý theo sở thích về {intent_kind.title()}"
-                intent_pool.insert(0, (product, score + 100000))
+                intent_pool.append((product, score))
             else:
                 product['recommendation_reason'] = f"Hợp với hoạt động gần đây về {names.get(cid, '')}"
                 intent_pool.append((product, score))
-        elif cid in comp_cats:
+        elif (any(is_complement(product,{'name':s['product_name'],'price':s.get('product_price',10000000)})
+                  for s in signals[:8] if s.get('product_name')) if retail else cid in comp_cats):
             product['recommendation_reason'] = "Phụ kiện & gợi ý phối hợp phù hợp"
             comp_pool.append((product, score))
         else:
@@ -432,21 +434,26 @@ class RecommendationService:
                     candidate.pop(key,None)
         return candidates
 
-    def recommend(self,user_id=None,touchpoint='home',product_id=None,limit=24,category_id=None,display_category='',presentation_policy='original',focus_product_id=None):
+    def recommend(self,user_id=None,touchpoint='home',product_id=None,limit=24,category_id=None,display_category='',presentation_policy='original',focus_product_id=None,*,write_logs=True):
         with connection() as db:
             cinfo=catalog_info(db)
             native=cinfo['mode']==MODE
+            retail=cinfo['mode'] in ('vietnam_tiki_v1','amazon_reviews_2023_v1')
         if native:
-            return native_ranking.recommend(self,user_id,touchpoint,product_id,limit,category_id,display_category=display_category,presentation_policy=presentation_policy,focus_product_id=focus_product_id)
+            return native_ranking.recommend(self,user_id,touchpoint,product_id,limit,category_id,display_category=display_category,presentation_policy=presentation_policy,focus_product_id=focus_product_id,write_logs=write_logs)
         start=time.perf_counter()
         with connection() as db:
             target=db.execute('SELECT * FROM products WHERE id=?',(product_id,)).fetchone() if touchpoint in ('similar','complementary') else None
             cart=cart_rows(db,user_id) if user_id else []
-            signals=[dict(r) for r in db.execute('''SELECT h.action_type,p.category_id,c.name category_name,p.id product_id,p.name product_name
+            purchases=purchase_context(db,user_id) if retail else {'keys':set(),'recent_kinds':set(),'items':[]}
+            purchased_ids={p['id'] for p in purchases['items']}
+            signals=[dict(r) for r in db.execute('''SELECT h.action_type,p.category_id,c.name category_name,p.id product_id,p.name product_name,p.price product_price
                 FROM user_behavior_history h JOIN products p ON p.id=h.product_id
                 JOIN categories c ON c.id=p.category_id
                 WHERE h.user_id=? AND h.action_type IN ('demo_interest','click','add_to_cart','purchase','favorite')
                 ORDER BY h.id DESC LIMIT 16''',(user_id,))] if user_id else []
+            if retail:
+                signals=[s for s in signals if s['action_type']!='purchase' or s['product_id'] in purchased_ids]
             is_million = cinfo.get('mode') in ('amazon_reviews_2023_v1', 'vietnam_tiki_v1') or bool(db.execute("SELECT 1 FROM products WHERE id > 1000 LIMIT 1").fetchone())
             if is_million:
                 if category_id is not None:
@@ -496,7 +503,11 @@ class RecommendationService:
                         ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 160''')]
                     seen_p = {p['id'] for p in products}
                     intent_cats = list(dict.fromkeys(s['category_id'] for s in signals[:6]))
-                    for cid in intent_cats[:3]:
+                    for owned in purchases['items'][:4]:
+                        if owned.get('recent_purchase'):
+                            for cid in COMPLEMENTARY_MAP.get(owned['category_id'],[]):
+                                if cid not in intent_cats:intent_cats.append(cid)
+                    for cid in intent_cats[:6]:
                         for r in db.execute('''SELECT p.*,pr.name province_name FROM products p
                             LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.category_id=? AND p.stock>0
                             ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 140''', (cid,)):
@@ -506,7 +517,7 @@ class RecommendationService:
                     intent_kinds = [product_kind(s.get('product_name') or '') for s in signals[:4] if product_kind(s.get('product_name') or '')]
                     for kind in list(dict.fromkeys(intent_kinds))[:2]:
                         for r in db.execute('''SELECT p.*,pr.name province_name FROM products p
-                            LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.name LIKE ? AND p.stock>0
+                            LEFT JOIN provinces pr ON pr.id=p.province_id WHERE p.id<=50000 AND p.name LIKE ? AND p.stock>0
                             ORDER BY p.rating_star DESC, p.sold_count DESC, p.id ASC LIMIT 80''', (f'%{kind}%',)):
                             if r['id'] not in seen_p:
                                 seen_p.add(r['id'])
@@ -547,17 +558,26 @@ class RecommendationService:
                 products=curated
                 metadata['catalog_policy']='curated_demo_metadata'
         products=[p for p in products if p['id']!=product_id]
+        if retail:
+            products=exclude_owned(products,purchases,cart if touchpoint in ('home','cart') else (),
+                                   home=touchpoint=='home',manual_category=category_id is not None)
+            metadata['purchase_policy']={'excluded_models':len(purchases['keys']),
+                'recent_durable_types':sorted(purchases['recent_kinds']),
+                'durable_cooldown_days':30,'cancelled_orders_excluded':True}
+            if target:
+                products=[p for p in products if identity(p)!=identity(dict(target))]
         if touchpoint=='home':
             recent_ids={row['product_id'] for row in signals if row['action_type'] in ('click','add_to_cart','purchase')}
             products=[p for p in products if p['id'] not in recent_ids]
         if touchpoint=='similar':
             products=[p for p in products if p['category_id']==target['category_id']]
             band=[p for p in products if target['price']*.5<=p['price']<=target['price']*2]
-            if band:
+            if band or retail:
                 products=band
             metadata['context_policy']='same_category_price_band' if band else 'same_category'
-            same_kind=[p for p in products if product_kind(p['name'])==product_kind(target['name'])]
-            if same_kind:
+            same_kind=[p for p in products if (merchandise_kind(p)==merchandise_kind(dict(target)) if retail
+                      else product_kind(p['name'])==product_kind(target['name']))]
+            if same_kind or retail:
                 products=same_kind
                 metadata['context_policy']='same_kind_price_band' if band else 'same_kind'
             alternatives=[p for p in products if p['image_url']!=target['image_url']]
@@ -566,6 +586,8 @@ class RecommendationService:
             for p in products:
                 p['recommendation_reason']=('Cùng loại sản phẩm' if same_kind else 'Cùng danh mục')+(' · Giá tương đương' if band else '')
         elif touchpoint=='complementary':
+            if retail:
+                products=[p for p in products if is_complement(p,dict(target))]
             # Items of the same kind already appear in "Sản phẩm tương tự".
             target_kind=product_kind(target['name'])
             others=[p for p in products if product_kind(p['name'])!=target_kind]
@@ -592,6 +614,8 @@ class RecommendationService:
                       and p['image_url'] not in cart_photos
                       and (not allowed_cats or p['category_id'] in allowed_cats)
                       and p['price']<=price_cap]
+            if retail:
+                products=[p for p in products if any(is_complement(p,item) for item in cart)]
             for p in products:
                 p['recommendation_reason']='Phù hợp với sản phẩm trong giỏ'
             metadata.update({'context_policy':'curated_cart_categories',
@@ -668,9 +692,28 @@ class RecommendationService:
             p['recommendation_source']='ai' if model_used else 'catalog'
         inference_ms=(time.perf_counter()-inference_start)*1000
         ranked=sorted(zip(products,scores),key=lambda x:(x[1],x[0]['sold_count'],-x[0]['id']),reverse=True)
+        if retail:
+            score_by_id={p['id']:score for p,score in ranked}
+            visible=[public_product(p) for p,_ in ranked]
+            visible=[p for p in visible if p.get('image_url')!='/static/images/placeholder.svg']
+            visible=unique_models(visible,exclude=[public_product(target)] if target else [])
+            ranked=[(p,score_by_id[p['id']]) for p in visible]
         intent_summary = []
         if touchpoint == 'home':
-            top, intent_summary = build_shopee_feed(ranked, signals, limit=limit)
+            feed_signals=list(signals)
+            if retail:
+                recent_signal_ids={s['product_id'] for s in signals}
+                for owned in purchases['items'][:4]:
+                    if owned.get('recent_purchase') and owned['id'] not in recent_signal_ids:
+                        feed_signals.append({'action_type':'purchase','category_id':owned['category_id'],
+                            'product_id':owned['id'],'product_name':owned['name'],'product_price':owned['price'],
+                            'category_name':f"Danh mục {owned['category_id']}"})
+            top, intent_summary = build_shopee_feed(ranked, feed_signals, limit=limit, retail=retail)
+            if retail:
+                just_bought=[p for p in purchases['items'][:4] if p.get('hot_purchase')]
+                accessories=[p for p,_ in ranked if any(is_complement(p,owned) for owned in just_bought)][:3]
+                top=unique_models(accessories+top)[:limit]
+                metadata['post_purchase_accessories']=len(accessories)
         else:
             top = []
             visible_names = set()
@@ -683,6 +726,9 @@ class RecommendationService:
                 top.append(item)
                 if len(top) >= limit:
                     break
+        if retail:
+            top=unique_models(top,exclude=[dict(target)] if target else [])
+            top=[p for p in top if p.get('image_url')!='/static/images/placeholder.svg']
         active_interest=next(({'category_id':row['category_id'],'category_name':row['category_name'],
                                'product_id':row['product_id']} for row in signals
                               if row['action_type']=='demo_interest'),None)
@@ -692,7 +738,7 @@ class RecommendationService:
                          'ranking_policy':'model_rank_with_recent_intent_and_diversity' if touchpoint=='home' and user_id else 'score_order_with_photo_and_category_diversity',
                          'has_more':len(ranked)>limit,'active_interest':active_interest,
                          'intent_summary':intent_summary})
-        if user_id:
+        if user_id and write_logs:
             with self.metrics_lock:
                 self.last_metrics[user_id]=metadata
                 self.last_metrics.move_to_end(user_id)

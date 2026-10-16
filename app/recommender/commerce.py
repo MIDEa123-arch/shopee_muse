@@ -8,6 +8,7 @@ from fastapi import HTTPException
 
 from app import config
 from app.storefront import CATEGORIES, TYPE_LABELS, presentation_map
+from .merchandise import purchase_context, exclude_owned, is_complement, unique_models, identity
 
 COMPLEMENTARY_TYPE_MAP = {
     # Electronics & Gadgets
@@ -291,6 +292,10 @@ def complementary_bundle(db, user_id=None, focus_product_id=None):
                 seen_ids.add(d['id'])
                 raw_candidates.append(d)
 
+        owned=purchase_context(db,user_id)
+        raw_candidates=exclude_owned(raw_candidates,owned)
+        raw_candidates=[p for p in raw_candidates if is_complement(p,focus)
+                        and public_product(p).get('image_url')!='/static/images/placeholder.svg']
         model = service.model
         p_click_map = {}
         sim_map = {}
@@ -373,6 +378,7 @@ def complementary_bundle(db, user_id=None, focus_product_id=None):
                 if len(selected_items) >= 3:
                     break
 
+        selected_items=unique_models(selected_items,exclude=[focus_pub])
         if focus_source == 'cart':
             bundle_label = f"Combo mua kèm sản phẩm trong giỏ: {focus_short}"
         elif focus_source == 'order':
@@ -761,6 +767,10 @@ def personalized_deals(db, user_id, limit=12):
                 seen_ids.add(r['id'])
                 candidates.append(dict(r))
 
+        from app.services.cart import cart_rows
+        owned=purchase_context(db,user_id)
+        candidates=exclude_owned(candidates,owned,cart_rows(db,user_id) if user_id else (),home=True)
+        candidates=[p for p in candidates if public_product(p).get('image_url')!='/static/images/placeholder.svg']
         p_click_map = {}
         model = service.model
         if model and user_id and candidates:
@@ -795,11 +805,12 @@ def personalized_deals(db, user_id, limit=12):
         items = []
         seen_names = set()
         seen_cores = set()
+        seen_photos=set()
         cat_cap = Counter()
         for pass_idx in (1, 2):
             for p in candidates:
                 cname = p['name'].strip().lower()
-                core = core_deal_title(p['name'])
+                core = identity(p)
                 if cname in seen_names or (core and core in seen_cores):
                     continue
                 if pass_idx == 1 and cat_cap[p['category_id']] >= 2:
@@ -816,6 +827,9 @@ def personalized_deals(db, user_id, limit=12):
                 else:
                     p['recommendation_reason'] = f"Deal hot hôm nay · Giảm {p['discount_percent']}%"
                 item = public_product(p)
+                if item['image_url'] in seen_photos:
+                    continue
+                seen_photos.add(item['image_url'])
                 seen_names.add(cname)
                 if core:
                     seen_cores.add(core)

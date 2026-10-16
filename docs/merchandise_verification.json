@@ -1,0 +1,428 @@
+{
+  "checked_at": "2026-10-16T17:22:16.414739+00:00",
+  "read_only": true,
+  "checkpoint_ready": true,
+  "checks": [
+    {
+      "check": "user_1_home_excludes_owned_model",
+      "passed": true
+    },
+    {
+      "check": "user_1_home_cools_down_recent_durable_type",
+      "passed": true
+    },
+    {
+      "check": "user_1_home_unique_models",
+      "passed": true
+    },
+    {
+      "check": "user_1_home_unique_photos",
+      "passed": true
+    },
+    {
+      "check": "user_1_deals_excludes_owned_models",
+      "passed": true
+    },
+    {
+      "check": "user_2_home_excludes_owned_model",
+      "passed": true
+    },
+    {
+      "check": "user_2_home_cools_down_recent_durable_type",
+      "passed": true
+    },
+    {
+      "check": "user_2_home_unique_models",
+      "passed": true
+    },
+    {
+      "check": "user_2_home_unique_photos",
+      "passed": true
+    },
+    {
+      "check": "user_2_deals_excludes_owned_models",
+      "passed": true
+    },
+    {
+      "check": "17438_similar_is_other_model_same_type_in_price_band",
+      "passed": true,
+      "count": 1
+    },
+    {
+      "check": "17438_addons_match_merchandise_and_basic_compatibility",
+      "passed": true,
+      "count": 6
+    },
+    {
+      "check": "20739_similar_is_other_model_same_type_in_price_band",
+      "passed": true,
+      "count": 5
+    },
+    {
+      "check": "20739_addons_match_merchandise_and_basic_compatibility",
+      "passed": true,
+      "count": 6
+    },
+    {
+      "check": "17150_similar_is_other_model_same_type_in_price_band",
+      "passed": true,
+      "count": 1
+    },
+    {
+      "check": "17150_addons_match_merchandise_and_basic_compatibility",
+      "passed": true,
+      "count": 1
+    },
+    {
+      "check": "application_row_counts_unchanged",
+      "passed": true
+    }
+  ],
+  "examples": {
+    "user_1_home": {
+      "count": 24,
+      "model_used": true,
+      "score_type": "p_click",
+      "purchase_policy": {
+        "excluded_models": 4,
+        "recent_durable_types": [
+          "earbuds",
+          "headphones",
+          "shoes"
+        ],
+        "durable_cooldown_days": 30,
+        "cancelled_orders_excluded": true
+      },
+      "post_purchase_accessories": 1,
+      "items": [
+        {
+          "id": 529995,
+          "name": "Củ sạc nhanh Apple 20W Type-C - Trắng White",
+          "price": 596000,
+          "p_click": 0.1739648,
+          "image_url": "/static/images/catalog/2ef69a8e8bbebf1e.jpg"
+        },
+        {
+          "id": 684197,
+          "name": "Laptop TUF Gaming F15 FX506HF - Bạc thanh lịch",
+          "price": 13040000,
+          "p_click": 0.2549588,
+          "image_url": "/static/images/catalog/deb5000b89dc7274.jpg"
+        },
+        {
+          "id": 1957411,
+          "name": "Laptop Katana 15 B13VGK - Carbon Gray",
+          "price": 14045000,
+          "p_click": 0.2387356,
+          "image_url": "/static/images/storefront/82.webp"
+        },
+        {
+          "id": 1241787,
+          "name": "Bàn phím cơ Keychron K8 Pro Không dây - Carbon Retro",
+          "price": 1670000,
+          "p_click": 0.1964251,
+          "image_url": "/static/images/catalog/2e7ad74f07692aea.jpg"
+        },
+        {
+          "id": 1444319,
+          "name": "Kem chống nắng cho da nhạy cảm em bé Anessa Moisture - Vàng ánh kim Gold",
+          "price": 589000,
+          "p_click": 0.22364,
+          "image_url": "/static/images/merchandise/anessa-mild.png"
+        },
+        {
+          "id": 267257,
+          "name": "Đồng hồ nữ Casio mặt vuông dây da - Bạc mặt xanh ngọc",
+          "price": 749000,
+          "p_click": 0.2073369,
+          "image_url": "/static/images/storefront/94.webp"
+        }
+      ]
+    },
+    "user_2_home": {
+      "count": 24,
+      "model_used": true,
+      "score_type": "p_click",
+      "purchase_policy": {
+        "excluded_models": 3,
+        "recent_durable_types": [
+          "charger",
+          "phone"
+        ],
+        "durable_cooldown_days": 30,
+        "cancelled_orders_excluded": true
+      },
+      "post_purchase_accessories": 3,
+      "items": [
+        {
+          "id": 13120,
+          "name": "Tai nghe Apple AirPods Pro 2 - Trắng White",
+          "price": 529000,
+          "p_click": 0.2030989,
+          "image_url": "/static/images/catalog/18971a1f250371e5.jpg"
+        },
+        {
+          "id": 28197,
+          "name": "Tai nghe true wireless Sony WF-1000XM5 - Đen tuyền",
+          "price": 1102000,
+          "p_click": 0.1902096,
+          "image_url": "/static/images/catalog/6b21cdaff41ae221.jpg"
+        },
+        {
+          "id": 342179,
+          "name": "Tai nghe gaming Logitech G435 Lightspeed - Đen",
+          "price": 303000,
+          "p_click": 0.1899126,
+          "image_url": "/static/images/catalog/868823f810e6d8bf.jpg"
+        },
+        {
+          "id": 1187569,
+          "name": "Loa di động JBL Flip 6 âm thanh vòm - Xanh rêu",
+          "price": 928000,
+          "p_click": 0.1460991,
+          "image_url": "/static/images/catalog/c366d5473a83e25f.jpg"
+        },
+        {
+          "id": 319017,
+          "name": "Laptop Inspiron 5430 - Platinum Silver",
+          "price": 13589000,
+          "p_click": 0.2616568,
+          "image_url": "/static/images/storefront/80.webp"
+        },
+        {
+          "id": 1231240,
+          "name": "Pin sạc dự phòng Anker 20000mAh 22.5W - Tím Lilac",
+          "price": 364000,
+          "p_click": 0.1822419,
+          "image_url": "/static/images/storefront/105.webp"
+        }
+      ]
+    },
+    "17438_similar": {
+      "count": 1,
+      "model_used": true,
+      "score_type": "cosine_similarity",
+      "purchase_policy": {
+        "excluded_models": 0,
+        "recent_durable_types": [],
+        "durable_cooldown_days": 30,
+        "cancelled_orders_excluded": true
+      },
+      "post_purchase_accessories": null,
+      "items": [
+        {
+          "id": 1174694,
+          "name": "Apple iPhone 16 Pro Max 256GB VN/A - Hồng Pink",
+          "price": 28707000,
+          "similarity": 0.241381,
+          "image_url": "/static/images/storefront/123.webp"
+        }
+      ]
+    },
+    "17438_addons": {
+      "count": 6,
+      "model_used": true,
+      "score_type": "cosine_similarity",
+      "purchase_policy": {
+        "excluded_models": 0,
+        "recent_durable_types": [],
+        "durable_cooldown_days": 30,
+        "cancelled_orders_excluded": true
+      },
+      "post_purchase_accessories": null,
+      "items": [
+        {
+          "id": 22042,
+          "name": "Củ sạc nhanh Apple 20W Type-C - Trắng White",
+          "price": 443000,
+          "similarity": 0.175864,
+          "image_url": "/static/images/catalog/2ef69a8e8bbebf1e.jpg"
+        },
+        {
+          "id": 21877,
+          "name": "Củ sạc đa cổng Anker Prime 67W GaN - Đen Black",
+          "price": 300000,
+          "similarity": 0.159841,
+          "image_url": "/static/images/storefront/104.webp"
+        },
+        {
+          "id": 14711,
+          "name": "Tai nghe true wireless JBL Wave 200TWS - Đỏ rực rỡ",
+          "price": 766000,
+          "similarity": 0.132886,
+          "image_url": "/static/images/catalog/18971a1f250371e5.jpg"
+        },
+        {
+          "id": 41978,
+          "name": "Tai nghe chụp tai Sony WH-CH520 - Đen tuyền",
+          "price": 1268000,
+          "similarity": 0.119744,
+          "image_url": "/static/images/catalog/50867512f65f1c41.jpg"
+        },
+        {
+          "id": 27009,
+          "name": "Tai nghe Apple AirPods 3 MagSafe - Trắng White",
+          "price": 529000,
+          "similarity": 0.068947,
+          "image_url": "/static/images/catalog/6b21cdaff41ae221.jpg"
+        },
+        {
+          "id": 13464,
+          "name": "Tai nghe gaming Logitech G435 Lightspeed - Xanh mint",
+          "price": 336000,
+          "similarity": 0.041991,
+          "image_url": "/static/images/catalog/868823f810e6d8bf.jpg"
+        }
+      ]
+    },
+    "20739_similar": {
+      "count": 5,
+      "model_used": true,
+      "score_type": "cosine_similarity",
+      "purchase_policy": {
+        "excluded_models": 0,
+        "recent_durable_types": [],
+        "durable_cooldown_days": 30,
+        "cancelled_orders_excluded": true
+      },
+      "post_purchase_accessories": null,
+      "items": [
+        {
+          "id": 1877320,
+          "name": "Laptop Vostro 3530 - Titan Gray",
+          "price": 15330000,
+          "similarity": 0.231171,
+          "image_url": "/static/images/catalog/93e94eb4f2f9c5a2.jpg"
+        },
+        {
+          "id": 424826,
+          "name": "Laptop Thin GF63 12VE - Carbon Gray",
+          "price": 10331000,
+          "similarity": 0.198608,
+          "image_url": "/static/images/storefront/78.webp"
+        },
+        {
+          "id": 781491,
+          "name": "Laptop Legion 5 15IRX9 - Thunder Black",
+          "price": 12361000,
+          "similarity": 0.188353,
+          "image_url": "/static/images/storefront/79.webp"
+        },
+        {
+          "id": 852339,
+          "name": "Laptop IdeaPad Slim 3 15IAH8 - Arctic Grey",
+          "price": 17867000,
+          "similarity": 0.176106,
+          "image_url": "/static/images/catalog/79ef8b2506087a94.jpg"
+        },
+        {
+          "id": 959873,
+          "name": "Laptop ROG Strix G16 G614JV - Đen cá tính",
+          "price": 15896000,
+          "similarity": 0.10073,
+          "image_url": "/static/images/catalog/deb5000b89dc7274.jpg"
+        }
+      ]
+    },
+    "20739_addons": {
+      "count": 6,
+      "model_used": true,
+      "score_type": "cosine_similarity",
+      "purchase_policy": {
+        "excluded_models": 0,
+        "recent_durable_types": [],
+        "durable_cooldown_days": 30,
+        "cancelled_orders_excluded": true
+      },
+      "post_purchase_accessories": null,
+      "items": [
+        {
+          "id": 956,
+          "name": "Tai nghe Apple AirPods Pro 2 - Trắng White",
+          "price": 486000,
+          "similarity": 0.262033,
+          "image_url": "/static/images/catalog/18971a1f250371e5.jpg"
+        },
+        {
+          "id": 4527,
+          "name": "Chuột công thái học không dây Logitech MX Master 3S - Trắng",
+          "price": 290000,
+          "similarity": 0.257263,
+          "image_url": "/static/images/catalog/937049b8ceaa8a26.jpg"
+        },
+        {
+          "id": 29964,
+          "name": "Bàn phím cơ Keychron K2 Pro QMK/VIA - Đen xám Classic",
+          "price": 1632000,
+          "similarity": 0.200766,
+          "image_url": "/static/images/catalog/76b08251e39e41f3.jpg"
+        },
+        {
+          "id": 21865,
+          "name": "Tai nghe true wireless Sony WF-1000XM5 - Cam pastel",
+          "price": 1488000,
+          "similarity": 0.152511,
+          "image_url": "/static/images/catalog/6b21cdaff41ae221.jpg"
+        },
+        {
+          "id": 49582,
+          "name": "Bàn phím cơ Keychron V1 Hotswap - Carbon Retro",
+          "price": 2039000,
+          "similarity": 0.123862,
+          "image_url": "/static/images/catalog/4dc029dea4e0a8b5.jpg"
+        },
+        {
+          "id": 14643,
+          "name": "Chuột không dây Logitech Pebble M350 - Trắng",
+          "price": 343000,
+          "similarity": 0.115561,
+          "image_url": "/static/images/catalog/7caad0a5922c8026.jpg"
+        }
+      ]
+    },
+    "17150_similar": {
+      "count": 1,
+      "model_used": true,
+      "score_type": "cosine_similarity",
+      "purchase_policy": {
+        "excluded_models": 0,
+        "recent_durable_types": [],
+        "durable_cooldown_days": 30,
+        "cancelled_orders_excluded": true
+      },
+      "post_purchase_accessories": null,
+      "items": [
+        {
+          "id": 1715612,
+          "name": "Sữa chống nắng dưỡng da kiềm dầu Perfect UV Milk 60ml - Hồng phấn",
+          "price": 519000,
+          "similarity": 0.218975,
+          "image_url": "/static/images/merchandise/anessa-milk.png"
+        }
+      ]
+    },
+    "17150_addons": {
+      "count": 1,
+      "model_used": true,
+      "score_type": "cosine_similarity",
+      "purchase_policy": {
+        "excluded_models": 0,
+        "recent_durable_types": [],
+        "durable_cooldown_days": 30,
+        "cancelled_orders_excluded": true
+      },
+      "post_purchase_accessories": null,
+      "items": [
+        {
+          "id": 32412,
+          "name": "Serum cấp ẩm phục hồi da Hyalu B5 30ml - Cam trắng",
+          "price": 469000,
+          "similarity": 0.126082,
+          "image_url": "/static/images/catalog/c6a786615a7ef26b.jpg"
+        }
+      ]
+    }
+  },
+  "passed": 17,
+  "failed": 0
+}

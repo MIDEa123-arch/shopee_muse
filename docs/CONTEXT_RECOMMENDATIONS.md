@@ -2,6 +2,8 @@
 
 ## Trạng thái đang chạy
 
+Cập nhật chính sách mua hàng và ảnh: xem [test case hiện tại](TEST_CASE_GOI_Y.md) và [đối chiếu dữ liệu thật](merchandise_verification.json). Catalog tiếng Việt hiện loại mẫu đã mua/biến thể màu, bỏ đơn hủy, áp dụng khoảng nghỉ đồ bền trên trang chủ và kiểm tra loại phụ kiện cụ thể. Các kết quả test và service name ở phần lịch sử phía dưới mô tả những lần triển khai trước.
+
 Service chính hiện dùng catalog `vietnam_tiki_v1` gồm 2.000.000 dòng sản phẩm. Giao diện khách hàng chỉ dùng ngôn ngữ mua sắm thông thường; tên MUSE, raw ID, P(click), cosine và thông số mô hình chỉ xuất hiện sau khi bật **Chế độ Lab**. Tên hiển thị đã bỏ phần thông số ghép trong ngoặc, mã sản phẩm không hiện ở thẻ hoặc chi tiết, và ảnh/tên trùng không được dùng để lấp đủ số lượng.
 
 Các vị trí có mục đích riêng:

@@ -12,6 +12,8 @@ def curated_demo_titles():
 
 def product_kind(name):
     name=name.casefold()
+    if name.startswith(('balo','túi laptop','túi chống sốc','chân đế','giá đỡ','đệm tai')):
+        return ' '.join(name.split()[:3])
     kinds=('kem chống nắng','bàn phím','màn hình','củ sạc','cáp sạc','pin dự phòng',
            'tai nghe','máy hút bụi','robot hút bụi','máy pha cà phê','nồi chiên',
            'nồi cơm','đồng hồ','kính mát','kính râm','laptop','chuột','serum','son','loa')
