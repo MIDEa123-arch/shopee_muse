@@ -37,4 +37,4 @@ echo "🎉 [3/3] Đang mở đường hầm HTTPS ra Internet..."
 echo "=========================================================="
 echo " Nhấn Ctrl+C bất cứ lúc nào để dừng đường hầm."
 echo "=========================================================="
-"$CLOUDFLARED" tunnel --url http://127.0.0.1:8000
+"$CLOUDFLARED" tunnel --url http://127.0.0.1:8000 2>&1 | tee /tmp/cloudflared.log
