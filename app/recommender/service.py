@@ -314,9 +314,10 @@ class RecommendationService:
             prefixes=ELECTRONICS_COMPLEMENTS.get(target['category_id'])
             if prefixes:
                 safe=[p for p in products if p['name'].casefold().startswith(prefixes)]
-                products=safe
+                if safe:
+                    products=safe
             for p in products:
-                p['recommendation_reason']='Phụ kiện phù hợp với sản phẩm đang xem'
+                p['recommendation_reason']=f"Phụ kiện & đồ bổ trợ cho {target['name'][:30]}…"
             metadata['context_policy']='curated_complementary_categories'
         elif touchpoint=='cart':
             cart_ids={i['id'] for i in cart}
